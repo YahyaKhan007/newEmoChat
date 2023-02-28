@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "974559767385",
+    "project_id": "crew-new-b9154",
+    "storage_bucket": "crew-new-b9154.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974559767385:android:3eb997381ab53afaf23a48",
+        "android_client_info": {
+          "package_name": "com.example.brew"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUIRPitoi5C1UCFWctIsOavOhN99NwYeY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974559767385:android:eea36dde086ca9d5f23a48",
+        "android_client_info": {
+          "package_name": "com.example.simplechat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUIRPitoi5C1UCFWctIsOavOhN99NwYeY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
