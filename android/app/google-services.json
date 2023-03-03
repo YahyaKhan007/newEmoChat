@@ -1,62 +1,33 @@
 {
   "project_info": {
-    "project_number": "974559767385",
-    "project_id": "crew-new-b9154",
-    "storage_bucket": "crew-new-b9154.appspot.com"
+    "project_number": "405024659852",
+    "project_id": "emochat-database",
+    "storage_bucket": "emochat-database.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:974559767385:android:3eb997381ab53afaf23a48",
-        "android_client_info": {
-          "package_name": "com.example.brew"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDUIRPitoi5C1UCFWctIsOavOhN99NwYeY"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:974559767385:android:eea36dde086ca9d5f23a48",
+        "mobilesdk_app_id": "1:405024659852:android:55c13a506d28e2ba579ea9",
         "android_client_info": {
           "package_name": "com.example.simplechat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
+          "client_id": "405024659852-5i8nd78nfffou3gipa5bsou0k4kn55gp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDUIRPitoi5C1UCFWctIsOavOhN99NwYeY"
+          "current_key": "AIzaSyBs_dlrEdnA-jfrHn15HdCesLHgoBS0nik"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "974559767385-q0pq5gvrec9anaakecal622pk87itr47.apps.googleusercontent.com",
+              "client_id": "405024659852-5i8nd78nfffou3gipa5bsou0k4kn55gp.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

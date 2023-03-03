@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -6,12 +8,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/user_model.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/widgets/showLoading.dart';
+import '../main.dart';
+import '../models/models.dart';
 import 'screens.dart';
 
 class CompleteProfile extends StatefulWidget {
@@ -28,8 +35,11 @@ class CompleteProfile extends StatefulWidget {
 }
 
 class _CompleteProfileState extends State<CompleteProfile> {
+  final TextEditingController searchUserController = TextEditingController();
+
   File? imageFile;
   TextEditingController fullNameController = TextEditingController();
+  TextEditingController bioController = TextEditingController();
 
   var spinkit = const SpinKitSpinningLines(
     color: Colors.black,
@@ -83,7 +93,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.gallery);
-                    Navigator.of(context).pop;
+                    Navigator.pop(context);
                   },
                   title: const Text("Select from Gallery"),
                   leading: const Icon(Icons.photo_album),
@@ -91,7 +101,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.camera);
-                    Navigator.of(context).pop;
+
+                    Navigator.pop(context);
                   },
                   title: const Text("Take a Photo"),
                   leading: const Icon(Icons.camera),
@@ -106,9 +117,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
   void checkValues() {
     provider.changeUploadDataLoading(value: true);
     String fullName = fullNameController.text.trim();
-    if (fullName == "" || imageFile == null) {
-      log("Enterd all the fields");
-      provider.changeUploadDataLoading(value: false);
+    if (fullName == "" || imageFile == null || bioController.text == "") {
+      Loading.showAlertDialog(context, "Missing", "Entered all the data");
     } else {
       uploadData();
     }
@@ -116,6 +126,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
 
 // ! Check either the data is entered or not
   void uploadData() async {
+    Loading.showLoadingDialog(
+        context, "Wait! while your data is being uploading");
     UploadTask uploadTask = FirebaseStorage.instance
         .ref("profilePictures")
         .child(widget.userModel.uid.toString())
@@ -128,7 +140,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
 
     String? fullName = fullNameController.text.trim();
 
+    String? bio = bioController.text.trim();
+
     widget.userModel.fullName = fullName.toString();
+    widget.userModel.bio = bio.toString();
     widget.userModel.profilePicture = imageUrl;
 
     await FirebaseFirestore.instance
@@ -138,13 +153,17 @@ class _CompleteProfileState extends State<CompleteProfile> {
         .then((value) => ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Data Uploaded"))))
         .then((value) => provider.changeUploadDataLoading(value: false))
+        .then((value) => Navigator.popUntil(context, (route) => route.isFirst))
         .then((value) => Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (builder) => HomePage(
-                      firebaseUser: widget.firebaseUser,
-                      userModel: widget.userModel,
-                    ))));
+            PageTransition(
+                duration: const Duration(milliseconds: 700),
+                type: PageTransitionType.fade,
+                child: HomePage(
+                  firebaseUser: widget.firebaseUser,
+                  userModel: widget.userModel,
+                ),
+                isIos: true)));
   }
 
 // ! Getting Provider Value
@@ -155,8 +174,11 @@ class _CompleteProfileState extends State<CompleteProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.lightBlue.shade100,
       appBar: AppBar(
+          elevation: 0.1,
           automaticallyImplyLeading: false,
+          centerTitle: true,
           backgroundColor: Theme.of(context).colorScheme.background,
           title: const Text(
             "Complete Profile",
@@ -168,13 +190,16 @@ class _CompleteProfileState extends State<CompleteProfile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              SizedBox(
+                height: 50.h,
+              ),
               CupertinoButton(
                   onPressed: () {
                     showPhotoOption();
                   },
                   child: CircleAvatar(
                     backgroundColor: Theme.of(context).colorScheme.background,
-                    radius: 65,
+                    radius: 85.r,
                     backgroundImage:
                         (imageFile != null) ? FileImage(imageFile!) : null,
                     child: (imageFile == null)
@@ -192,6 +217,12 @@ class _CompleteProfileState extends State<CompleteProfile> {
                     labelText: "Full Name",
                     labelStyle: TextStyle(fontSize: 16)),
               ),
+              TextFormField(
+                controller: bioController,
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
+                decoration: const InputDecoration(
+                    labelText: "Bio", labelStyle: TextStyle(fontSize: 16)),
+              ),
               const SizedBox(
                 height: 30,
               ),
@@ -199,23 +230,21 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 onTap: () {
                   checkValues();
                 },
-                child: provider.uploadDataLoading
-                    ? spinkit
-                    : Container(
-                        height: 60,
-                        width: 120,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Theme.of(context).colorScheme.background),
-                        child: Center(
-                            child: Text(
-                          "Submit",
-                          style: TextStyle(
-                              color: Theme.of(context).canvasColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700),
-                        )),
-                      ),
+                child: Container(
+                  height: 60,
+                  width: 120,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).colorScheme.background),
+                  child: Center(
+                      child: Text(
+                    "Submit",
+                    style: TextStyle(
+                        color: Theme.of(context).canvasColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700),
+                  )),
+                ),
               )
             ],
           ),

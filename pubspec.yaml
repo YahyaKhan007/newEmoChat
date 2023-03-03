@@ -45,6 +45,10 @@ dependencies:
   image_cropper: ^3.0.1
   uuid: ^3.0.7
   flutter_screenutil: ^5.6.1
+  timeago: ^3.3.0
+  intl: ^0.17.0
+  animated_text_kit: ^4.2.2
+  page_transition: ^2.0.9
 
 dev_dependencies:
   flutter_test:

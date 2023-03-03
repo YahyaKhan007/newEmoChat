@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,17 +8,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:simplechat/firebase/auth_credential.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/pages/profile.dart';
-import 'package:simplechat/pages/search.dart';
+import 'package:simplechat/widgets/showLoading.dart';
 
 import '../main.dart';
 import '../models/models.dart';
 import 'screens.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key, required this.userModel, required this.firebaseUser});
+  const HomePage(
+      {super.key, required this.userModel, required this.firebaseUser});
   final UserModel userModel;
   final User firebaseUser;
 
@@ -29,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   var spinkit = const SpinKitSpinningLines(
     color: Colors.black,
-    size: 50.0,
+    size: 25.0,
   );
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
         actions: [
           CupertinoButton(
@@ -49,6 +53,7 @@ class _HomePageState extends State<HomePage> {
                 // FirebaseController().signout(context: context);
               })
         ],
+        leadingWidth: 80,
         leading: CupertinoButton(
             padding: const EdgeInsets.symmetric(horizontal: 7),
             child: CircleAvatar(
@@ -56,8 +61,14 @@ class _HomePageState extends State<HomePage> {
                 backgroundImage: NetworkImage(widget.userModel.profilePicture!),
                 backgroundColor: Theme.of(context).colorScheme.onBackground),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (builder) => const Profile()));
+              log("message");
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      duration: const Duration(milliseconds: 700),
+                      type: PageTransitionType.fade,
+                      child: const Profile(),
+                      isIos: true));
             }),
         automaticallyImplyLeading: true,
         backgroundColor: Theme.of(context).colorScheme.background,
@@ -71,8 +82,8 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: 15.h,
           ),
-          Container(
-            height: 50.h,
+          SizedBox(
+            height: 40.h,
             child: Row(
               children: [
                 const SizedBox(
@@ -92,9 +103,20 @@ class _HomePageState extends State<HomePage> {
                   width: 15,
                 ),
                 CupertinoButton(
-                    child: const Icon(Icons.search),
+                    child: const Icon(
+                      Icons.search,
+                      size: 25,
+                    ),
                     onPressed: () {
-                      setState(() {});
+                      setState(() {
+                        // search(
+                        //     context: context,
+                        //     userEmail: searchUserController.text
+                        //         .toLowerCase()
+                        //         .toString(),
+                        //     currentUserModel: widget.userModel);
+                        searchUserController.clear();
+                      });
                     })
               ],
             ),
@@ -106,8 +128,8 @@ class _HomePageState extends State<HomePage> {
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("chatrooms")
-                  .where("participants.${widget.userModel.uid}",
-                      isEqualTo: true)
+                  .where("users", arrayContains: widget.userModel.uid)
+                  .orderBy("updatedOn", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.active) {
@@ -166,57 +188,47 @@ class _HomePageState extends State<HomePage> {
                                       },
                                       child: Container(
                                           margin: EdgeInsets.symmetric(
-                                              vertical: 5.h),
-                                          height: 70.h,
+                                              vertical: 2.h),
+                                          height: 60.h,
                                           width:
                                               MediaQuery.of(context).size.width,
                                           decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                              color: Colors.blueGrey.shade50),
-                                          child: Card(
-                                              elevation: 0.1,
-                                              child: ListTile(
-                                                leading: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                      userModel
-                                                          .profilePicture!),
-                                                ),
-                                                title: Text(
-                                                  userModel.fullName!,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 15.sp),
-                                                ),
-                                                subtitle: Text(
-                                                  chatRoomModel.lastMessage!,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      fontSize: 15.sp),
-                                                ),
+                                            color: Color.fromARGB(
+                                                255, 197, 215, 225),
+                                            borderRadius:
+                                                BorderRadius.circular(10.r),
+                                          ),
+                                          child: ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                  userModel.profilePicture!),
+                                            ),
+                                            title: Text(
+                                              userModel.fullName!,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 13.sp),
+                                            ),
+                                            subtitle: Text(
+                                              chatRoomModel.lastMessage!,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(fontSize: 11.sp),
+                                            ),
 
-                                                // ! Option for Delete
-                                                trailing: GestureDetector(
-                                                    behavior: HitTestBehavior
-                                                        .deferToChild,
-                                                    onTap: () {},
-                                                    child: const Icon(
-                                                        Icons.more_vert)),
-                                              ))),
+                                            // ! Option for Delete
+                                            trailing: GestureDetector(
+                                                behavior: HitTestBehavior
+                                                    .deferToChild,
+                                                onTap: () {},
+                                                child: const Icon(
+                                                    Icons.more_vert)),
+                                          )),
                                     );
                                   } else {
                                     return Container();
                                   }
                                 } else {
-                                  return Center(
-                                    child: SizedBox(
-                                      height: 70,
-                                      width: 70,
-                                      child: spinkit,
-                                    ),
-                                  );
+                                  return spinkit;
                                 }
                               });
                         }));
@@ -238,8 +250,8 @@ class _HomePageState extends State<HomePage> {
                 } else {
                   return Center(
                     child: SizedBox(
-                      height: 70,
-                      width: 70,
+                      height: 30,
+                      width: 30,
                       child: spinkit,
                     ),
                   );
@@ -257,12 +269,135 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (builder) => SearchPage(
-                          firebaseUser: widget.firebaseUser,
-                          userModel: widget.userModel,
-                        )));
+                PageTransition(
+                    duration: const Duration(milliseconds: 700),
+                    type: PageTransitionType.fade,
+                    child: SearchPage(
+                      firebaseUser: widget.firebaseUser,
+                      userModel: widget.userModel,
+                    ),
+                    isIos: true));
           }),
     );
   }
 }
+
+// search(
+//     {required BuildContext context,
+//     required String userEmail,
+//     required UserModel currentUserModel}) {
+//   log("33");
+//   StreamBuilder(
+//     stream: FirebaseFirestore.instance
+//         .collection("users")
+//         .where("email", isEqualTo: userEmail)
+//         .where("email", isNotEqualTo: currentUserModel.email)
+//         .snapshots(),
+//     builder: (context, snapshot) {
+//       if (snapshot.connectionState == ConnectionState.active) {
+//         if (snapshot.hasData) {
+//           log("has Data");
+
+//           QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
+//           if (dataSnapshot.docs.isNotEmpty) {
+//             log("not Empty");
+//             Map<String, dynamic> userMap =
+//                 dataSnapshot.docs[0].data() as Map<String, dynamic>;
+//             UserModel searchedUser = UserModel.fromMap(userMap);
+
+//             return Material(
+//               type: MaterialType.transparency,
+//               child: Padding(
+//                 padding: const EdgeInsets.symmetric(),
+//                 child: Container(
+//                   color: Colors.white,
+//                   child: Column(
+//                     mainAxisSize: MainAxisSize.min,
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       ListTile(
+//                           onTap: () async {
+//                             // !  ******************************
+
+//                             Loading.showLoadingDialog(
+//                                 context, "Creating a chatroom");
+
+//                             // ChatRoomModel? chatRoom =
+//                             //     await getChatroomModel(searchedUser);
+//                             // Navigator.pop(context);
+//                             Navigator.pop(context);
+
+//                             // Navigator.push(
+//                             //     context,
+//                             //     PageTransition(
+//                             //         duration: const Duration(milliseconds: 700),
+//                             //         type: PageTransitionType.fade,
+//                             //         child: ChatRoom(
+//                             //           chatRoomModel: chatRoom!,
+//                             //           enduser: searchedUser,
+//                             //           firebaseUser: widget.firebaseUser!,
+//                             //           currentUserModel: widget.userModel!,
+//                             //         ),
+//                             //         isIos: true));
+//                           },
+//                           trailing: const Icon(Icons.keyboard_arrow_right),
+//                           leading: CircleAvatar(
+//                             backgroundImage:
+//                                 NetworkImage(searchedUser.profilePicture!),
+//                           ),
+//                           title: Text("${searchedUser.fullName}"),
+//                           subtitle: Text("${searchedUser.email}"))
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             );
+//           } else {}
+//         } else {
+//           return const Text("Nothing Found");
+//         }
+//       } else {
+//         return const Center(child: CircularProgressIndicator());
+//       }
+//       return const Text("");
+//     },
+//   );
+// }
+
+// Future<ChatRoomModel?> getChatroomModel(
+//     UserModel targetUser, UserModel userModel) async {
+//   ChatRoomModel? chatRoom;
+//   QuerySnapshot snapshot = await FirebaseFirestore.instance
+//       .collection("chatrooms")
+//       .where("participants.${userModel.uid}", isEqualTo: true)
+//       .where("participants.${targetUser.uid}", isEqualTo: true)
+//       .get();
+
+//   if (snapshot.docs.isNotEmpty) {
+//     var docData = snapshot.docs[0].data();
+
+//     ChatRoomModel existingChatRoom =
+//         ChatRoomModel.fromMap(docData as Map<String, dynamic>);
+
+//     chatRoom = existingChatRoom;
+//     log("Already Existed");
+//   } else {
+//     ChatRoomModel newChatRoom = ChatRoomModel(
+//         timeChatroom: Timestamp.now(),
+//         chatroomid: uuid.v1(),
+//         lastMessage: "",
+//         participants: {
+//           userModel.uid.toString(): true,
+//           targetUser.uid.toString(): true
+//         });
+//     await FirebaseFirestore.instance
+//         .collection("chatrooms")
+//         .doc(newChatRoom.chatroomid)
+//         .set(newChatRoom.toMap());
+
+//     chatRoom = newChatRoom;
+//     log("New Charoom Created");
+//   }
+//   return chatRoom;
+// }

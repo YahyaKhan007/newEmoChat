@@ -21,12 +21,12 @@ class LoadingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // !   DataUploading
-  bool _uploadDataLoading = false;
-  bool get uploadDataLoading => _uploadDataLoading;
+  // !   showPassword
+  bool _showPassword = false;
+  bool get showPassword => _showPassword;
   void changeUploadDataLoading({required bool value}) {
-    _uploadDataLoading = value;
-    log("$_uploadDataLoading");
+    _showPassword = value;
+    log("$_showPassword");
     notifyListeners();
   }
 }

@@ -4,21 +4,27 @@ class ChatRoomModel {
   String? chatroomid;
   Map<String, dynamic>? participants;
   String? lastMessage;
-  Timestamp? timeChatroom;
+  Timestamp? createdOn;
+  Timestamp? updatedOn;
+  List<dynamic>? users;
 
 // ! simple Constructor
   ChatRoomModel(
       {this.chatroomid,
       this.participants,
       this.lastMessage,
-      this.timeChatroom});
+      this.createdOn,
+      this.updatedOn,
+      this.users});
 
 //  !  will be Used to change your Map/Json data into ChatRoomModel
   ChatRoomModel.fromMap(Map<String, dynamic> map) {
     chatroomid = map["chatroomid"];
     participants = map["participants"];
     lastMessage = map["lastmessage"];
-    timeChatroom = map["timeChatroom"];
+    createdOn = map["createdOn"];
+    updatedOn = map["updatedOn"];
+    users = map["users"];
   }
 
 //  !  will be Used to change your ChatRoomModel object into Map/Json
@@ -27,7 +33,9 @@ class ChatRoomModel {
       "chatroomid": chatroomid,
       "participants": participants,
       "lastmessage": lastMessage,
-      "timeChatroom": timeChatroom,
+      "createdOn": createdOn,
+      "updatedOn": updatedOn,
+      "users": users,
     };
   }
 }

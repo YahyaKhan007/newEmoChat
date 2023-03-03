@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/widgets/showLoading.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../pages/screens.dart';
 
@@ -36,8 +38,13 @@ class FirebaseController {
     }
     if (credential != null) {
       String uid = credential.user!.uid;
-      UserModel newUser =
-          UserModel(uid: uid, fullName: "", email: email, profilePicture: "");
+      UserModel newUser = UserModel(
+          uid: uid,
+          fullName: "",
+          email: email,
+          profilePicture: "",
+          bio: "",
+          memberSince: Timestamp.now());
 
       await FirebaseFirestore.instance
           .collection("users")
@@ -46,11 +53,14 @@ class FirebaseController {
           .then((value) => provider.changeSigupLoading(value: false))
           .then((value) => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (builder) => CompleteProfile(
-                        firebaseUser: credential!.user!,
-                        userModel: newUser,
-                      ))));
+              PageTransition(
+                  duration: const Duration(milliseconds: 700),
+                  type: PageTransitionType.fade,
+                  child: CompleteProfile(
+                    firebaseUser: credential!.user!,
+                    userModel: newUser,
+                  ),
+                  isIos: true)));
     }
   }
 
@@ -82,14 +92,18 @@ class FirebaseController {
       provider.changeSigupLoading(value: false);
       Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (builder) => HomePage(
-                    firebaseUser: userCredential.user!,
-                    userModel: userModel,
-                  )));
+          PageTransition(
+              duration: const Duration(milliseconds: 700),
+              type: PageTransitionType.fade,
+              child: HomePage(
+                firebaseUser: userCredential.user!,
+                userModel: userModel,
+              ),
+              isIos: true));
 
       return true;
     } catch (e) {
+      Loading.showAlertDialog(context, "Login Error", e.toString());
       provider.changeSigupLoading(value: false);
       log("$e");
       return false;

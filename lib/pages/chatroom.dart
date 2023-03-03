@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/screens.dart';
 
@@ -51,6 +53,11 @@ class _ChatRoomState extends State<ChatRoom> {
           .set(messageModel.toMap());
 
       widget.chatRoomModel.lastMessage = msg;
+      widget.chatRoomModel.updatedOn = Timestamp.now();
+      // !   ***************************8
+      // !   ***************************8
+      // !   ***************************8
+      // !   ***************************8
 
       FirebaseFirestore.instance
           .collection("chatrooms")
@@ -69,17 +76,26 @@ class _ChatRoomState extends State<ChatRoom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.background,
         leadingWidth: 40,
+        leading: IconButton(
+            icon: const Icon(
+              CupertinoIcons.back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
         title: GestureDetector(
           onTap: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (builder) => EndUserProfile(
-                          endUser: widget.enduser,
-                        )));
+                PageTransition(
+                    duration: const Duration(milliseconds: 700),
+                    type: PageTransitionType.fade,
+                    child: EndUserProfile(endUser: widget.enduser)));
           },
           child: Row(
             children: [
@@ -124,11 +140,20 @@ class _ChatRoomState extends State<ChatRoom> {
                           MessageModel currentMessage = MessageModel.fromMap(
                               dataSnapshot.docs[index].data()
                                   as Map<String, dynamic>);
+
+                          log(currentMessage.createdOn!.millisecondsSinceEpoch
+                              .toString());
+
+                          String messgaeDate = DateFormat("EEE dd MMM   hh:mm")
+                              .format(DateTime.fromMillisecondsSinceEpoch(
+                                  currentMessage
+                                      .createdOn!.millisecondsSinceEpoch));
+
                           return messageContainer(
                               messageText: currentMessage.text.toString(),
                               sender: currentMessage.sender ==
                                   widget.currentUserModel.uid.toString(),
-                              time: currentMessage.createdOn!);
+                              time: messgaeDate);
                         });
                   } else if (snapshot.hasError) {
                     return const Center(
@@ -153,7 +178,7 @@ class _ChatRoomState extends State<ChatRoom> {
               Flexible(
                   child: TextFormField(
                 controller: messageController,
-                maxLength: null,
+                maxLines: null,
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.only(left: 15),
                     hintText: "Type a messgae ...",
@@ -167,6 +192,8 @@ class _ChatRoomState extends State<ChatRoom> {
                   child: const Icon(Icons.send),
                   onPressed: () {
                     sendMessage();
+
+                    log("");
                   })
             ],
           ),
@@ -178,7 +205,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
   Widget messageContainer(
       {required String messageText,
-      required Timestamp time,
+      required String time,
       required bool sender}) {
     return Padding(
       padding: EdgeInsets.only(
@@ -186,46 +213,54 @@ class _ChatRoomState extends State<ChatRoom> {
           bottom: 7.h,
           left: sender ? 40.w : 7.w,
           right: sender ? 7.w : 40.w),
-      child: Row(
-        mainAxisAlignment:
-            sender ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 5),
-            child: Text(
-              sender != true ? "7:10" : "",
-              style: TextStyle(fontSize: 9.sp),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft:
-                      sender ? Radius.circular(15.r) : Radius.circular(15.r),
-                  topRight:
-                      sender ? Radius.circular(15.r) : Radius.circular(15.r),
-                  bottomLeft:
-                      sender ? Radius.circular(15.r) : Radius.circular(0.r),
-                  bottomRight:
-                      sender ? Radius.circular(0.r) : Radius.circular(15.r),
+      child: Container(
+        child: Column(
+          crossAxisAlignment:
+              sender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          mainAxisAlignment:
+              sender ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft:
+                        sender ? Radius.circular(10.r) : Radius.circular(10.r),
+                    topRight:
+                        sender ? Radius.circular(10.r) : Radius.circular(10.r),
+                    bottomLeft:
+                        sender ? Radius.circular(10.r) : Radius.circular(0.r),
+                    bottomRight:
+                        sender ? Radius.circular(0.r) : Radius.circular(10.r),
+                  ),
+                  color: sender ? Colors.blue.shade100 : Colors.grey.shade300),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.7),
+                  child: Column(
+                    children: [
+                      Text(
+                        messageText,
+                        style: TextStyle(color: Colors.black, fontSize: 14.sp),
+                      ),
+                    ],
+                  ),
                 ),
-                color: sender ? Colors.blue.shade100 : Colors.grey.shade300),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-              child: Text(
-                messageText,
-                style: TextStyle(color: Colors.black, fontSize: 14.sp),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: Text(
-              sender == true ? "7:10" : "",
-              style: TextStyle(fontSize: 9.sp),
+            SizedBox(
+              height: 3.h,
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(left: 5),
+              child: Text(
+                time,
+                style: TextStyle(fontSize: 9.sp),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,8 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/chatroom.dart';
+import 'package:simplechat/widgets/showLoading.dart';
 
 import '../models/models.dart';
 
@@ -22,6 +24,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  bool isClicked = false;
   final TextEditingController searchUserController = TextEditingController();
 
   Future<ChatRoomModel?> getChatroomModel(UserModel targetUser) async {
@@ -42,13 +45,15 @@ class _SearchPageState extends State<SearchPage> {
       log("Already Existed");
     } else {
       ChatRoomModel newChatRoom = ChatRoomModel(
-          timeChatroom: Timestamp.now(),
+          createdOn: Timestamp.now(),
           chatroomid: uuid.v1(),
           lastMessage: "",
           participants: {
             widget.userModel!.uid.toString(): true,
             targetUser.uid.toString(): true
-          });
+          },
+          users: [widget.userModel!.uid.toString(), targetUser.uid.toString()],
+          updatedOn: Timestamp.now());
       await FirebaseFirestore.instance
           .collection("chatrooms")
           .doc(newChatRoom.chatroomid)
@@ -63,6 +68,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue.shade50,
       appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.background),
       body: Column(
         children: [
@@ -125,21 +131,31 @@ class _SearchPageState extends State<SearchPage> {
                             children: [
                               ListTile(
                                   onTap: () async {
-                                    log("chaeck 1");
+                                    // !  ******************************
+
+                                    Loading.showLoadingDialog(
+                                        context, "Creating a chatroom");
+
                                     ChatRoomModel? chatRoom =
                                         await getChatroomModel(searchedUser);
                                     Navigator.pop(context);
+                                    Navigator.pop(context);
+
                                     Navigator.push(
                                         context,
-                                        MaterialPageRoute(
-                                            builder: (builder) => ChatRoom(
-                                                  chatRoomModel: chatRoom!,
-                                                  enduser: searchedUser,
-                                                  firebaseUser:
-                                                      widget.firebaseUser!,
-                                                  currentUserModel:
-                                                      widget.userModel!,
-                                                )));
+                                        PageTransition(
+                                            duration: const Duration(
+                                                milliseconds: 700),
+                                            type: PageTransitionType.fade,
+                                            child: ChatRoom(
+                                              chatRoomModel: chatRoom!,
+                                              enduser: searchedUser,
+                                              firebaseUser:
+                                                  widget.firebaseUser!,
+                                              currentUserModel:
+                                                  widget.userModel!,
+                                            ),
+                                            isIos: true));
                                   },
                                   trailing:
                                       const Icon(Icons.keyboard_arrow_right),
