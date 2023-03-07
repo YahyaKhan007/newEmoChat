@@ -17,7 +17,7 @@ class Loading {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SpinKitSpinningLines(
-              color: Colors.black,
+              color: Colors.white,
               size: 35.0,
             ),
             const SizedBox(

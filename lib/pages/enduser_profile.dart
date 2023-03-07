@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 import '../models/models.dart';
 
@@ -12,18 +13,18 @@ class EndUserProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.blue.shade50,
+        backgroundColor: Colors.deepPurpleAccent,
         appBar: AppBar(
           elevation: 0,
           leading: IconButton(
               icon: const Icon(
                 CupertinoIcons.back,
-                color: Colors.grey,
+                color: Colors.white,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               }),
-          backgroundColor: Colors.blue.shade50,
+          backgroundColor: Colors.deepPurpleAccent,
         ),
         body: Center(
           child: Column(
@@ -48,14 +49,14 @@ class EndUserProfile extends StatelessWidget {
                           Text(
                             endUser.fullName!,
                             style: TextStyle(
-                                color: Colors.grey.shade600,
+                                color: Colors.white,
                                 fontSize: 17.sp,
                                 fontWeight: FontWeight.w600),
                           ),
                           Text(
                             endUser.email!,
                             style: TextStyle(
-                                color: Colors.grey.shade600,
+                                color: Colors.white,
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.w300),
                           )
@@ -75,17 +76,24 @@ class EndUserProfile extends StatelessWidget {
                 //         backgroundImage: NetworkImage(endUser.profilePicture!),
                 //       ),
                 //     )),
+
                 option(context,
-                    label: "Member Since", value: "7 Jan 2020 06:53"),
-                option(context,
-                    label: "Bio", value: "Dont put all your eggs in one plate"),
+                    label: "Member Since",
+                    value: DateFormat("EEE dd MMM   hh:mm").format(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            endUser.memberSince!.millisecondsSinceEpoch))),
+
+                option(context, label: "Bio", value: endUser.bio!),
               ]),
         ));
   }
 }
 
-Widget option(BuildContext context,
-    {required String label, required String value}) {
+Widget option(
+  BuildContext context, {
+  required String label,
+  required String value,
+}) {
   return Padding(
     padding: EdgeInsets.only(left: 20.w, top: 30.h),
     child: Row(
@@ -96,7 +104,7 @@ Widget option(BuildContext context,
           child: Text(
             label,
             style: TextStyle(
-                color: Colors.grey.shade600,
+                color: Colors.white,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600),
           ),
@@ -127,8 +135,8 @@ Widget option(BuildContext context,
                 fit: BoxFit.cover,
                 child: Text(
                   value,
-                  style: TextStyle(
-                      color: Colors.grey.shade600,
+                  style: const TextStyle(
+                      color: Colors.white,
                       fontSize: 15,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w300),
@@ -139,8 +147,8 @@ Widget option(BuildContext context,
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 1,
-                color: Colors.grey.shade600,
+                height: 0.8,
+                color: Colors.grey.shade100,
               )
             ],
           ),

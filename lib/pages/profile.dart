@@ -1,17 +1,13 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
-import '../main.dart';
 import 'enduser_profile.dart';
 import 'screens.dart';
 
@@ -21,18 +17,18 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.blue.shade50,
+        backgroundColor: Colors.deepPurpleAccent,
         appBar: AppBar(
           elevation: 0,
           leading: IconButton(
               icon: const Icon(
                 CupertinoIcons.back,
-                color: Colors.grey,
+                color: Colors.white,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               }),
-          backgroundColor: Colors.blue.shade50,
+          backgroundColor: Colors.deepPurpleAccent,
         ),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance
@@ -72,14 +68,14 @@ class Profile extends StatelessWidget {
                                     Text(
                                       userModel.fullName!,
                                       style: TextStyle(
-                                          color: Colors.grey.shade600,
+                                          color: Colors.white,
                                           fontSize: 17.sp,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     Text(
                                       userModel.email!,
                                       style: TextStyle(
-                                          color: Colors.grey.shade600,
+                                          color: Colors.white,
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w300),
                                     )
@@ -130,13 +126,13 @@ class Profile extends StatelessWidget {
                         ]),
                   );
                 } else {
-                  return Text("NoOne Found");
+                  return const Text("NoOne Found");
                 }
               } else {
-                return CircularProgressIndicator();
+                return const CircularProgressIndicator();
               }
             } else {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             }
           },
         ));

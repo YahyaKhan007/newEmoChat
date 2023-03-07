@@ -12,6 +12,7 @@ import 'package:simplechat/widgets/showLoading.dart';
 import '../provider/loading_provider.dart';
 import 'screens.dart';
 
+// ignore: must_be_immutable
 class Signup extends StatelessWidget {
   Signup({super.key});
   var spinkit = const SpinKitSpinningLines(
@@ -38,7 +39,7 @@ class Signup extends StatelessWidget {
     final provider = Provider.of<LoadingProvider>(context, listen: true);
 
     return Scaffold(
-      backgroundColor: Colors.lightBlue.shade100,
+      backgroundColor: Colors.deepPurpleAccent.shade200,
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -52,7 +53,7 @@ class Signup extends StatelessWidget {
             },
             child: Text(
               "Login here",
-              style: TextStyle(color: Theme.of(context).primaryColor),
+              style: TextStyle(color: Colors.amber.shade200),
             ),
           ),
         ],
@@ -77,14 +78,14 @@ class Signup extends StatelessWidget {
                           // fontFamily: ,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
-                          color: Colors.purple,
+                          color: Colors.amber,
                         ))
                   ]),
             ),
             Container(
               height: 300.h,
               decoration: BoxDecoration(
-                  color: Colors.lightBlue.shade200,
+                  color: Colors.amber.shade200.withOpacity(0.8),
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(100.r),
                       bottomRight: Radius.circular(100.r))),
@@ -198,7 +199,7 @@ class Signup extends StatelessWidget {
                       height: 70,
                       width: 100,
                       decoration: BoxDecoration(
-                          color: Colors.purple,
+                          color: Colors.amber.shade200.withOpacity(0.8),
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50.r),
                               bottomRight: Radius.circular(50.r))),

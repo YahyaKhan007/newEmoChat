@@ -1,15 +1,21 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/screens.dart';
+import 'package:simplechat/provider/randomNameGenerator.dart';
 
 import '../models/models.dart';
 
@@ -31,15 +37,221 @@ class ChatRoom extends StatefulWidget {
 }
 
 class _ChatRoomState extends State<ChatRoom> {
+  late int randomName;
+  File? imageFile;
   final TextEditingController messageController = TextEditingController();
+  final TextEditingController messageNextController = TextEditingController();
 
-  void sendMessage() async {
-    String msg = messageController.text.trim();
+// ! Selecting the Image
+  void selectImage(ImageSource source) async {
+    XFile? pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile != null) {
+      // ! we are cropping the image now
+      cropImage(pickedFile);
+    }
+  }
+
+// ! Cropping the Image
+  void cropImage(XFile file) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: file.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressQuality: 20);
+    if (croppedImage != null) {
+      // ! we need "a value of File Type" so here we are converting the from CropperdFile to File
+      final File croppedFile = File(
+        croppedImage.path,
+      );
+      setState(() {
+        log("storing the image");
+        imageFile = croppedFile;
+        if (imageFile != null) {
+          log("photo is stored");
+
+          // !   ************
+          sendPhoto(context);
+        }
+      });
+    }
+  }
+
+  // ! sending photo
+  sendPhoto(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: Colors.black,
+            resizeToAvoidBottomInset: true,
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: Stack(
+                      // alignment: Alignment.topRight,
+                      children: [
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.8,
+                            width: MediaQuery.of(context).size.width,
+                            child: Image.file(
+                              imageFile!,
+                              fit: BoxFit.fill,
+                            )),
+                        Positioned(
+                          top: 20,
+                          child: CupertinoButton(
+                              child: const CircleAvatar(
+                                backgroundColor: Colors.grey,
+                                child: Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                setState(() {
+                                  messageController.clear();
+                                  imageFile = null;
+                                });
+                              }),
+                        ),
+                        Positioned(
+                          bottom: 95,
+                          right: 25,
+                          left: 25,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  50,
+                                ),
+                                border: Border.all(color: Colors.white54),
+                                color: Colors.black),
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 20.w, right: 20.w),
+                              child: TextField(
+                                maxLines: null,
+                                controller: messageNextController,
+                                style: TextStyle(
+                                    fontSize: 13.sp, color: Colors.white),
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Add a Caption...",
+                                    hintStyle: TextStyle(
+                                        fontSize: 13.sp,
+                                        color: Colors.white,
+                                        fontStyle: FontStyle.italic)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 20,
+                          right: 20, bottom: 20,
+                          // height: ,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8.h),
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Center(
+                                  child: Text(
+                                    widget.enduser.fullName!,
+                                    style: TextStyle(fontSize: 15.sp),
+                                  ),
+                                ),
+                              ),
+                              CupertinoButton(
+                                  child: const CircleAvatar(
+                                    backgroundColor: Colors.blue,
+                                    child: Icon(Icons.send),
+                                  ),
+                                  onPressed: () {
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+                                    // ! ********************
+
+                                    sendMessage(
+                                        msg: messageNextController.text.trim());
+                                    Navigator.pop(context);
+                                  })
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  // ! Options for picking a photo
+  void showPhotoOption() {
+    showDialog(
+        context: context,
+        builder: (builder) {
+          return AlertDialog(
+            title: const Text("Upload Profile Photo"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  onTap: () {
+                    selectImage(ImageSource.gallery);
+                    Navigator.pop(context);
+                  },
+                  title: const Text("Select from Gallery"),
+                  leading: const Icon(Icons.photo_album),
+                ),
+                ListTile(
+                  onTap: () {
+                    selectImage(ImageSource.camera);
+
+                    Navigator.pop(context);
+                  },
+                  title: const Text("Take a Photo"),
+                  leading: const Icon(Icons.camera),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void sendMessage({required String? msg}) async {
+    MessageModel? messageModel;
+    // String? msg = messageController.text.trim();
     messageController.clear();
 
-    if (msg != "") {
-      MessageModel messageModel = MessageModel(
+// ! for simple message
+    if (msg != "" && imageFile == null) {
+      messageModel = MessageModel(
           createdOn: Timestamp.now(),
+          image: "",
           messageId: uuid.v1(),
           seen: false,
           sender: widget.currentUserModel.uid,
@@ -52,12 +264,85 @@ class _ChatRoomState extends State<ChatRoom> {
           .doc(messageModel.messageId)
           .set(messageModel.toMap());
 
-      widget.chatRoomModel.lastMessage = msg;
       widget.chatRoomModel.updatedOn = Timestamp.now();
-      // !   ***************************8
-      // !   ***************************8
-      // !   ***************************8
-      // !   ***************************8
+      widget.chatRoomModel.lastMessage = msg;
+
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(widget.chatRoomModel.chatroomid)
+          .set(widget.chatRoomModel.toMap());
+
+      log("Message has been send");
+    }
+
+    // ! for message with picture
+    else if (imageFile != null && msg != "") {
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref(
+              "PicturesBetween${widget.currentUserModel.fullName} and ${widget.enduser.fullName}")
+          .child(randomName.toString())
+          .putFile(imageFile!);
+
+      TaskSnapshot snapshot = await uploadTask;
+
+      // ! we need imageUrl of the profile photo inOrder to Upload it on FirebaseFirestore
+      String imageUrl = await snapshot.ref.getDownloadURL();
+      messageModel = MessageModel(
+          createdOn: Timestamp.now(),
+          image: imageUrl,
+          messageId: uuid.v1(),
+          seen: false,
+          sender: widget.currentUserModel.uid,
+          text: msg);
+
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(widget.chatRoomModel.chatroomid)
+          .collection("messages")
+          .doc(messageModel.messageId)
+          .set(messageModel.toMap());
+
+      widget.chatRoomModel.updatedOn = Timestamp.now();
+      widget.chatRoomModel.lastMessage = msg;
+
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(widget.chatRoomModel.chatroomid)
+          .set(widget.chatRoomModel.toMap());
+
+      log("Message has been send");
+    }
+
+    // ! for just picture
+
+    else if (msg == "" && imageFile != null) {
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref(
+              "Pictures from ${widget.currentUserModel.fullName} to ${widget.enduser.fullName}")
+          .child(randomName.toString())
+          .putFile(imageFile!);
+
+      TaskSnapshot snapshot = await uploadTask;
+
+      // ! we need imageUrl of the profile photo inOrder to Upload it on FirebaseFirestore
+      String imageUrl = await snapshot.ref.getDownloadURL();
+      messageModel = MessageModel(
+          createdOn: Timestamp.now(),
+          image: imageUrl,
+          messageId: uuid.v1(),
+          seen: false,
+          sender: widget.currentUserModel.uid,
+          text: "");
+
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(widget.chatRoomModel.chatroomid)
+          .collection("messages")
+          .doc(messageModel.messageId)
+          .set(messageModel.toMap());
+
+      widget.chatRoomModel.updatedOn = Timestamp.now();
+      widget.chatRoomModel.lastMessage = "photo";
 
       FirebaseFirestore.instance
           .collection("chatrooms")
@@ -69,16 +354,19 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   var spinkit = const SpinKitSpinningLines(
-    color: Colors.black,
+    color: Colors.white,
     size: 50.0,
   );
 
+  // !  provider
+
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<RandomName>(context);
     return Scaffold(
-      backgroundColor: Colors.blue.shade50,
+      backgroundColor: Colors.deepPurpleAccent.shade200,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Colors.deepPurpleAccent.shade200,
         leadingWidth: 40,
         leading: IconButton(
             icon: const Icon(
@@ -131,30 +419,53 @@ class _ChatRoomState extends State<ChatRoom> {
                 if (snapshot.connectionState == ConnectionState.active) {
                   if (snapshot.hasData) {
                     QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
+                    log(dataSnapshot.docs.length.toString());
 
-                    return ListView.builder(
-                        reverse: true,
-                        itemCount: dataSnapshot.docs.length,
-                        itemBuilder: (context, index) {
-                          // ! converting to message model
-                          MessageModel currentMessage = MessageModel.fromMap(
-                              dataSnapshot.docs[index].data()
-                                  as Map<String, dynamic>);
+                    return dataSnapshot.docs.length != 0
+                        ? ListView.builder(
+                            reverse: true,
+                            itemCount: dataSnapshot.docs.length,
+                            itemBuilder: (context, index) {
+                              // ! converting to message model
+                              MessageModel currentMessage =
+                                  MessageModel.fromMap(dataSnapshot.docs[index]
+                                      .data() as Map<String, dynamic>);
 
-                          log(currentMessage.createdOn!.millisecondsSinceEpoch
-                              .toString());
+                              log(currentMessage
+                                  .createdOn!.millisecondsSinceEpoch
+                                  .toString());
 
-                          String messgaeDate = DateFormat("EEE dd MMM   hh:mm")
-                              .format(DateTime.fromMillisecondsSinceEpoch(
-                                  currentMessage
-                                      .createdOn!.millisecondsSinceEpoch));
+                              String messgaeDate =
+                                  DateFormat("EEE dd MMM   hh:mm").format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          currentMessage.createdOn!
+                                              .millisecondsSinceEpoch));
 
-                          return messageContainer(
-                              messageText: currentMessage.text.toString(),
-                              sender: currentMessage.sender ==
-                                  widget.currentUserModel.uid.toString(),
-                              time: messgaeDate);
-                        });
+                              return currentMessage.sender ==
+                                          widget.currentUserModel.uid
+                                              .toString() &&
+                                      provider.disbale
+                                  ? spinkit
+                                  : messageContainer(
+                                      image: currentMessage.image != ""
+                                          ? currentMessage.image
+                                          : null,
+                                      messageText: currentMessage.text == ""
+                                          ? null
+                                          : currentMessage.text.toString(),
+                                      sender: currentMessage.sender ==
+                                          widget.currentUserModel.uid
+                                              .toString(),
+                                      time: messgaeDate);
+                            })
+                        : const Center(
+                            child: Text(
+                              "Say hi! to start a conversation!",
+                              style: TextStyle(
+                                  color: Colors.amber,
+                                  fontStyle: FontStyle.italic),
+                            ),
+                          );
                   } else if (snapshot.hasError) {
                     return const Center(
                       child: Text("Internet Issue"),
@@ -172,26 +483,54 @@ class _ChatRoomState extends State<ChatRoom> {
               })),
         )),
         Container(
-          color: Colors.blue.shade50,
+          color: Colors.deepPurpleAccent.shade200,
           child: Row(
             children: [
               Flexible(
                   child: TextFormField(
+                // textAlignVertical: TextAlignVertical.top,
+                // textAlign: TextAlign.center,
                 controller: messageController,
+                style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                cursorColor: Colors.white,
                 maxLines: null,
+                enabled: imageFile != null ? false : true,
                 decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.only(left: 15),
+                    contentPadding: EdgeInsets.only(
+                      left: 15,
+                    ),
                     hintText: "Type a messgae ...",
                     hintStyle: TextStyle(
                       fontStyle: FontStyle.italic,
+                      color: Colors.white,
                       fontSize: 14,
                     ),
                     border: InputBorder.none),
               )),
               CupertinoButton(
-                  child: const Icon(Icons.send),
+                  child: const Icon(
+                    Icons.photo_camera,
+                    color: Colors.white,
+                  ),
                   onPressed: () {
-                    sendMessage();
+                    // sendMessage();
+
+                    provider.randomNameChanger(value: provider.randomName + 1);
+                    randomName = provider.randomName;
+                    setState(() {});
+                    log("$randomName");
+                    showPhotoOption();
+                  }),
+              CupertinoButton(
+                  child: const Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    sendMessage(msg: messageController.text.trim());
+                    setState(() {
+                      imageFile = null;
+                    });
 
                     log("");
                   })
@@ -204,7 +543,8 @@ class _ChatRoomState extends State<ChatRoom> {
 // !  This is Widget in which we will show messages to the user
 
   Widget messageContainer(
-      {required String messageText,
+      {required String? messageText,
+      required String? image,
       required String time,
       required bool sender}) {
     return Padding(
@@ -213,54 +553,103 @@ class _ChatRoomState extends State<ChatRoom> {
           bottom: 7.h,
           left: sender ? 40.w : 7.w,
           right: sender ? 7.w : 40.w),
-      child: Container(
-        child: Column(
-          crossAxisAlignment:
-              sender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          mainAxisAlignment:
-              sender ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft:
-                        sender ? Radius.circular(10.r) : Radius.circular(10.r),
-                    topRight:
-                        sender ? Radius.circular(10.r) : Radius.circular(10.r),
-                    bottomLeft:
-                        sender ? Radius.circular(10.r) : Radius.circular(0.r),
-                    bottomRight:
-                        sender ? Radius.circular(0.r) : Radius.circular(10.r),
-                  ),
-                  color: sender ? Colors.blue.shade100 : Colors.grey.shade300),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.7),
-                  child: Column(
-                    children: [
-                      Text(
-                        messageText,
-                        style: TextStyle(color: Colors.black, fontSize: 14.sp),
-                      ),
-                    ],
-                  ),
+      child: Column(
+        crossAxisAlignment:
+            sender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        mainAxisAlignment:
+            sender ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft:
+                      sender ? Radius.circular(15.r) : Radius.circular(15.r),
+                  topRight:
+                      sender ? Radius.circular(15.r) : Radius.circular(15.r),
+                  bottomLeft:
+                      sender ? Radius.circular(15.r) : Radius.circular(0.r),
+                  bottomRight:
+                      sender ? Radius.circular(0.r) : Radius.circular(15.r),
                 ),
+                color: sender ? Colors.yellow.shade100 : Colors.green.shade300),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.7),
+              child: Column(
+                crossAxisAlignment:
+                    sender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                mainAxisAlignment:
+                    sender ? MainAxisAlignment.end : MainAxisAlignment.start,
+                children: [
+                  image != null
+                      ? GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                                backgroundColor: Colors.transparent,
+                                constraints: BoxConstraints.expand(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height),
+                                context: context,
+                                builder: (builder) {
+                                  return Material(
+                                    type: MaterialType.transparency,
+                                    elevation: 0,
+                                    child: Container(
+                                      color: Colors.black,
+                                      height:
+                                          MediaQuery.of(context).size.height,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Expanded(
+                                            child: Image.network(image,
+                                                fit: BoxFit.cover),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.35,
+                            width: MediaQuery.of(context).size.height * 0.35,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.network(
+                                image,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                  messageText != null
+                      ? Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 8.h),
+                          child: Text(
+                            messageText,
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 14.sp),
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
               ),
             ),
-            SizedBox(
-              height: 3.h,
+          ),
+          SizedBox(
+            height: 3.h,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: Text(
+              time,
+              style: TextStyle(fontSize: 9.sp, color: Colors.white),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5),
-              child: Text(
-                time,
-                style: TextStyle(fontSize: 9.sp),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

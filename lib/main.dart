@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/models/models.dart';
-import 'package:simplechat/provider/disableButtonProvider.dart';
+import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,6 +18,19 @@ void main() async {
 
   User? currentUser = FirebaseAuth.instance.currentUser;
   UserModel? thisUserModel;
+
+  // try {
+  //   if (Platform.isAndroid || Platform.isIOS) {
+  //     final RemoteMessage? remoteMessage =
+  //         await FirebaseMessaging.instance.getInitialMessage();
+  //     if (remoteMessage != null) {
+  //       // _orderID = remoteMessage.notification?.titleLocKey != null?
+  //       // int.parse(remoteMessage.notification!.titleLocKey!) : null;
+
+  //       log("The phone is Android");
+  //     }
+  //   }
+  // } catch (e) {}
 
   if (currentUser != null) {
     thisUserModel = await FirebaseHelper.getUserModelById(currentUser.uid);
@@ -52,7 +65,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ListenableProvider(create: (_) => LoadingProvider()),
-        ListenableProvider(create: (_) => DisableButtonProvider())
+        ListenableProvider(create: (_) => RandomName())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -76,7 +89,10 @@ class MyAppLoggedIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ListenableProvider(create: (_) => LoadingProvider())],
+      providers: [
+        ListenableProvider(create: (_) => LoadingProvider()),
+        ListenableProvider(create: (_) => RandomName()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',

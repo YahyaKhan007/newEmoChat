@@ -10,6 +10,7 @@ import 'package:simplechat/firebase/auth_credential.dart';
 import '../provider/loading_provider.dart';
 import 'screens.dart';
 
+// ignore: must_be_immutable
 class Login extends StatelessWidget {
   Login({super.key});
 
@@ -26,7 +27,7 @@ class Login extends StatelessWidget {
     final provider = Provider.of<LoadingProvider>(context, listen: true);
 
     return Scaffold(
-      backgroundColor: Colors.lightBlue.shade100,
+      backgroundColor: Colors.deepPurpleAccent.shade200,
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -46,7 +47,7 @@ class Login extends StatelessWidget {
             },
             child: Text(
               "Signup here",
-              style: TextStyle(color: Theme.of(context).primaryColor),
+              style: TextStyle(color: Colors.amber.shade200),
             ),
           ),
         ],
@@ -72,7 +73,7 @@ class Login extends StatelessWidget {
                             // fontFamily: ,
                             fontWeight: FontWeight.bold,
                             fontStyle: FontStyle.italic,
-                            color: Colors.purple,
+                            color: Colors.amber,
                           ))
                     ]),
               ),
@@ -80,7 +81,7 @@ class Login extends StatelessWidget {
             Container(
               height: 250.h,
               decoration: BoxDecoration(
-                  color: Colors.lightBlue.shade200,
+                  color: Colors.amber.shade200.withOpacity(0.9),
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(100.r),
                       bottomRight: Radius.circular(100.r))),
@@ -141,25 +142,6 @@ class Login extends StatelessWidget {
                 ],
               ),
             ),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-
-            // TextFormField(
-            //   controller: emailController,
-            //   style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
-            //   decoration: const InputDecoration(
-            //       labelText: "Email", labelStyle: TextStyle(fontSize: 16)),
-            // ),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-            // TextFormField(
-            //   controller: passwordController,
-            //   style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
-            //   decoration: const InputDecoration(
-            //       labelText: "Password", labelStyle: TextStyle(fontSize: 16)),
-            // ),
             SizedBox(
               height: 25.h,
             ),
@@ -178,7 +160,7 @@ class Login extends StatelessWidget {
                       height: 70,
                       width: 100,
                       decoration: BoxDecoration(
-                          color: Colors.purple,
+                          color: Colors.amber.shade200.withOpacity(0.9),
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50.r),
                               bottomRight: Radius.circular(50.r))),
@@ -189,37 +171,6 @@ class Login extends StatelessWidget {
                       )),
                     ),
                   ),
-
-            // const SizedBox(
-            //   height: 20,
-            // ),
-            // GestureDetector(
-            //   onTap: () async {
-            //     Future<bool> res = FirebaseController().login(
-            //         context: context,
-            //         email: emailController.text.toLowerCase(),
-            //         password: passwordController.text.toLowerCase());
-
-            //     log("$res");
-            //   },
-            //   child: provider.loginLoading
-            //       ? spinkit
-            //       : Container(
-            //           height: 60,
-            //           width: 120,
-            //           decoration: BoxDecoration(
-            //               borderRadius: BorderRadius.circular(10),
-            //               color: Theme.of(context).colorScheme.background),
-            //           child: Center(
-            //               child: Text(
-            //             "Login",
-            //             style: TextStyle(
-            //                 color: Theme.of(context).canvasColor,
-            //                 fontSize: 18,
-            //                 fontWeight: FontWeight.w700),
-            //           )),
-            //         ),
-            // )
           ],
         ),
       ),
@@ -237,7 +188,7 @@ final kTextFieldBorder = OutlineInputBorder(
 final kButtonTextStyle = TextStyle(
     fontSize: 15.sp,
     // fontFamily: '',
-    color: Colors.white);
+    color: Colors.black);
 
 final kTextFieldInputStyle = TextStyle(
   fontSize: 13.sp, color: Colors.black,

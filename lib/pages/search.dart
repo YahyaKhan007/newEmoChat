@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/chatroom.dart';
@@ -68,8 +70,11 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue.shade50,
-      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.background),
+      backgroundColor: Colors.deepPurpleAccent.shade200,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.deepPurpleAccent.shade200,
+      ),
       body: Column(
         children: [
           const SizedBox(
@@ -81,20 +86,30 @@ class _SearchPageState extends State<SearchPage> {
                 width: 15,
               ),
               Expanded(
-                child: TextField(
-                  controller: searchUserController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      labelText: "Search User",
-                      labelStyle: const TextStyle(fontSize: 16)),
+                child: Container(
+                  height: 50.h,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15.r)),
+                  child: TextField(
+                    controller: searchUserController,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.white),
+                            borderRadius: BorderRadius.circular(15.r)),
+                        hintText: "Search User",
+                        hintStyle: const TextStyle(fontSize: 16)),
+                  ),
                 ),
               ),
               const SizedBox(
                 width: 15,
               ),
               CupertinoButton(
-                  child: const Icon(Icons.search),
+                  child: const Icon(
+                    Icons.search,
+                    color: Colors.white,
+                  ),
                   onPressed: () {
                     setState(() {});
                   })
@@ -123,7 +138,11 @@ class _SearchPageState extends State<SearchPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(),
                         child: Container(
-                          color: Colors.white,
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 15.w, vertical: 10.h),
+                          decoration: BoxDecoration(
+                              color: Colors.amber.shade300,
+                              borderRadius: BorderRadius.circular(8)),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -170,14 +189,31 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                     );
-                  } else {}
+                  } else {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 50),
+                        child: Text(
+                          "NoOne Found with this specefic email",
+                          style:
+                              TextStyle(fontSize: 14.sp, color: Colors.amber),
+                        ),
+                      ),
+                    );
+                  }
                 } else {
                   return const Text("Nothing Found");
                 }
               } else {
-                return const Center(child: CircularProgressIndicator());
+                return const Padding(
+                  padding: EdgeInsets.only(top: 30),
+                  child: Center(
+                      child: SpinKitSpinningLines(
+                    color: Colors.white,
+                    size: 25.0,
+                  )),
+                );
               }
-              return const Text("");
             },
           )
         ],

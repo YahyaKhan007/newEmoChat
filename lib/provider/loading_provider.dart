@@ -13,11 +13,9 @@ class LoadingProvider extends ChangeNotifier {
   }
 
   // !   login Loading
-  bool _loginLoading = false;
 
   bool get loginLoading => _signUpLoading;
   void changeLoginLoading({required bool value}) {
-    _loginLoading = value;
     notifyListeners();
   }
 

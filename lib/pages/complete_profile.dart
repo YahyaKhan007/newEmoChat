@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,7 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:simplechat/models/user_model.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
-import '../main.dart';
+
 import '../models/models.dart';
 import 'screens.dart';
 
@@ -42,7 +41,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
   TextEditingController bioController = TextEditingController();
 
   var spinkit = const SpinKitSpinningLines(
-    color: Colors.black,
+    color: Colors.white,
     size: 50.0,
   );
 
@@ -174,12 +173,12 @@ class _CompleteProfileState extends State<CompleteProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue.shade100,
+      backgroundColor: Colors.deepPurpleAccent.shade200,
       appBar: AppBar(
           elevation: 0.1,
           automaticallyImplyLeading: false,
           centerTitle: true,
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Colors.deepPurpleAccent.shade200,
           title: const Text(
             "Complete Profile",
             style: TextStyle(),
@@ -198,30 +197,31 @@ class _CompleteProfileState extends State<CompleteProfile> {
                     showPhotoOption();
                   },
                   child: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor: Colors.amber.shade200.withOpacity(0.8),
                     radius: 85.r,
                     backgroundImage:
                         (imageFile != null) ? FileImage(imageFile!) : null,
                     child: (imageFile == null)
-                        ? const Icon(
+                        ? Icon(
                             Icons.person,
-                            color: Colors.white,
-                            size: 55,
+                            color: Colors.grey.shade700,
+                            size: 65.r,
                           )
                         : null,
                   )),
               TextFormField(
                 controller: fullNameController,
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
+                style: const TextStyle(fontSize: 16, color: Colors.white),
                 decoration: const InputDecoration(
                     labelText: "Full Name",
-                    labelStyle: TextStyle(fontSize: 16)),
+                    labelStyle: TextStyle(fontSize: 16, color: Colors.white)),
               ),
               TextFormField(
                 controller: bioController,
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
+                style: const TextStyle(fontSize: 16, color: Colors.white),
                 decoration: const InputDecoration(
-                    labelText: "Bio", labelStyle: TextStyle(fontSize: 16)),
+                    labelText: "Bio",
+                    labelStyle: TextStyle(fontSize: 16, color: Colors.white)),
               ),
               const SizedBox(
                 height: 30,
@@ -231,18 +231,17 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   checkValues();
                 },
                 child: Container(
-                  height: 60,
-                  width: 120,
+                  height: 70,
+                  width: 100,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).colorScheme.background),
+                      color: Colors.amber.shade200.withOpacity(0.8),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50.r),
+                          bottomRight: Radius.circular(50.r))),
                   child: Center(
                       child: Text(
                     "Submit",
-                    style: TextStyle(
-                        color: Theme.of(context).canvasColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700),
+                    style: kButtonTextStyle,
                   )),
                 ),
               )
