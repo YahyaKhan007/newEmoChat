@@ -7,6 +7,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
+import '../colors/colors.dart';
 import '../provider/loading_provider.dart';
 import 'screens.dart';
 
@@ -27,13 +28,13 @@ class Login extends StatelessWidget {
     final provider = Provider.of<LoadingProvider>(context, listen: true);
 
     return Scaffold(
-      backgroundColor: Colors.deepPurpleAccent.shade200,
+      backgroundColor: AppColors.backgroudColor,
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
             "Don't have an Account?",
-            style: TextStyle(fontStyle: FontStyle.italic),
+            style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
           ),
           CupertinoButton(
             onPressed: () {
@@ -45,9 +46,10 @@ class Login extends StatelessWidget {
                       child: Signup(),
                       isIos: true));
             },
-            child: Text(
+            child: const Text(
               "Signup here",
-              style: TextStyle(color: Colors.amber.shade200),
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -73,7 +75,7 @@ class Login extends StatelessWidget {
                             // fontFamily: ,
                             fontWeight: FontWeight.bold,
                             fontStyle: FontStyle.italic,
-                            color: Colors.amber,
+                            color: Colors.black,
                           ))
                     ]),
               ),
@@ -81,7 +83,10 @@ class Login extends StatelessWidget {
             Container(
               height: 250.h,
               decoration: BoxDecoration(
-                  color: Colors.amber.shade200.withOpacity(0.9),
+                  boxShadow: [
+                    AppColors.containerShadow,
+                  ],
+                  color: AppColors.foregroundColor,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(100.r),
                       bottomRight: Radius.circular(100.r))),
@@ -94,7 +99,9 @@ class Login extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 25.h),
                     child: Container(
                         margin: EdgeInsets.symmetric(vertical: 12.h),
-                        decoration: const BoxDecoration(
+                        decoration: const BoxDecoration(boxShadow: [
+                          // AppColors.containerShadow,
+                        ]
                             // borderRadius: BorderRadius.circular(15),
                             ),
                         child: TextField(
@@ -121,7 +128,9 @@ class Login extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 25.h),
                     child: Container(
                         margin: EdgeInsets.symmetric(vertical: 12.h),
-                        decoration: const BoxDecoration(
+                        decoration: const BoxDecoration(boxShadow: [
+                          // AppColors.containerShadow,
+                        ]
                             // borderRadius: BorderRadius.circular(15),
                             ),
                         child: TextField(
@@ -160,7 +169,8 @@ class Login extends StatelessWidget {
                       height: 70,
                       width: 100,
                       decoration: BoxDecoration(
-                          color: Colors.amber.shade200.withOpacity(0.9),
+                          boxShadow: [AppColors.containerShadow],
+                          color: AppColors.foregroundColor,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50.r),
                               bottomRight: Radius.circular(50.r))),
@@ -188,6 +198,7 @@ final kTextFieldBorder = OutlineInputBorder(
 final kButtonTextStyle = TextStyle(
     fontSize: 15.sp,
     // fontFamily: '',
+    fontWeight: FontWeight.bold,
     color: Colors.black);
 
 final kTextFieldInputStyle = TextStyle(

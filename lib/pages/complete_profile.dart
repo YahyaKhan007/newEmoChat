@@ -17,6 +17,7 @@ import 'package:simplechat/models/user_model.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
+import '../colors/colors.dart';
 import '../models/models.dart';
 import 'screens.dart';
 
@@ -153,7 +154,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
             .showSnackBar(const SnackBar(content: Text("Data Uploaded"))))
         .then((value) => provider.changeUploadDataLoading(value: false))
         .then((value) => Navigator.popUntil(context, (route) => route.isFirst))
-        .then((value) => Navigator.push(
+        .then((value) => Navigator.pushReplacement(
             context,
             PageTransition(
                 duration: const Duration(milliseconds: 700),
@@ -173,15 +174,15 @@ class _CompleteProfileState extends State<CompleteProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurpleAccent.shade200,
+      backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
           elevation: 0.1,
           automaticallyImplyLeading: false,
           centerTitle: true,
-          backgroundColor: Colors.deepPurpleAccent.shade200,
+          backgroundColor: AppColors.backgroudColor,
           title: const Text(
             "Complete Profile",
-            style: TextStyle(),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           )),
       body: SingleChildScrollView(
         child: Padding(
@@ -196,32 +197,37 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   onPressed: () {
                     showPhotoOption();
                   },
-                  child: CircleAvatar(
-                    backgroundColor: Colors.amber.shade200.withOpacity(0.8),
-                    radius: 85.r,
-                    backgroundImage:
-                        (imageFile != null) ? FileImage(imageFile!) : null,
-                    child: (imageFile == null)
-                        ? Icon(
-                            Icons.person,
-                            color: Colors.grey.shade700,
-                            size: 65.r,
-                          )
-                        : null,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [AppColors.containerShadow]),
+                    child: CircleAvatar(
+                      backgroundColor: AppColors.foregroundColor,
+                      radius: 85.r,
+                      backgroundImage:
+                          (imageFile != null) ? FileImage(imageFile!) : null,
+                      child: (imageFile == null)
+                          ? Icon(
+                              Icons.person,
+                              color: Colors.grey.shade700,
+                              size: 65.r,
+                            )
+                          : null,
+                    ),
                   )),
               TextFormField(
                 controller: fullNameController,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
                 decoration: const InputDecoration(
                     labelText: "Full Name",
-                    labelStyle: TextStyle(fontSize: 16, color: Colors.white)),
+                    labelStyle: TextStyle(fontSize: 16, color: Colors.black)),
               ),
               TextFormField(
                 controller: bioController,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
                 decoration: const InputDecoration(
                     labelText: "Bio",
-                    labelStyle: TextStyle(fontSize: 16, color: Colors.white)),
+                    labelStyle: TextStyle(fontSize: 16, color: Colors.black)),
               ),
               const SizedBox(
                 height: 30,
@@ -234,7 +240,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   height: 70,
                   width: 100,
                   decoration: BoxDecoration(
-                      color: Colors.amber.shade200.withOpacity(0.8),
+                      color: AppColors.foregroundColor,
+                      boxShadow: [AppColors.containerShadow],
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(50.r),
                           bottomRight: Radius.circular(50.r))),

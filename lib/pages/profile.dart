@@ -8,6 +8,7 @@ import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
+import '../colors/colors.dart';
 import 'enduser_profile.dart';
 import 'screens.dart';
 
@@ -17,18 +18,18 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
           elevation: 0,
           leading: IconButton(
               icon: const Icon(
                 CupertinoIcons.back,
-                color: Colors.white,
+                color: Colors.black87,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               }),
-          backgroundColor: Colors.deepPurpleAccent,
+          backgroundColor: AppColors.backgroudColor,
         ),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance
@@ -54,10 +55,15 @@ class Profile extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                CircleAvatar(
-                                  radius: 60,
-                                  backgroundImage:
-                                      NetworkImage(userModel.profilePicture!),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      boxShadow: [AppColors.containerShadow],
+                                      shape: BoxShape.circle),
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundImage:
+                                        NetworkImage(userModel.profilePicture!),
+                                  ),
                                 ),
                                 SizedBox(
                                   width: 20.w,
@@ -68,14 +74,14 @@ class Profile extends StatelessWidget {
                                     Text(
                                       userModel.fullName!,
                                       style: TextStyle(
-                                          color: Colors.white,
+                                          color: Colors.black87,
                                           fontSize: 17.sp,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     Text(
                                       userModel.email!,
                                       style: TextStyle(
-                                          color: Colors.white,
+                                          color: Colors.black87,
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w300),
                                     )

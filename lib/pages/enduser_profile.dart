@@ -13,7 +13,7 @@ class EndUserProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: Colors.deepPurpleAccent.shade100,
         appBar: AppBar(
           elevation: 0,
           leading: IconButton(
@@ -24,7 +24,7 @@ class EndUserProfile extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               }),
-          backgroundColor: Colors.deepPurpleAccent,
+          backgroundColor: Colors.deepPurpleAccent.shade100,
         ),
         body: Center(
           child: Column(
@@ -49,14 +49,14 @@ class EndUserProfile extends StatelessWidget {
                           Text(
                             endUser.fullName!,
                             style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black87,
                                 fontSize: 17.sp,
                                 fontWeight: FontWeight.w600),
                           ),
                           Text(
                             endUser.email!,
                             style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black87,
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.w300),
                           )
@@ -104,7 +104,7 @@ Widget option(
           child: Text(
             label,
             style: TextStyle(
-                color: Colors.white,
+                color: Colors.black87,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600),
           ),
@@ -136,19 +136,19 @@ Widget option(
                 child: Text(
                   value,
                   style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black87,
                       fontSize: 15,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w300),
                 ),
               ),
               SizedBox(
-                height: 8.h,
+                height: 4.h,
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 0.8,
-                color: Colors.grey.shade100,
+                height: 0.3,
+                color: Colors.black38,
               )
             ],
           ),
