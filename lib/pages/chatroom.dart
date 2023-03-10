@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/screens.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
@@ -364,14 +365,15 @@ class _ChatRoomState extends State<ChatRoom> {
   Widget build(BuildContext context) {
     final provider = Provider.of<RandomName>(context);
     return Scaffold(
-      backgroundColor: Colors.deepPurpleAccent.shade200,
+      backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
-        backgroundColor: Colors.deepPurpleAccent.shade200,
+        backgroundColor: AppColors.backgroudColor,
         leadingWidth: 40,
+        elevation: 0.5,
         leading: IconButton(
             icon: const Icon(
               CupertinoIcons.back,
-              color: Colors.white,
+              color: Colors.black87,
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -397,6 +399,7 @@ class _ChatRoomState extends State<ChatRoom> {
               Text(
                 widget.enduser.fullName!,
                 style: const TextStyle(
+                  color: Colors.black87,
                   fontSize: 14,
                 ),
               ),
@@ -458,14 +461,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                               .toString(),
                                       time: messgaeDate);
                             })
-                        : const Center(
-                            child: Text(
-                              "Say hi! to start a conversation!",
-                              style: TextStyle(
-                                  color: Colors.amber,
-                                  fontStyle: FontStyle.italic),
-                            ),
-                          );
+                        : Center(child: Image.asset("assets/noMessage.png"));
                   } else if (snapshot.hasError) {
                     return const Center(
                       child: Text("Internet Issue"),
@@ -483,7 +479,7 @@ class _ChatRoomState extends State<ChatRoom> {
               })),
         )),
         Container(
-          color: Colors.deepPurpleAccent.shade200,
+          color: AppColors.backgroudColor,
           child: Row(
             children: [
               Flexible(
@@ -491,8 +487,8 @@ class _ChatRoomState extends State<ChatRoom> {
                 // textAlignVertical: TextAlignVertical.top,
                 // textAlign: TextAlign.center,
                 controller: messageController,
-                style: TextStyle(fontSize: 14.sp, color: Colors.white),
-                cursorColor: Colors.white,
+                style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                cursorColor: Colors.black87,
                 maxLines: null,
                 enabled: imageFile != null ? false : true,
                 decoration: const InputDecoration(
@@ -502,7 +498,7 @@ class _ChatRoomState extends State<ChatRoom> {
                     hintText: "Type a messgae ...",
                     hintStyle: TextStyle(
                       fontStyle: FontStyle.italic,
-                      color: Colors.white,
+                      color: Colors.black87,
                       fontSize: 14,
                     ),
                     border: InputBorder.none),
@@ -510,7 +506,7 @@ class _ChatRoomState extends State<ChatRoom> {
               CupertinoButton(
                   child: const Icon(
                     Icons.photo_camera,
-                    color: Colors.white,
+                    color: Colors.black87,
                   ),
                   onPressed: () {
                     // sendMessage();
@@ -524,7 +520,7 @@ class _ChatRoomState extends State<ChatRoom> {
               CupertinoButton(
                   child: const Icon(
                     Icons.send,
-                    color: Colors.white,
+                    color: Colors.black87,
                   ),
                   onPressed: () {
                     sendMessage(msg: messageController.text.trim());
@@ -571,7 +567,8 @@ class _ChatRoomState extends State<ChatRoom> {
                   bottomRight:
                       sender ? Radius.circular(0.r) : Radius.circular(15.r),
                 ),
-                color: sender ? Colors.yellow.shade100 : Colors.green.shade300),
+                color:
+                    sender ? Colors.green.shade300 : Colors.blueGrey.shade300),
             child: ConstrainedBox(
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.7),
@@ -646,7 +643,7 @@ class _ChatRoomState extends State<ChatRoom> {
             padding: const EdgeInsets.only(left: 5),
             child: Text(
               time,
-              style: TextStyle(fontSize: 9.sp, color: Colors.white),
+              style: TextStyle(fontSize: 9.sp, color: Colors.black87),
             ),
           ),
         ],

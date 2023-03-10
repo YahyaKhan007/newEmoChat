@@ -8,13 +8,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/pages/profile.dart';
+import 'package:simplechat/widgets/showLoading.dart';
 
-import '../main.dart';
 import '../models/models.dart';
-import '../widgets/showLoading.dart';
 import 'screens.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,14 +44,23 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(164, 124, 77, 255),
+      backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
         actions: [
           CupertinoButton(
               child: const Icon(CupertinoIcons.chat_bubble_2_fill,
-                  color: Colors.white),
+                  color: Colors.black),
               onPressed: () {
                 // !   Logout here
+                Navigator.push(
+                    context,
+                    PageTransition(
+                        duration: const Duration(milliseconds: 700),
+                        type: PageTransitionType.fade,
+                        child: AllUsers(
+                            firebaseUser: widget.firebaseUser,
+                            userModel: widget.userModel),
+                        isIos: true));
                 // FirebaseController().signout(context: context);
               })
         ],
@@ -72,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                       isIos: true));
             }),
         automaticallyImplyLeading: true,
-        backgroundColor: Colors.deepPurpleAccent.shade200,
+        backgroundColor: AppColors.backgroudColor,
         centerTitle: true,
         title: const Text(
           "Home Page",
@@ -80,7 +91,7 @@ class _HomePageState extends State<HomePage> {
               letterSpacing: -5,
               fontFamily: "zombie",
               fontSize: 32,
-              color: Colors.white),
+              color: Colors.black),
         ),
       ),
       body: Column(
@@ -112,12 +123,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(
-                  width: 15,
+                  width: 0,
                 ),
                 CupertinoButton(
                     child: const Icon(
                       Icons.search,
-                      color: Colors.white,
+                      color: Colors.black,
                       size: 25,
                     ),
                     onPressed: () {
@@ -149,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                     QuerySnapshot chatRoomSnapshot =
                         snapshot.data as QuerySnapshot;
 
-                    return chatRoomSnapshot.docs.length != 0
+                    return chatRoomSnapshot.docs.isNotEmpty
                         ? ListView.builder(
                             itemCount: chatRoomSnapshot.docs.length,
                             itemBuilder: ((context, index) {
@@ -186,6 +197,15 @@ class _HomePageState extends State<HomePage> {
 
                                       // !
                                       return GestureDetector(
+                                        onLongPress: () {
+                                          log("deleted");
+                                          dialogBox(
+                                              context: context,
+                                              onPressed: () {});
+                                          // ! **********************
+                                          // !    Delete
+                                          // !  *********************
+                                        },
                                         onTap: () {
                                           Navigator.push(
                                               context,
@@ -205,82 +225,140 @@ class _HomePageState extends State<HomePage> {
                                             margin: EdgeInsets.symmetric(
                                                 vertical: 5.h,
                                                 horizontal: 10.w),
-                                            height: 70.h,
+                                            height: 60.h,
                                             width: MediaQuery.of(context)
                                                 .size
                                                 .width,
                                             decoration: BoxDecoration(
-                                              color: Colors
-                                                  .deepPurpleAccent.shade200,
+                                              boxShadow: [
+                                                AppColors.containerShadow
+                                              ],
+                                              color: Colors.white,
                                               borderRadius:
                                                   BorderRadius.circular(10.r),
                                             ),
                                             child: Center(
                                               child: ListTile(
-                                                minVerticalPadding: -30,
-                                                // dense: true,
-                                                contentPadding:
-                                                    const EdgeInsets.only(
-                                                        bottom: 0),
-
-                                                leading: CircleAvatar(
-                                                  radius: 30.r,
-                                                  backgroundColor:
-                                                      Colors.grey.shade500,
-                                                  backgroundImage: NetworkImage(
-                                                      userModel
-                                                          .profilePicture!),
-                                                ),
-                                                title: Text(
-                                                  userModel.fullName!,
-                                                  style: TextStyle(
-                                                      fontFamily: "Aclonica",
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 13.sp),
-                                                ),
-                                                subtitle: chatRoomModel
-                                                            .lastMessage !=
-                                                        ""
-                                                    ? Text(
-                                                        chatRoomModel
-                                                            .lastMessage!,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 11.sp,
+                                                  minVerticalPadding: -30,
+                                                  // dense: true,
+                                                  contentPadding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 0,
+                                                          right: 10,
+                                                          left: 7),
+                                                  leading: CircleAvatar(
+                                                    radius: 30.r,
+                                                    backgroundColor:
+                                                        Colors.grey.shade500,
+                                                    backgroundImage:
+                                                        NetworkImage(userModel
+                                                            .profilePicture!),
+                                                  ),
+                                                  title: Text(
+                                                    userModel.fullName!,
+                                                    style: TextStyle(
+                                                        fontFamily: "Aclonica",
+                                                        color: Colors.black54,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 13.sp),
+                                                  ),
+                                                  subtitle: chatRoomModel
+                                                              .lastMessage !=
+                                                          ""
+                                                      ? Text(
+                                                          chatRoomModel
+                                                              .lastMessage!,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                            color: Colors.grey,
+                                                            fontSize: 11.sp,
+                                                          ),
+                                                        )
+                                                      : Text(
+                                                          "Say Hi to Start a Conversation!",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.blue,
+                                                              fontSize: 11.sp,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic),
                                                         ),
-                                                      )
-                                                    : Text(
-                                                        "Say Hi to Start a Conversation!",
-                                                        style: TextStyle(
-                                                            color: Colors.amber,
-                                                            fontSize: 12.sp),
-                                                      ),
 
-                                                // ! Option for Delete
-                                                trailing: GestureDetector(
-                                                    behavior: HitTestBehavior
-                                                        .deferToChild,
-                                                    onTap: () {},
-                                                    child: const Icon(
-                                                      Icons.more_vert,
-                                                      color: Colors.white,
-                                                    )),
-                                              ),
+                                                  // ! Option for Delete
+                                                  trailing: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        DateFormat(
+                                                                " dd MMM yyy")
+                                                            .format(DateTime
+                                                                .fromMillisecondsSinceEpoch(
+                                                                    chatRoomModel
+                                                                        .updatedOn!
+                                                                        .millisecondsSinceEpoch)),
+                                                        style: TextStyle(
+                                                            fontSize: 8.sp,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                            color: Colors.grey),
+                                                      ),
+                                                      Text(
+                                                        DateFormat(" hh:mm").format(
+                                                            DateTime.fromMillisecondsSinceEpoch(
+                                                                chatRoomModel
+                                                                    .updatedOn!
+                                                                    .millisecondsSinceEpoch)),
+                                                        style: TextStyle(
+                                                            fontSize: 8.sp,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ],
+                                                  )),
                                             )),
                                       );
                                     } else {
-                                      return spinkit;
+                                      return Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 5.h),
+                                        child: Shimmer.fromColors(
+                                          baseColor: Colors.grey.shade100,
+                                          highlightColor: Colors.grey.shade500,
+                                          child: ListTile(
+                                            leading: CircleAvatar(
+                                              radius: 27.r,
+                                              backgroundColor: Colors.white,
+                                            ),
+                                            title: Container(
+                                                height: 5,
+                                                color: Colors.white,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.4),
+                                            subtitle: Container(
+                                                height: 3,
+                                                color: Colors.white,
+                                                width: 50),
+                                          ),
+                                        ),
+                                      );
                                     }
                                   });
                             }))
-                        : Text(
-                            "No Conversations yet! Search a user and start a Conversation",
-                            style: TextStyle(fontSize: 13, color: Colors.amber),
-                          );
+                        : Center(
+                            child:
+                                Image.asset("assets/noMessageTransparent.png"));
                   } else if (snapshot.hasError) {
                     return Center(
                       child: Text(
@@ -313,10 +391,10 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: CupertinoButton(
           child: CircleAvatar(
               radius: 25,
-              backgroundColor: Colors.deepPurpleAccent.shade200,
-              child: const Icon(
+              backgroundColor: AppColors.backgroudColor,
+              child: Icon(
                 Icons.search,
-                color: Colors.white,
+                color: Colors.grey.shade800,
               )),
           onPressed: () {
             Navigator.push(
@@ -331,5 +409,56 @@ class _HomePageState extends State<HomePage> {
                     isIos: true));
           }),
     );
+  }
+
+  dialogBox({required BuildContext context, required VoidCallback onPressed}) {
+    return showDialog(
+        context: context,
+        builder: (builder) {
+          return AlertDialog(
+            title: const Text("Delete Confirmaton"),
+            contentPadding: EdgeInsets.only(left: 22.w, top: 5),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Are you sure you want to delete this",
+                    style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    CupertinoButton(
+                        onPressed: onPressed,
+                        child: Text(
+                          "Yes",
+                          style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue),
+                        )),
+                    CupertinoButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "No",
+                          style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue),
+                        ))
+                  ],
+                )
+              ],
+            ),
+          );
+        });
   }
 }

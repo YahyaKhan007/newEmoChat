@@ -13,6 +13,7 @@ import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/chatroom.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
+import '../colors/colors.dart';
 import '../models/models.dart';
 
 class SearchPage extends StatefulWidget {
@@ -70,10 +71,23 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurpleAccent.shade200,
+      backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.deepPurpleAccent.shade200,
+        title: const Text(
+          "Search User",
+          style: TextStyle(color: Colors.black87, letterSpacing: -1.8),
+        ),
+        backgroundColor: AppColors.backgroudColor,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: Icon(
+            CupertinoIcons.back,
+            color: Colors.grey.shade700,
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -103,17 +117,20 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               const SizedBox(
-                width: 15,
+                width: 0,
               ),
               CupertinoButton(
                   child: const Icon(
                     Icons.search,
-                    color: Colors.white,
+                    color: Colors.grey,
                   ),
                   onPressed: () {
                     setState(() {});
                   })
             ],
+          ),
+          SizedBox(
+            height: 30.h,
           ),
           StreamBuilder(
             stream: FirebaseFirestore.instance
@@ -141,7 +158,8 @@ class _SearchPageState extends State<SearchPage> {
                           margin: EdgeInsets.symmetric(
                               horizontal: 15.w, vertical: 10.h),
                           decoration: BoxDecoration(
-                              color: Colors.amber.shade300,
+                              boxShadow: [AppColors.containerShadow],
+                              color: AppColors.foregroundColor,
                               borderRadius: BorderRadius.circular(8)),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -149,6 +167,7 @@ class _SearchPageState extends State<SearchPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               ListTile(
+                                  minLeadingWidth: 50,
                                   onTap: () async {
                                     // !  ******************************
 
@@ -178,9 +197,14 @@ class _SearchPageState extends State<SearchPage> {
                                   },
                                   trailing:
                                       const Icon(Icons.keyboard_arrow_right),
-                                  leading: CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        searchedUser.profilePicture!),
+                                  leading: Container(
+                                    decoration: BoxDecoration(boxShadow: [
+                                      AppColors.containerShadow,
+                                    ], shape: BoxShape.circle),
+                                    child: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          searchedUser.profilePicture!),
+                                    ),
                                   ),
                                   title: Text("${searchedUser.fullName}"),
                                   subtitle: Text("${searchedUser.email}"))

@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
+import '../colors/colors.dart';
 import '../provider/loading_provider.dart';
 import 'screens.dart';
 
@@ -39,13 +40,13 @@ class Signup extends StatelessWidget {
     final provider = Provider.of<LoadingProvider>(context, listen: true);
 
     return Scaffold(
-      backgroundColor: Colors.deepPurpleAccent.shade200,
+      backgroundColor: AppColors.backgroudColor,
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
             "Already have an Account?",
-            style: TextStyle(fontStyle: FontStyle.italic),
+            style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
           ),
           CupertinoButton(
             onPressed: () {
@@ -53,7 +54,7 @@ class Signup extends StatelessWidget {
             },
             child: Text(
               "Login here",
-              style: TextStyle(color: Colors.amber.shade200),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ],
@@ -78,14 +79,15 @@ class Signup extends StatelessWidget {
                           // fontFamily: ,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
-                          color: Colors.amber,
+                          color: Colors.black,
                         ))
                   ]),
             ),
             Container(
               height: 300.h,
               decoration: BoxDecoration(
-                  color: Colors.amber.shade200.withOpacity(0.8),
+                  boxShadow: [AppColors.containerShadow],
+                  color: AppColors.foregroundColor,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(100.r),
                       bottomRight: Radius.circular(100.r))),
@@ -99,6 +101,7 @@ class Signup extends StatelessWidget {
                     child: Container(
                         margin: EdgeInsets.symmetric(vertical: 12.h),
                         decoration: const BoxDecoration(
+                            // boxShadow: [AppColors.containerShadow],
                             // borderRadius: BorderRadius.circular(15),
                             ),
                         child: TextField(
@@ -126,6 +129,7 @@ class Signup extends StatelessWidget {
                     child: Container(
                         margin: EdgeInsets.symmetric(vertical: 12.h),
                         decoration: const BoxDecoration(
+                            // boxShadow: [AppColors.containerShadow],
                             // borderRadius: BorderRadius.circular(15),
                             ),
                         child: TextFormField(
@@ -148,6 +152,7 @@ class Signup extends StatelessWidget {
                     child: Container(
                         margin: EdgeInsets.symmetric(vertical: 12.h),
                         decoration: const BoxDecoration(
+                            // boxShadow: [AppColors.containerShadow],
                             // borderRadius: BorderRadius.circular(15),
                             ),
                         child: TextField(
@@ -199,7 +204,8 @@ class Signup extends StatelessWidget {
                       height: 70,
                       width: 100,
                       decoration: BoxDecoration(
-                          color: Colors.amber.shade200.withOpacity(0.8),
+                          boxShadow: [AppColors.containerShadow],
+                          color: AppColors.foregroundColor,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50.r),
                               bottomRight: Radius.circular(50.r))),
