@@ -13,7 +13,11 @@ import 'package:page_transition/page_transition.dart';
 
 import '../pages/screens.dart';
 
-class FirebaseController {
+enum Status {
+  done,
+}
+
+class FirebaseController extends ChangeNotifier {
   // ! Signup here
   void signup(
       {required BuildContext context,
@@ -44,6 +48,7 @@ class FirebaseController {
           email: email,
           profilePicture: "",
           bio: "",
+          pushToken: "",
           memberSince: Timestamp.now());
 
       await FirebaseFirestore.instance

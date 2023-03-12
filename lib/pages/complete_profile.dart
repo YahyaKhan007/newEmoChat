@@ -1,14 +1,18 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
@@ -40,6 +44,9 @@ class _CompleteProfileState extends State<CompleteProfile> {
   File? imageFile;
   TextEditingController fullNameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
+  static FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  static String? token;
 
   var spinkit = const SpinKitSpinningLines(
     color: Colors.white,
@@ -50,8 +57,25 @@ class _CompleteProfileState extends State<CompleteProfile> {
 
   @override
   void initState() {
-    gettingProvider();
+    getToken();
     super.initState();
+  }
+
+  static Future<void> getToken() async {
+    try {
+      await messaging.requestPermission();
+
+      await messaging.getToken().then((t) {
+        if (t != null) {
+          token = t;
+          log("Push Token ----->   $t");
+        }
+      });
+    } catch (e) {
+      log("$e");
+    }
+
+    // log("Push Token ----->   $messaging.getToken()");
   }
 
 // ! Selecting the Image
@@ -115,9 +139,11 @@ class _CompleteProfileState extends State<CompleteProfile> {
 
 // ! Check either the data is entered or not
   void checkValues() {
-    provider.changeUploadDataLoading(value: true);
     String fullName = fullNameController.text.trim();
-    if (fullName == "" || imageFile == null || bioController.text == "") {
+    if (fullName == "" ||
+        imageFile == null ||
+        bioController.text == "" ||
+        token == "") {
       Loading.showAlertDialog(context, "Missing", "Entered all the data");
     } else {
       uploadData();
@@ -145,6 +171,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
     widget.userModel.fullName = fullName.toString();
     widget.userModel.bio = bio.toString();
     widget.userModel.profilePicture = imageUrl;
+    widget.userModel.pushToken = token!;
 
     await FirebaseFirestore.instance
         .collection("users")
@@ -152,7 +179,6 @@ class _CompleteProfileState extends State<CompleteProfile> {
         .set(widget.userModel.toMap())
         .then((value) => ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Data Uploaded"))))
-        .then((value) => provider.changeUploadDataLoading(value: false))
         .then((value) => Navigator.popUntil(context, (route) => route.isFirst))
         .then((value) => Navigator.pushReplacement(
             context,
@@ -167,23 +193,30 @@ class _CompleteProfileState extends State<CompleteProfile> {
   }
 
 // ! Getting Provider Value
-  gettingProvider() {
-    provider = Provider.of<LoadingProvider>(context, listen: false);
-  }
+  gettingTokenValue() {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
-      appBar: AppBar(
-          elevation: 0.1,
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          backgroundColor: AppColors.backgroudColor,
-          title: const Text(
-            "Complete Profile",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          )),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.h),
+        child: AppBar(
+            elevation: 0.1,
+            automaticallyImplyLeading: false,
+            leadingWidth: 90,
+            centerTitle: true,
+            backgroundColor: AppColors.backgroudColor,
+            leading: SizedBox(
+              height: 200,
+              child: Image.asset("assets/logo.png"),
+            ),
+            title: const Text(
+              "Complete Profile",
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            )),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),

@@ -20,7 +20,7 @@ class EndUserProfile extends StatelessWidget {
             leading: IconButton(
                 icon: const Icon(
                   CupertinoIcons.back,
-                  color: Colors.white,
+                  color: Colors.black87,
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();

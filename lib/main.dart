@@ -15,22 +15,8 @@ var uuid = const Uuid();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   User? currentUser = FirebaseAuth.instance.currentUser;
   UserModel? thisUserModel;
-
-  // try {
-  //   if (Platform.isAndroid || Platform.isIOS) {
-  //     final RemoteMessage? remoteMessage =
-  //         await FirebaseMessaging.instance.getInitialMessage();
-  //     if (remoteMessage != null) {
-  //       // _orderID = remoteMessage.notification?.titleLocKey != null?
-  //       // int.parse(remoteMessage.notification!.titleLocKey!) : null;
-
-  //       log("The phone is Android");
-  //     }
-  //   }
-  // } catch (e) {}
 
   if (currentUser != null) {
     thisUserModel = await FirebaseHelper.getUserModelById(currentUser.uid);

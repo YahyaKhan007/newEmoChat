@@ -63,28 +63,9 @@ class Signup extends StatelessWidget {
           child: SingleChildScrollView(
         child: Column(
           children: [
-            AnimatedContainer(
-              duration: const Duration(seconds: 2),
-              curve: Curves.fastOutSlowIn,
-              height: 200.h,
-              child: AnimatedTextKit(
-                  displayFullTextOnTap: true,
-                  repeatForever: true,
-                  isRepeatingAnimation: true,
-                  stopPauseOnTap: true,
-                  animatedTexts: [
-                    RotateAnimatedText("Signup",
-                        textStyle: TextStyle(
-                          fontSize: 32.sp,
-                          // fontFamily: ,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.black,
-                        ))
-                  ]),
-            ),
+            SizedBox(height: 200.h, child: Image.asset("assets/logo.png")),
             Container(
-              height: 300.h,
+              height: 310.h,
               decoration: BoxDecoration(
                   boxShadow: [AppColors.containerShadow],
                   color: AppColors.foregroundColor,
@@ -93,8 +74,25 @@ class Signup extends StatelessWidget {
                       bottomRight: Radius.circular(100.r))),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 50.h,
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 2),
+                    curve: Curves.fastOutSlowIn,
+                    height: 70.h,
+                    child: AnimatedTextKit(
+                        displayFullTextOnTap: true,
+                        repeatForever: true,
+                        isRepeatingAnimation: true,
+                        stopPauseOnTap: true,
+                        animatedTexts: [
+                          RotateAnimatedText("Signup",
+                              textStyle: TextStyle(
+                                fontSize: 32.sp,
+                                // fontFamily: ,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.black,
+                              ))
+                        ]),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 25.h),

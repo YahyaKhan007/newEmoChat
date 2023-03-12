@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/widgets/showLoading.dart';
@@ -12,8 +16,32 @@ import '../colors/colors.dart';
 import 'enduser_profile.dart';
 import 'screens.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  static FirebaseMessaging messaging = FirebaseMessaging.instance;
+  @override
+  void initState() {
+    getoken();
+    super.initState();
+  }
+
+  static Future<void> getoken() async {
+    await messaging.requestPermission();
+
+    await messaging.getToken().then((t) {
+      if (t != null) {
+        log("Push Token ----->   $t");
+      }
+    });
+
+    // log("Push Token ----->   $messaging.getToken()");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +129,21 @@ class Profile extends StatelessWidget {
                             padding: EdgeInsets.only(
                                 top: 45.h, left: 10.w, right: 10.w),
                             child: GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 Loading.showLoadingDialog(
-                                    context, "Please Wait!");
-                                FirebaseController().signout(context: context);
+                                    context, "Signing Out");
+                                await FirebaseAuth.instance.signOut();
+
+                                Navigator.popUntil(
+                                    context, (route) => route.isFirst);
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                        duration:
+                                            const Duration(milliseconds: 700),
+                                        type: PageTransitionType.fade,
+                                        child: Login(),
+                                        isIos: true));
                               },
                               child: Container(
                                 decoration: BoxDecoration(
