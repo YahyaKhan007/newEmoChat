@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,8 +14,8 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
+import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/profile.dart';
-import 'package:simplechat/widgets/showLoading.dart';
 
 import '../models/models.dart';
 import 'screens.dart';
@@ -38,6 +39,11 @@ class _HomePageState extends State<HomePage> {
   );
   @override
   void initState() {
+    FirebaseMessaging.onMessage.listen((event) {
+      log("new Message  --->  ${event.notification!.title}");
+      log("new Message  --->  ${event.notification!.body}");
+      LocalNotificationServic.display(event);
+    });
     super.initState();
   }
 

@@ -17,6 +17,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/main.dart';
+import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
@@ -288,7 +289,9 @@ class _ChatRoomState extends State<ChatRoom> {
       FirebaseFirestore.instance
           .collection("chatrooms")
           .doc(widget.chatRoomModel.chatroomid)
-          .set(widget.chatRoomModel.toMap());
+          .set(widget.chatRoomModel.toMap())
+          .then((value) => LocalNotificationServic.sendPushNotificatio(
+              widget.enduser, msg!));
 
       log("Message has been send");
     }
@@ -327,7 +330,8 @@ class _ChatRoomState extends State<ChatRoom> {
           .collection("chatrooms")
           .doc(widget.chatRoomModel.chatroomid)
           .set(widget.chatRoomModel.toMap())
-          .then((value) => sendPushNotificatio(widget.enduser, msg!));
+          .then((value) => LocalNotificationServic.sendPushNotificatio(
+              widget.enduser, msg!));
       final provider = Provider.of<LoadingProvider>(context, listen: false);
       provider.sendPhotoCmplete(value: true);
 
@@ -361,7 +365,8 @@ class _ChatRoomState extends State<ChatRoom> {
           .collection("messages")
           .doc(messageModel.messageId)
           .set(messageModel.toMap())
-        ..then((value) => sendPushNotificatio(widget.enduser, "Photo"));
+        ..then((value) => LocalNotificationServic.sendPushNotificatio(
+            widget.enduser, "Photo"));
 
       widget.chatRoomModel.updatedOn = Timestamp.now();
       widget.chatRoomModel.lastMessage = "photo";
