@@ -58,30 +58,9 @@ class Login extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Center(
-              child: AnimatedContainer(
-                duration: const Duration(seconds: 2),
-                curve: Curves.fastOutSlowIn,
-                height: 200.h,
-                child: AnimatedTextKit(
-                    displayFullTextOnTap: true,
-                    repeatForever: true,
-                    isRepeatingAnimation: true,
-                    stopPauseOnTap: true,
-                    animatedTexts: [
-                      RotateAnimatedText("Login",
-                          textStyle: TextStyle(
-                            fontSize: 32.sp,
-                            // fontFamily: ,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.black,
-                          ))
-                    ]),
-              ),
-            ),
+            SizedBox(height: 230.h, child: Image.asset("assets/logo.png")),
             Container(
-              height: 250.h,
+              height: 300.h,
               decoration: BoxDecoration(
                   boxShadow: [
                     AppColors.containerShadow,
@@ -92,8 +71,27 @@ class Login extends StatelessWidget {
                       bottomRight: Radius.circular(100.r))),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 50.h,
+                  Center(
+                    child: AnimatedContainer(
+                      duration: const Duration(seconds: 2),
+                      curve: Curves.fastOutSlowIn,
+                      height: 100.h,
+                      child: AnimatedTextKit(
+                          displayFullTextOnTap: true,
+                          repeatForever: true,
+                          isRepeatingAnimation: true,
+                          stopPauseOnTap: true,
+                          animatedTexts: [
+                            RotateAnimatedText("Login",
+                                textStyle: TextStyle(
+                                  fontSize: 32.sp,
+                                  // fontFamily: ,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.black,
+                                ))
+                          ]),
+                    ),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 25.h),

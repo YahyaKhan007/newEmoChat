@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:simplechat/colors/colors.dart';
 
 import '../models/models.dart';
 
@@ -13,19 +14,18 @@ class EndUserProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.deepPurpleAccent.shade100,
+        backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
-          elevation: 0,
-          leading: IconButton(
-              icon: const Icon(
-                CupertinoIcons.back,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              }),
-          backgroundColor: Colors.deepPurpleAccent.shade100,
-        ),
+            elevation: 0,
+            leading: IconButton(
+                icon: const Icon(
+                  CupertinoIcons.back,
+                  color: Colors.black87,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                }),
+            backgroundColor: AppColors.backgroudColor),
         body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,

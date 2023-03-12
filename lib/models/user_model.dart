@@ -4,6 +4,7 @@ class UserModel {
   String? uid;
   String? fullName;
   String? email;
+  String? pushToken;
   String? profilePicture;
   String? bio;
   Timestamp? memberSince;
@@ -14,6 +15,7 @@ class UserModel {
       required this.email,
       required this.bio,
       required this.memberSince,
+      required this.pushToken,
       required this.profilePicture});
 
 //  !  will be Used to change your Map/Json data into UserModel
@@ -22,6 +24,7 @@ class UserModel {
     fullName = map["fullName"];
     email = map["email"];
     memberSince = map["memberSince"];
+    pushToken = map["pushToken"];
     profilePicture = map["profilePicture"];
     bio = map["bio"];
   }
@@ -34,6 +37,7 @@ class UserModel {
       "email": email,
       "memberSince": memberSince,
       "profilePicture": profilePicture,
+      "pushToken": pushToken,
       "bio": bio
     };
   }

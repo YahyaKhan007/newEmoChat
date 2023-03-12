@@ -178,12 +178,12 @@ class _AllUsersState extends State<AllUsers> {
                   );
                 } else {
                   log("Empty");
-                  return const Center(
-                    child: SpinKitSpinningLines(
-                      color: Colors.black,
-                      size: 25.0,
-                    ),
-                  );
+                  return Center(
+                      child: Text(
+                    "There are no other Users in the Database",
+                    style:
+                        TextStyle(fontStyle: FontStyle.italic, fontSize: 12.sp),
+                  ));
                 }
                 // !   ***********
               } else {

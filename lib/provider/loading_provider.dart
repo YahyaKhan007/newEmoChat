@@ -27,4 +27,13 @@ class LoadingProvider extends ChangeNotifier {
     log("$_showPassword");
     notifyListeners();
   }
+
+  // !   send photo
+  bool _send = true;
+  bool get send => _send;
+  void sendPhotoCmplete({required bool value}) {
+    _send = value;
+    log("$_send");
+    notifyListeners();
+  }
 }
