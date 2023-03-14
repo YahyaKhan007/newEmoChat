@@ -137,7 +137,7 @@ class _EditProfileState extends State<EditProfile> {
 
       widget.userModel.fullName = fullName.toString();
       widget.userModel.bio = bio.toString();
-      if (imageUrl != null) {
+      if (imageFile != null) {
         widget.userModel.profilePicture = imageUrl;
       }
       widget.userModel.bio = bioController.text.trim();
@@ -245,11 +245,17 @@ class _EditProfileState extends State<EditProfile> {
                                       shape: BoxShape.circle),
                                   child: Stack(
                                     children: [
-                                      CircleAvatar(
-                                        radius: 60,
-                                        backgroundImage: NetworkImage(
-                                            userModel.profilePicture!),
-                                      ),
+                                      (imageFile != null)
+                                          ? CircleAvatar(
+                                              radius: 60,
+                                              backgroundImage:
+                                                  FileImage(imageFile!),
+                                            )
+                                          : CircleAvatar(
+                                              radius: 60,
+                                              backgroundImage: NetworkImage(
+                                                  userModel.profilePicture!),
+                                            ),
                                       Positioned(
                                           top: -15,
                                           right: -10,
