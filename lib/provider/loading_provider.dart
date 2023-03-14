@@ -3,8 +3,12 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 
 class LoadingProvider extends ChangeNotifier {
-  // !   Signup Loading
   bool _signUpLoading = false;
+  bool _creating = false;
+  bool _loading = false;
+  bool _loginLoading = false;
+
+  // !   Signup Loading
 
   bool get signUpLoading => _signUpLoading;
   void changeSigupLoading({required bool value}) {
@@ -13,9 +17,23 @@ class LoadingProvider extends ChangeNotifier {
   }
 
   // !   login Loading
-
-  bool get loginLoading => _signUpLoading;
+  bool get loginLoading => _loginLoading;
   void changeLoginLoading({required bool value}) {
+    _loginLoading = value;
+    notifyListeners();
+  }
+
+// ! complete profile
+  bool get loading => _loading;
+  void changeLoading({required bool value}) {
+    _loading = value;
+    notifyListeners();
+  }
+
+  // !  creating chatroom
+  bool get creating => _creating;
+  void changeCreating({required bool value}) {
+    _creating = value;
     notifyListeners();
   }
 

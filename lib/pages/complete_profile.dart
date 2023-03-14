@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -12,7 +11,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
@@ -49,8 +47,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
   static String? token;
 
   var spinkit = const SpinKitSpinningLines(
-    color: Colors.white,
-    size: 50.0,
+    color: Colors.black,
+    size: 40.0,
   );
 
   late LoadingProvider provider;
@@ -117,7 +115,6 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.gallery);
-                    Navigator.pop(context);
                   },
                   title: const Text("Select from Gallery"),
                   leading: const Icon(Icons.photo_album),
@@ -125,8 +122,6 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.camera);
-
-                    Navigator.pop(context);
                   },
                   title: const Text("Take a Photo"),
                   leading: const Icon(Icons.camera),
@@ -138,7 +133,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
   }
 
 // ! Check either the data is entered or not
-  void checkValues() {
+  void checkValues({required LoadingProvider provider}) {
     String fullName = fullNameController.text.trim();
     if (fullName == "" ||
         imageFile == null ||
@@ -146,14 +141,15 @@ class _CompleteProfileState extends State<CompleteProfile> {
         token == "") {
       Loading.showAlertDialog(context, "Missing", "Entered all the data");
     } else {
-      uploadData();
+      uploadData(provider: provider);
     }
   }
 
 // ! Check either the data is entered or not
-  void uploadData() async {
-    Loading.showLoadingDialog(
-        context, "Wait! while your data is being uploading");
+  void uploadData({required LoadingProvider provider}) async {
+    // var provider = Provider.of<LoadingProvider>(context, listen: false);
+    provider.changeLoading(value: true);
+
     UploadTask uploadTask = FirebaseStorage.instance
         .ref("profilePictures")
         .child(widget.userModel.uid.toString())
@@ -180,6 +176,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
         .then((value) => ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Data Uploaded"))))
         .then((value) => Navigator.popUntil(context, (route) => route.isFirst))
+        .then((value) => provider.changeLoading(value: false))
         .then((value) => Navigator.pushReplacement(
             context,
             PageTransition(
@@ -192,11 +189,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 isIos: true)));
   }
 
-// ! Getting Provider Value
-  gettingTokenValue() {}
-
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<LoadingProvider>(context, listen: true);
+
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
       appBar: PreferredSize(
@@ -228,6 +224,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
               ),
               CupertinoButton(
                   onPressed: () {
+                    // provider.changeLoading(value: false);
+
                     showPhotoOption();
                   },
                   child: Container(
@@ -267,23 +265,25 @@ class _CompleteProfileState extends State<CompleteProfile> {
               ),
               GestureDetector(
                 onTap: () {
-                  checkValues();
+                  checkValues(provider: provider);
                 },
-                child: Container(
-                  height: 70,
-                  width: 100,
-                  decoration: BoxDecoration(
-                      color: AppColors.foregroundColor,
-                      boxShadow: [AppColors.containerShadow],
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(50.r),
-                          bottomRight: Radius.circular(50.r))),
-                  child: Center(
-                      child: Text(
-                    "Submit",
-                    style: kButtonTextStyle,
-                  )),
-                ),
+                child: provider.loading
+                    ? spinkit
+                    : Container(
+                        height: 70,
+                        width: 100,
+                        decoration: BoxDecoration(
+                            color: AppColors.foregroundColor,
+                            boxShadow: [AppColors.containerShadow],
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(50.r),
+                                bottomRight: Radius.circular(50.r))),
+                        child: Center(
+                            child: Text(
+                          "Submit",
+                          style: kButtonTextStyle,
+                        )),
+                      ),
               )
             ],
           ),

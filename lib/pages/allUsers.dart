@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,12 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/models/models.dart';
-
+import 'package:simplechat/widgets/showLoading.dart';
 import '../colors/colors.dart';
 import '../main.dart';
 import 'screens.dart';
@@ -29,8 +26,11 @@ class AllUsers extends StatefulWidget {
 }
 
 class _AllUsersState extends State<AllUsers> {
-  Future<ChatRoomModel?> getChatroomModel(UserModel targetUser) async {
+  Future<ChatRoomModel?> getChatroomModel(
+    UserModel targetUser,
+  ) async {
     ChatRoomModel? chatRoom;
+    // Loading.showLoadingDialog(context, "Creating");
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection("chatrooms")
         .where("participants.${widget.userModel?.uid}", isEqualTo: true)
@@ -44,12 +44,17 @@ class _AllUsersState extends State<AllUsers> {
           ChatRoomModel.fromMap(docData as Map<String, dynamic>);
 
       chatRoom = existingChatRoom;
+
       log("Already Existed");
     } else {
+      // Loading.showLoadingDialog(context, "Creating");
+
       ChatRoomModel newChatRoom = ChatRoomModel(
           createdOn: Timestamp.now(),
           chatroomid: uuid.v1(),
           lastMessage: "",
+          readMessage: null,
+          fromUser: null,
           participants: {
             widget.userModel!.uid.toString(): true,
             targetUser.uid.toString(): true
@@ -62,6 +67,7 @@ class _AllUsersState extends State<AllUsers> {
           .set(newChatRoom.toMap());
 
       chatRoom = newChatRoom;
+
       log("New Charoom Created");
     }
     return chatRoom;
@@ -97,15 +103,9 @@ class _AllUsersState extends State<AllUsers> {
               if (snapshot.hasData) {
                 log(snapshot.data!.size.toString());
 
-                log("came 1");
-
                 QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
 
-                log(dataSnapshot.docs.length.toString());
-
                 if (dataSnapshot.docs.isNotEmpty) {
-                  log("Not Empty");
-
                   return ListView.builder(
                     itemCount: dataSnapshot.docs.length,
                     itemBuilder: (context, index) {
@@ -121,10 +121,10 @@ class _AllUsersState extends State<AllUsers> {
                             boxShadow: [AppColors.containerShadow]),
                         child: ListTile(
                           onTap: () async {
+                            // showWaiting(context: context, title: "creating");
+                            Loading.showLoadingDialog(context, "Creating");
                             ChatRoomModel? chatRoom =
                                 await getChatroomModel(endUser);
-                            Navigator.pop(context);
-
                             Navigator.push(
                                 context,
                                 PageTransition(
@@ -216,3 +216,18 @@ class _AllUsersState extends State<AllUsers> {
         ));
   }
 }
+
+showWaiting({required BuildContext context, required String title}) {
+  return showCupertinoDialog(
+      context: context,
+      builder: (builder) {
+        return Column(
+          children: [CircularProgressIndicator(), Text(title)],
+        );
+      });
+}
+
+// Future<dy> pop(BuildContext context) async{
+//   Future.delayed(Duration(seconds: 3))
+//       .then((value) => Navigator.of(context).pop());
+// }

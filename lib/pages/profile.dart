@@ -8,12 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/models/models.dart';
-import 'package:simplechat/widgets/showLoading.dart';
 
 import '../colors/colors.dart';
-import 'enduser_profile.dart';
 import 'screens.dart';
 
 class Profile extends StatefulWidget {
@@ -25,6 +22,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   static FirebaseMessaging messaging = FirebaseMessaging.instance;
+  UserModel? userModel;
   @override
   void initState() {
     getoken();
@@ -48,6 +46,47 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            "Profile",
+            style: TextStyle(
+                fontSize: 22.sp,
+                letterSpacing: -1.3,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade900),
+          ),
+          actions: [
+            CupertinoButton(
+                child: Row(children: [
+                  Icon(
+                    CupertinoIcons.pencil_ellipsis_rectangle,
+                    size: 18,
+                    color: Colors.grey.shade900,
+                  ),
+                  SizedBox(
+                    width: 4,
+                  ),
+                  Text(
+                    "Edit Profile",
+                    style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontSize: 13.sp,
+                        color: Colors.grey.shade900),
+                  )
+                ]),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          duration: const Duration(milliseconds: 700),
+                          type: PageTransitionType.fade,
+                          child: EditProfile(
+                            userModel: userModel!,
+                            firebaseUser: FirebaseAuth.instance.currentUser!,
+                          ),
+                          isIos: true));
+                })
+          ],
           elevation: 0,
           leading: IconButton(
               icon: const Icon(
@@ -72,7 +111,7 @@ class _ProfileState extends State<Profile> {
                 if (dataSnapshot.docs.isNotEmpty) {
                   Map<String, dynamic> userMap =
                       dataSnapshot.docs[0].data() as Map<String, dynamic>;
-                  UserModel userModel = UserModel.fromMap(userMap);
+                  userModel = UserModel.fromMap(userMap);
                   return Center(
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -89,8 +128,8 @@ class _ProfileState extends State<Profile> {
                                       shape: BoxShape.circle),
                                   child: CircleAvatar(
                                     radius: 60,
-                                    backgroundImage:
-                                        NetworkImage(userModel.profilePicture!),
+                                    backgroundImage: NetworkImage(
+                                        userModel!.profilePicture!),
                                   ),
                                 ),
                                 SizedBox(
@@ -100,14 +139,14 @@ class _ProfileState extends State<Profile> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      userModel.fullName!,
+                                      userModel!.fullName!,
                                       style: TextStyle(
                                           color: Colors.black87,
                                           fontSize: 17.sp,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     Text(
-                                      userModel.email!,
+                                      userModel!.email!,
                                       style: TextStyle(
                                           color: Colors.black87,
                                           fontSize: 13.sp,
@@ -121,17 +160,15 @@ class _ProfileState extends State<Profile> {
                           option(context,
                               label: "Member Since",
                               value: DateFormat("EEE dd MMM   hh:mm").format(
-                                  DateTime.fromMillisecondsSinceEpoch(userModel
+                                  DateTime.fromMillisecondsSinceEpoch(userModel!
                                       .memberSince!.millisecondsSinceEpoch))),
                           option(context,
-                              label: "Bio", value: userModel.bio.toString()),
+                              label: "Bio", value: userModel!.bio.toString()),
                           Padding(
                             padding: EdgeInsets.only(
                                 top: 45.h, left: 10.w, right: 10.w),
                             child: GestureDetector(
                               onTap: () async {
-                                Loading.showLoadingDialog(
-                                    context, "Signing Out");
                                 await FirebaseAuth.instance.signOut();
 
                                 Navigator.popUntil(

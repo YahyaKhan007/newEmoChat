@@ -51,6 +51,8 @@ class _SearchPageState extends State<SearchPage> {
           createdOn: Timestamp.now(),
           chatroomid: uuid.v1(),
           lastMessage: "",
+          fromUser: null,
+          readMessage: null,
           participants: {
             widget.userModel!.uid.toString(): true,
             targetUser.uid.toString(): true
@@ -176,7 +178,6 @@ class _SearchPageState extends State<SearchPage> {
 
                                     ChatRoomModel? chatRoom =
                                         await getChatroomModel(searchedUser);
-                                    Navigator.pop(context);
                                     Navigator.pop(context);
 
                                     Navigator.push(

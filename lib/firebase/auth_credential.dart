@@ -28,7 +28,6 @@ class FirebaseController extends ChangeNotifier {
     var provider = Provider.of<LoadingProvider>(context, listen: false);
 
     try {
-      log("just came here 1");
       provider.changeSigupLoading(value: true);
       credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.toString(), password: password.toString());
@@ -77,7 +76,7 @@ class FirebaseController extends ChangeNotifier {
       required String password}) async {
     var provider = Provider.of<LoadingProvider>(context, listen: false);
     try {
-      provider.changeSigupLoading(value: true);
+      provider.changeLoginLoading(value: true);
 
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
@@ -94,7 +93,7 @@ class FirebaseController extends ChangeNotifier {
 
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("User Logged in")));
-      provider.changeSigupLoading(value: false);
+      provider.changeLoginLoading(value: false);
       Navigator.pushReplacement(
           context,
           PageTransition(
@@ -109,7 +108,7 @@ class FirebaseController extends ChangeNotifier {
       return true;
     } catch (e) {
       Loading.showAlertDialog(context, "Login Error", e.toString());
-      provider.changeSigupLoading(value: false);
+      provider.changeLoginLoading(value: false);
       log("$e");
       return false;
     }

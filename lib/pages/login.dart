@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,15 +11,21 @@ import '../provider/loading_provider.dart';
 import 'screens.dart';
 
 // ignore: must_be_immutable
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   Login({super.key});
 
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
   var spinkit = const SpinKitSpinningLines(
     color: Colors.black,
     size: 50.0,
   );
 
   TextEditingController emailController = TextEditingController();
+
   TextEditingController passwordController = TextEditingController();
 
   @override
@@ -161,7 +166,8 @@ class Login extends StatelessWidget {
                           email: emailController.text.toLowerCase(),
                           password: passwordController.text.toLowerCase());
 
-                      log("$res");
+                      // await Future.delayed(Duration(seconds: 4)).then(
+                      //     (value) => provider.changeLoginLoading(value: false));
                     },
                     child: Container(
                       height: 70,

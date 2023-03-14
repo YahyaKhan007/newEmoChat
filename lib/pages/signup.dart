@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +35,7 @@ class Signup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<LoadingProvider>(context, listen: true);
+    final provider = Provider.of<LoadingProvider>(context);
 
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
@@ -174,12 +172,16 @@ class Signup extends StatelessWidget {
             SizedBox(
               height: 35.h,
             ),
-            provider.loginLoading
-                ? spinkit
+            provider.signUpLoading
+                ? SpinKitSpinningLines(
+                    color: Colors.black,
+                    size: 40.0,
+                  )
                 : GestureDetector(
                     onTap: () {
-                      log("check");
                       // signup(context: context);
+                      // provider.changeSigupLoading(value: true);
+
                       if (passwordController.text.toString() ==
                           confirmPasswordController.text.toString()) {
                         FirebaseController().signup(

@@ -33,6 +33,34 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController searchUserController = TextEditingController();
 
+  // !****************************************************
+// ! ****************************************************
+// !****************************************************
+
+  // Future<void> readMessageStatus()
+  //   {required MessageModel message, required ChatRoomModel chatModel}) async {
+  // QuerySnapshot? chatRoomSnapshot = await FirebaseFirestore.instance
+  //     .collection("chatrooms")
+  //     .doc(chatModel.chatroomid)
+  //     .collection("messages")
+  //     .where("chatroomid", isEqualTo: chatModel.chatroomid)
+  //     .snapshots();
+
+  // final status = await FirebaseFirestore.instance
+  //     .collection("chatrooms")
+  //     .doc(chatModel.chatroomid)
+  //     .collection("messages")
+  //     .doc(message.messageId)
+  //     .get();
+
+  // if (status.data() != null) {
+  //   ChatRoomModel chatModel =
+  //       ChatRoomModel.fromMap(status.data() as Map<String, dynamic>);
+
+  //   log("$chatModel.lastMessage");
+  // }
+  // }
+
   var spinkit = const SpinKitSpinningLines(
     color: Colors.white,
     size: 25.0,
@@ -213,6 +241,38 @@ class _HomePageState extends State<HomePage> {
                                           // !  *********************
                                         },
                                         onTap: () {
+                                          // !8888888888888888888888888888888888888888
+                                          log("Yahya --->  ${chatRoomModel.fromUser.toString()}");
+
+                                          log("Random --->  ${FirebaseAuth.instance.currentUser!.uid}");
+
+                                          if (chatRoomModel.fromUser
+                                                  .toString() ==
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid) {
+                                            log("same user");
+                                            chatRoomModel.readMessage = null;
+                                          } else {
+                                            log("Different user");
+                                            chatRoomModel.readMessage =
+                                                Timestamp.now();
+                                          }
+
+                                          // chatRoomModel.fromUser.toString() !=
+                                          //         FirebaseAuth
+                                          //             .instance.currentUser!.uid
+                                          //     ? chatRoomModel.readMessage =
+                                          //         Timestamp.now()
+                                          //     : chatRoomModel.readMessage =
+                                          //         null;
+
+                                          FirebaseFirestore.instance
+                                              .collection("chatrooms")
+                                              .doc(chatRoomModel.chatroomid)
+                                              .set(chatRoomModel.toMap());
+
+                                          log("chatRoom updated");
+
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -244,94 +304,110 @@ class _HomePageState extends State<HomePage> {
                                                   BorderRadius.circular(10.r),
                                             ),
                                             child: Center(
-                                              child: ListTile(
-                                                  minVerticalPadding: -30,
-                                                  // dense: true,
-                                                  contentPadding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 0,
-                                                          right: 10,
-                                                          left: 7),
-                                                  leading: CircleAvatar(
-                                                    radius: 30.r,
-                                                    backgroundColor:
-                                                        Colors.grey.shade500,
-                                                    backgroundImage:
-                                                        NetworkImage(userModel
-                                                            .profilePicture!),
-                                                  ),
-                                                  title: Text(
-                                                    userModel.fullName!,
-                                                    style: TextStyle(
-                                                        fontFamily: "Aclonica",
-                                                        color: Colors.black54,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 13.sp),
-                                                  ),
-                                                  subtitle: chatRoomModel
-                                                              .lastMessage !=
-                                                          ""
-                                                      ? Text(
-                                                          chatRoomModel
-                                                              .lastMessage!,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                            fontStyle: FontStyle
-                                                                .italic,
-                                                            color: Colors.grey,
-                                                            fontSize: 11.sp,
-                                                          ),
-                                                        )
-                                                      : Text(
-                                                          "Say Hi to Start a Conversation!",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.blue,
-                                                              fontSize: 11.sp,
+                                                child: ListTile(
+                                                    minVerticalPadding: -30,
+                                                    // dense: true,
+                                                    contentPadding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 0,
+                                                            right: 10,
+                                                            left: 7),
+                                                    leading: CircleAvatar(
+                                                      radius: 30.r,
+                                                      backgroundColor:
+                                                          Colors.grey.shade500,
+                                                      backgroundImage:
+                                                          NetworkImage(userModel
+                                                              .profilePicture!),
+                                                    ),
+                                                    title: Text(
+                                                      userModel.fullName!,
+                                                      style: TextStyle(
+                                                          fontFamily:
+                                                              "Aclonica",
+                                                          color: Colors.black54,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 13.sp),
+                                                    ),
+                                                    subtitle: chatRoomModel
+                                                                .lastMessage !=
+                                                            ""
+                                                        ? Text(
+                                                            chatRoomModel
+                                                                .lastMessage!,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
                                                               fontStyle:
                                                                   FontStyle
-                                                                      .italic),
-                                                        ),
+                                                                      .italic,
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize: 11.sp,
+                                                            ),
+                                                          )
+                                                        : Text(
+                                                            "Say Hi to Start a Conversation!",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.blue,
+                                                                fontSize: 11.sp,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                          ),
 
-                                                  // ! Option for Delete
-                                                  trailing: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text(
-                                                        DateFormat(
-                                                                " dd MMM yyy")
-                                                            .format(DateTime
-                                                                .fromMillisecondsSinceEpoch(
-                                                                    chatRoomModel
+                                                    // ! Option for Delete
+                                                    trailing: chatRoomModel
+                                                                .readMessage !=
+                                                            null
+                                                        ? Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                DateFormat(
+                                                                        " dd MMM yyy")
+                                                                    .format(DateTime.fromMillisecondsSinceEpoch(chatRoomModel
                                                                         .updatedOn!
                                                                         .millisecondsSinceEpoch)),
-                                                        style: TextStyle(
-                                                            fontSize: 8.sp,
-                                                            fontStyle: FontStyle
-                                                                .italic,
-                                                            color: Colors.grey),
-                                                      ),
-                                                      Text(
-                                                        DateFormat(" hh:mm").format(
-                                                            DateTime.fromMillisecondsSinceEpoch(
-                                                                chatRoomModel
-                                                                    .updatedOn!
-                                                                    .millisecondsSinceEpoch)),
-                                                        style: TextStyle(
-                                                            fontSize: 8.sp,
-                                                            fontStyle: FontStyle
-                                                                .italic,
-                                                            color: Colors.grey),
-                                                      ),
-                                                    ],
-                                                  )),
-                                            )),
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        8.sp,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    color: Colors
+                                                                        .grey),
+                                                              ),
+                                                              Text(
+                                                                DateFormat(
+                                                                        " hh:mm")
+                                                                    .format(DateTime.fromMillisecondsSinceEpoch(chatRoomModel
+                                                                        .updatedOn!
+                                                                        .millisecondsSinceEpoch)),
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        8.sp,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    color: Colors
+                                                                        .grey),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : CircleAvatar(
+                                                            backgroundColor:
+                                                                Colors.blue,
+                                                            radius: 7,
+                                                          )))),
                                       );
                                     } else {
                                       return Padding(

@@ -5,11 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/models/models.dart';
-import 'package:simplechat/pages/homepage.dart';
 
 import '../provider/loading_provider.dart';
 import '../provider/randomNameGenerator.dart';
-import 'screens.dart';
 
 class Splash extends StatelessWidget {
   final User? firebaseUser;

@@ -260,6 +260,27 @@ class _ChatRoomState extends State<ChatRoom> {
         });
   }
 
+// !****************************************************
+// ! ****************************************************
+// !****************************************************
+
+  Future<void> readMessageStatus({required MessageModel message}) async {
+    final status = await FirebaseFirestore.instance
+        .collection("chatrooms")
+        .doc(widget.chatRoomModel.chatroomid)
+        .collection("messages")
+        .doc(message.messageId)
+        .get();
+
+    if (status.data() != null) {
+      ChatRoomModel chatModel =
+          ChatRoomModel.fromMap(status.data() as Map<String, dynamic>);
+
+      log("$chatModel.lastMessage");
+    }
+  }
+
+// !  **********************************************
   void sendMessage({required String? msg}) async {
     MessageModel? messageModel;
     // String? msg = messageController.text.trim();
@@ -273,6 +294,7 @@ class _ChatRoomState extends State<ChatRoom> {
           messageId: uuid.v1(),
           seen: false,
           sender: widget.currentUserModel.uid,
+          reciever: widget.enduser.uid,
           text: msg);
 
       FirebaseFirestore.instance
@@ -283,8 +305,15 @@ class _ChatRoomState extends State<ChatRoom> {
           .set(messageModel.toMap())
           .then((value) => sendPushNotificatio(widget.enduser, msg!));
 
+// !****************************************************
+//  ? ****************************************************
       widget.chatRoomModel.updatedOn = Timestamp.now();
+      widget.chatRoomModel.readMessage = null;
+      widget.chatRoomModel.fromUser = widget.currentUserModel.uid;
       widget.chatRoomModel.lastMessage = msg;
+
+      // !****************************************************
+//  ? ****************************************************
 
       FirebaseFirestore.instance
           .collection("chatrooms")
@@ -314,6 +343,7 @@ class _ChatRoomState extends State<ChatRoom> {
           messageId: uuid.v1(),
           seen: false,
           sender: widget.currentUserModel.uid,
+          reciever: widget.enduser.uid,
           text: msg);
 
       FirebaseFirestore.instance
@@ -324,6 +354,8 @@ class _ChatRoomState extends State<ChatRoom> {
           .set(messageModel.toMap());
 
       widget.chatRoomModel.updatedOn = Timestamp.now();
+      widget.chatRoomModel.readMessage = null;
+      widget.chatRoomModel.fromUser = widget.currentUserModel.uid;
       widget.chatRoomModel.lastMessage = msg;
 
       FirebaseFirestore.instance
@@ -357,6 +389,7 @@ class _ChatRoomState extends State<ChatRoom> {
           messageId: uuid.v1(),
           seen: false,
           sender: widget.currentUserModel.uid,
+          reciever: widget.enduser.uid,
           text: "");
 
       FirebaseFirestore.instance
@@ -365,10 +398,12 @@ class _ChatRoomState extends State<ChatRoom> {
           .collection("messages")
           .doc(messageModel.messageId)
           .set(messageModel.toMap())
-        ..then((value) => LocalNotificationServic.sendPushNotificatio(
-            widget.enduser, "Photo"));
+          .then((value) => LocalNotificationServic.sendPushNotificatio(
+              widget.enduser, "Photo"));
 
       widget.chatRoomModel.updatedOn = Timestamp.now();
+      widget.chatRoomModel.readMessage = null;
+      widget.chatRoomModel.fromUser = widget.currentUserModel.uid;
       widget.chatRoomModel.lastMessage = "photo";
 
       FirebaseFirestore.instance
@@ -468,12 +503,8 @@ class _ChatRoomState extends State<ChatRoom> {
                                   MessageModel.fromMap(dataSnapshot.docs[index]
                                       .data() as Map<String, dynamic>);
 
-                              log(currentMessage
-                                  .createdOn!.millisecondsSinceEpoch
-                                  .toString());
-
                               String messgaeDate =
-                                  DateFormat("EEE dd MMM   hh:mm").format(
+                                  DateFormat("EEE,dd MMM   hh:mm a").format(
                                       DateTime.fromMillisecondsSinceEpoch(
                                           currentMessage.createdOn!
                                               .millisecondsSinceEpoch));
@@ -498,10 +529,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                               : MainAxisAlignment.start,
                                       children: [
                                         InkWell(
-                                          onTap: () {
-                                            log("$index");
-                                            log("$dataSnapshot.docs.length");
-                                          },
+                                          onTap: () {},
                                           child: messageContainer(
                                               context: context,
                                               image: currentMessage.image != ""
@@ -565,6 +593,19 @@ class _ChatRoomState extends State<ChatRoom> {
           color: AppColors.backgroudColor,
           child: Row(
             children: [
+              CupertinoButton(
+                  child: const Icon(
+                    Icons.photo_camera,
+                    color: Colors.black87,
+                  ),
+                  onPressed: () {
+                    // sendMessage();
+
+                    provider.randomNameChanger(value: provider.randomName + 1);
+                    randomName = provider.randomName;
+                    setState(() {});
+                    showPhotoOption();
+                  }),
               Flexible(
                   child: TextFormField(
                 // textAlignVertical: TextAlignVertical.top,
@@ -588,20 +629,6 @@ class _ChatRoomState extends State<ChatRoom> {
               )),
               CupertinoButton(
                   child: const Icon(
-                    Icons.photo_camera,
-                    color: Colors.black87,
-                  ),
-                  onPressed: () {
-                    // sendMessage();
-
-                    provider.randomNameChanger(value: provider.randomName + 1);
-                    randomName = provider.randomName;
-                    setState(() {});
-                    log("$randomName");
-                    showPhotoOption();
-                  }),
-              CupertinoButton(
-                  child: const Icon(
                     Icons.send,
                     color: Colors.black87,
                   ),
@@ -610,8 +637,6 @@ class _ChatRoomState extends State<ChatRoom> {
                     setState(() {
                       imageFile = null;
                     });
-
-                    log("");
                   })
             ],
           ),
@@ -627,9 +652,6 @@ class _ChatRoomState extends State<ChatRoom> {
       required String? image,
       required String time,
       required bool sender}) {
-    final provider = Provider.of<LoadingProvider>(
-      context,
-    );
     return Padding(
       padding: EdgeInsets.only(
           top: 7.h,
