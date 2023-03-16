@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +17,7 @@ import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/colors/colors.dart';
+import 'package:simplechat/constants/emotions.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/screens.dart';
@@ -66,10 +68,10 @@ class _ChatRoomState extends State<ChatRoom> {
         croppedImage.path,
       );
       setState(() {
-        log("storing the image");
+        // log("storing the image");
         imageFile = croppedFile;
         if (imageFile != null) {
-          log("photo is stored");
+          // log("photo is stored");
 
           // !   ************
           sendPhoto(context);
@@ -98,10 +100,10 @@ class _ChatRoomState extends State<ChatRoom> {
                 'key=AAAAXk1Z2Yw:APA91bEJJT8NzzNAbx-pNe3_h6uB5x84hga6FtIatZmRSXk40p6FzF9H7iVoQ9jmVa_rDM79hfuQxSjssxJQMuXMCCfn_X3q_4dvZXl7z-MxPCxMG5-hyfPYlxI5A0DQlIxq5ib0SqCV',
           },
           body: jsonEncode(body));
-      log("Response status : ${res.statusCode}");
-      log("Response body : ${res.body}");
+      // log("Response status : ${res.statusCode}");
+      // log("Response body : ${res.body}");
     } catch (e) {
-      log("Send Notification  E --->      $e");
+      // log("Send Notification  E --->      $e");
     }
   }
 
@@ -240,7 +242,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.gallery);
-                    Navigator.pop(context);
+                    // Navigator.pop(context);
                   },
                   title: const Text("Select from Gallery"),
                   leading: const Icon(Icons.photo_album),
@@ -249,7 +251,7 @@ class _ChatRoomState extends State<ChatRoom> {
                   onTap: () {
                     selectImage(ImageSource.camera);
 
-                    Navigator.pop(context);
+                    // Navigator.pop(context);
                   },
                   title: const Text("Take a Photo"),
                   leading: const Icon(Icons.camera),
@@ -276,7 +278,7 @@ class _ChatRoomState extends State<ChatRoom> {
       ChatRoomModel chatModel =
           ChatRoomModel.fromMap(status.data() as Map<String, dynamic>);
 
-      log("$chatModel.lastMessage");
+      // log("$chatModel.lastMessage");
     }
   }
 
@@ -322,7 +324,7 @@ class _ChatRoomState extends State<ChatRoom> {
           .then((value) => LocalNotificationServic.sendPushNotificatio(
               widget.enduser, msg!));
 
-      log("Message has been send");
+      // log("Message has been send");
     }
 
     // ! for message with picture
@@ -367,7 +369,7 @@ class _ChatRoomState extends State<ChatRoom> {
       final provider = Provider.of<LoadingProvider>(context, listen: false);
       provider.sendPhotoCmplete(value: true);
 
-      log("Message has been send");
+      // log("Message has been send");
     }
 
     // ! for just picture
@@ -411,7 +413,7 @@ class _ChatRoomState extends State<ChatRoom> {
           .doc(widget.chatRoomModel.chatroomid)
           .set(widget.chatRoomModel.toMap());
 
-      log("Message has been send");
+      // log("Message has been send");
 
       final provider = Provider.of<LoadingProvider>(context, listen: false);
       provider.sendPhotoCmplete(value: true);
@@ -491,7 +493,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 if (snapshot.connectionState == ConnectionState.active) {
                   if (snapshot.hasData) {
                     QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
-                    log(dataSnapshot.docs.length.toString());
+                    // log(dataSnapshot.docs.length.toString());
 
                     return dataSnapshot.docs.length != 0
                         ? ListView.builder(
@@ -508,6 +510,8 @@ class _ChatRoomState extends State<ChatRoom> {
                                       DateTime.fromMillisecondsSinceEpoch(
                                           currentMessage.createdOn!
                                               .millisecondsSinceEpoch));
+
+                              var rand = Random();
 
                               return currentMessage.sender ==
                                           widget.currentUserModel.uid
@@ -531,6 +535,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                         InkWell(
                                           onTap: () {},
                                           child: messageContainer(
+                                              emotion: rand.nextInt(4),
                                               context: context,
                                               image: currentMessage.image != ""
                                                   ? currentMessage.image
@@ -647,7 +652,8 @@ class _ChatRoomState extends State<ChatRoom> {
 // !  This is Widget in which we will show messages to the user
 
   Widget messageContainer(
-      {required BuildContext context,
+      {required int emotion,
+      required BuildContext context,
       required String? messageText,
       required String? image,
       required String time,
@@ -658,103 +664,151 @@ class _ChatRoomState extends State<ChatRoom> {
           bottom: 7.h,
           left: sender ? 40.w : 7.w,
           right: sender ? 7.w : 40.w),
-      child: Column(
+      child: Row(
         crossAxisAlignment:
-            sender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            sender ? CrossAxisAlignment.center : CrossAxisAlignment.center,
         mainAxisAlignment:
             sender ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft:
-                      sender ? Radius.circular(15.r) : Radius.circular(15.r),
-                  topRight:
-                      sender ? Radius.circular(15.r) : Radius.circular(15.r),
-                  bottomLeft:
-                      sender ? Radius.circular(15.r) : Radius.circular(0.r),
-                  bottomRight:
-                      sender ? Radius.circular(0.r) : Radius.circular(15.r),
+          Visibility(
+            visible: sender == false,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.grey.shade300,
+                  backgroundImage: AssetImage(Emotions.emotions[emotion]),
                 ),
-                color:
-                    sender ? Colors.green.shade300 : Colors.blueGrey.shade300),
-            child: ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.7),
-                child: Column(
-                  crossAxisAlignment: sender
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
-                  mainAxisAlignment:
-                      sender ? MainAxisAlignment.end : MainAxisAlignment.start,
-                  children: [
-                    image != null
-                        ? GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                  backgroundColor: Colors.transparent,
-                                  constraints: BoxConstraints.expand(
-                                      width: MediaQuery.of(context).size.width,
-                                      height:
-                                          MediaQuery.of(context).size.height),
-                                  context: context,
-                                  builder: (builder) {
-                                    return Material(
-                                      type: MaterialType.transparency,
-                                      elevation: 0,
-                                      child: Container(
-                                        color: Colors.black,
-                                        height:
-                                            MediaQuery.of(context).size.height,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          children: [
-                                            Expanded(
-                                              child: Image.network(image,
-                                                  fit: BoxFit.cover),
+                SizedBox(
+                  width: 7,
+                )
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment:
+                sender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            mainAxisAlignment:
+                sender ? MainAxisAlignment.end : MainAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: sender
+                          ? Radius.circular(15.r)
+                          : Radius.circular(15.r),
+                      topRight: sender
+                          ? Radius.circular(15.r)
+                          : Radius.circular(15.r),
+                      bottomLeft:
+                          sender ? Radius.circular(15.r) : Radius.circular(0.r),
+                      bottomRight:
+                          sender ? Radius.circular(0.r) : Radius.circular(15.r),
+                    ),
+                    color: sender
+                        ? Colors.green.shade300
+                        : Colors.blueGrey.shade300),
+                child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.7),
+                    child: Column(
+                      crossAxisAlignment: sender
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      mainAxisAlignment: sender
+                          ? MainAxisAlignment.end
+                          : MainAxisAlignment.start,
+                      children: [
+                        image != null
+                            ? GestureDetector(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                      backgroundColor: Colors.transparent,
+                                      constraints: BoxConstraints.expand(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height),
+                                      context: context,
+                                      builder: (builder) {
+                                        return Material(
+                                          type: MaterialType.transparency,
+                                          elevation: 0,
+                                          child: Container(
+                                            color: Colors.black,
+                                            height: MediaQuery.of(context)
+                                                .size
+                                                .height,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Expanded(
+                                                  child: Image.network(image,
+                                                      fit: BoxFit.cover),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  });
-                            },
-                            child: Container(
-                              // color: AppColors.backgroudColor,
-                              // height: MediaQuery.of(context).size.height * 0.35,
-                              // width: MediaQuery.of(context).size.height * 0.35,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(6),
-                                child: Image.network(
-                                  image,
-                                  fit: BoxFit.contain,
+                                          ),
+                                        );
+                                      });
+                                },
+                                child: Container(
+                                  // color: AppColors.backgroudColor,
+                                  // height: MediaQuery.of(context).size.height * 0.35,
+                                  // width: MediaQuery.of(context).size.height * 0.35,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: Image.network(
+                                      image,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          )
-                        : const SizedBox(),
-                    messageText != null
-                        ? Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12.w, vertical: 8.h),
-                            child: Text(
-                              messageText,
-                              style: TextStyle(
-                                  color: Colors.black, fontSize: 14.sp),
-                            ),
-                          )
-                        : const SizedBox(),
-                  ],
-                )),
+                              )
+                            : const SizedBox(),
+                        messageText != null
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w, vertical: 8.h),
+                                child: Text(
+                                  messageText,
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 14.sp),
+                                ),
+                              )
+                            : const SizedBox(),
+                      ],
+                    )),
+              ),
+              SizedBox(
+                height: 3.h,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Text(
+                  time,
+                  style: TextStyle(fontSize: 9.sp, color: Colors.black87),
+                ),
+              ),
+            ],
           ),
-          SizedBox(
-            height: 3.h,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: Text(
-              time,
-              style: TextStyle(fontSize: 9.sp, color: Colors.black87),
+          Visibility(
+            visible: sender,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 7,
+                ),
+                CircleAvatar(
+                  backgroundColor: Colors.green.shade300,
+                  backgroundImage: AssetImage(Emotions.emotions[emotion]),
+                ),
+              ],
             ),
           ),
         ],

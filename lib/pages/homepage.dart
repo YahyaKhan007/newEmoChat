@@ -325,9 +325,18 @@ class _HomePageState extends State<HomePage> {
                                                       style: TextStyle(
                                                           fontFamily:
                                                               "Aclonica",
-                                                          color: Colors.black54,
-                                                          fontWeight:
-                                                              FontWeight.w600,
+                                                          color: chatRoomModel
+                                                                      .readMessage !=
+                                                                  null
+                                                              ? Colors
+                                                                  .grey.shade600
+                                                              : Colors.black,
+                                                          fontWeight: chatRoomModel
+                                                                      .readMessage !=
+                                                                  null
+                                                              ? FontWeight
+                                                                  .normal
+                                                              : FontWeight.bold,
                                                           fontSize: 13.sp),
                                                     ),
                                                     subtitle: chatRoomModel
@@ -340,11 +349,22 @@ class _HomePageState extends State<HomePage> {
                                                                 TextOverflow
                                                                     .ellipsis,
                                                             style: TextStyle(
+                                                              fontWeight: chatRoomModel
+                                                                          .readMessage !=
+                                                                      null
+                                                                  ? FontWeight
+                                                                      .normal
+                                                                  : FontWeight
+                                                                      .bold,
                                                               fontStyle:
                                                                   FontStyle
                                                                       .italic,
-                                                              color:
-                                                                  Colors.grey,
+                                                              color: chatRoomModel
+                                                                          .readMessage !=
+                                                                      null
+                                                                  ? Colors.grey
+                                                                  : Colors
+                                                                      .black,
                                                               fontSize: 11.sp,
                                                             ),
                                                           )

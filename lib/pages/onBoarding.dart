@@ -1,7 +1,9 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:simplechat/constants/images.dart';
 
 import '../main.dart';
 import '../provider/loading_provider.dart';
@@ -18,6 +20,7 @@ class OnBoardingScreen extends StatelessWidget {
         ListenableProvider(create: (_) => RandomName())
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: OnBoarding(),
       ),
     );
@@ -33,16 +36,12 @@ class OnBoarding extends StatefulWidget {
 
 class _OnBoardingState extends State<OnBoarding> {
   List<String> boardingText = [
-    "Be social, find friends and inspiration",
+    "Chat anyOne along with emotions",
     "Meet awesom people",
     "Hangout with friends and attend events"
   ];
-  List<String> pic = [
-    "assets/awais.JPG",
-    "assets/yahya2.JPG",
-  ];
 
-  String text = 'A varification code will be sent to your phone';
+  String text = 'simple signup and Enjoy chatting';
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -51,6 +50,7 @@ class _OnBoardingState extends State<OnBoarding> {
         height: size.height,
         width: size.width,
         child: Stack(
+          alignment: Alignment.bottomCenter,
           children: [
             PageView(
               children: [
@@ -65,8 +65,8 @@ class _OnBoardingState extends State<OnBoarding> {
                         child: SizedBox(
                           height: size.height * 0.19907822,
                           width: size.width * 0.395976,
-                          child:
-                              CircleAvatar(backgroundImage: AssetImage(pic[0])),
+                          child: CircleAvatar(
+                              backgroundImage: AssetImage(Images.images[2])),
                         ),
                       ),
                       Positioned(
@@ -75,8 +75,8 @@ class _OnBoardingState extends State<OnBoarding> {
                         child: SizedBox(
                           height: size.height * 0.04608885,
                           width: size.width * 0.09167303,
-                          child:
-                              CircleAvatar(backgroundImage: AssetImage(pic[1])),
+                          child: CircleAvatar(
+                              backgroundImage: AssetImage(Images.images[4])),
                         ),
                       ),
                       Positioned(
@@ -85,8 +85,8 @@ class _OnBoardingState extends State<OnBoarding> {
                         child: SizedBox(
                           height: size.height * 0.09729868,
                           width: size.width * 0.19353196,
-                          child:
-                              CircleAvatar(backgroundImage: AssetImage(pic[1])),
+                          child: CircleAvatar(
+                              backgroundImage: AssetImage(Images.images[3])),
                         ),
                       ),
                       Positioned(
@@ -95,8 +95,8 @@ class _OnBoardingState extends State<OnBoarding> {
                         child: SizedBox(
                           height: size.height * 0.16131097,
                           width: size.width * 0.29793736,
-                          child:
-                              CircleAvatar(backgroundImage: AssetImage(pic[1])),
+                          child: CircleAvatar(
+                              backgroundImage: AssetImage(Images.images[8])),
                         ),
                       ),
                       Positioned(
@@ -105,8 +105,8 @@ class _OnBoardingState extends State<OnBoarding> {
                         child: SizedBox(
                           height: size.height * 0.09391883,
                           width: size.width * 0.20117138,
-                          child:
-                              CircleAvatar(backgroundImage: AssetImage(pic[1])),
+                          child: CircleAvatar(
+                              backgroundImage: AssetImage(Images.images[4])),
                         ),
                       ),
                       Positioned(
@@ -115,8 +115,8 @@ class _OnBoardingState extends State<OnBoarding> {
                         child: SizedBox(
                           height: size.height * 0.104980156,
                           width: size.width * 0.208810797,
-                          child:
-                              CircleAvatar(backgroundImage: AssetImage(pic[1])),
+                          child: CircleAvatar(
+                              backgroundImage: AssetImage(Images.images[1])),
                         ),
                       ),
                       Positioned(
@@ -125,8 +125,8 @@ class _OnBoardingState extends State<OnBoarding> {
                         child: SizedBox(
                           height: size.height * 0.128024581,
                           width: size.width * 0.254647313,
-                          child:
-                              CircleAvatar(backgroundImage: AssetImage(pic[1])),
+                          child: CircleAvatar(
+                              backgroundImage: AssetImage(Images.images[8])),
                         ),
                       ),
                       Positioned(
@@ -148,7 +148,8 @@ class _OnBoardingState extends State<OnBoarding> {
                             ),
                           )),
                       Positioned(
-                          top: size.height * 0.844962233,
+                          top: size.height * 0.850224043,
+                          right: 55.w,
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                                 horizontal: size.width * 0.08912656),
@@ -169,31 +170,31 @@ class _OnBoardingState extends State<OnBoarding> {
                   child: Stack(
                     children: [
                       Positioned(
-                          top: size.height * 0.322621943,
-                          left: -size.width * 0.25974026,
+                          top: size.height * 0.422621943,
+                          left: -size.width * 0.10974026,
                           child: SizedBox(
                             height: size.height * 0.199078223,
                             width: size.width * 0.395976572,
                             child: CircleAvatar(
-                                backgroundImage: AssetImage(pic[1])),
+                                backgroundImage: AssetImage(Images.images[1])),
                           )),
                       Positioned(
-                          top: size.height * 0.286775076,
+                          top: size.height * 0.186775076,
                           left: size.width * 0.198624905,
                           child: SizedBox(
-                            height: size.height * 0.27781334,
+                            height: size.height * 0.26781334,
                             width: size.width * 0.55258467,
                             child: CircleAvatar(
-                                backgroundImage: AssetImage(pic[1])),
+                                backgroundImage: AssetImage(Images.images[8])),
                           )),
                       Positioned(
-                          top: size.height * 0.322621943,
-                          left: size.width * 0.814871403,
+                          top: size.height * 0.422621943,
+                          right: -size.width * 0.063,
                           child: SizedBox(
                             height: size.height * 0.199078223,
                             width: size.width * 0.395976572,
                             child: CircleAvatar(
-                                backgroundImage: AssetImage(pic[1])),
+                                backgroundImage: AssetImage(Images.images[4])),
                           )),
                       Positioned(
                           top: size.height * 0.7937524,
@@ -214,7 +215,8 @@ class _OnBoardingState extends State<OnBoarding> {
                             ),
                           )),
                       Positioned(
-                          top: size.height * 0.844962233,
+                          top: size.height * 0.850224043,
+                          right: 55.w,
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                                 horizontal: size.width * 0.0891265597),
@@ -234,19 +236,20 @@ class _OnBoardingState extends State<OnBoarding> {
                   height: size.height,
                   width: size.width,
                   child: Stack(
+                    alignment: Alignment.center,
                     children: [
                       Swiper(
                         scrollDirection: Axis.vertical,
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
                             child: Image.asset(
-                              pic[index],
+                              Images.images[index],
                               fit: BoxFit.cover,
                             ),
                             color: Colors.green,
                           );
                         },
-                        itemCount: pic.length,
+                        itemCount: Images.images.length,
                         itemWidth: 300.0,
                         itemHeight: 320.0,
                         layout: SwiperLayout.TINDER,
@@ -270,12 +273,13 @@ class _OnBoardingState extends State<OnBoarding> {
                             ),
                           )),
                       Positioned(
-                          top: size.height * 0.844962233,
+                          top: size.height * 0.850224043,
+                          right: 85.w,
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: size.width * 0.0891265597),
+                            padding: EdgeInsets.only(left: 200.w),
                             child: Text(
                               text,
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: size.width * 0.038197097,
                                   fontWeight: FontWeight.bold,
