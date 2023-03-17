@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -191,6 +192,12 @@ class _HomePageState extends State<HomePage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.active) {
                   if (snapshot.hasData) {
+                    // !   *************************
+                    CollectionReference ref =
+                        FirebaseFirestore.instance.collection('chatrooms');
+
+                    // !   *************************
+
                     QuerySnapshot chatRoomSnapshot =
                         snapshot.data as QuerySnapshot;
 
@@ -225,17 +232,26 @@ class _HomePageState extends State<HomePage> {
                                         ConnectionState.done) {
                                       UserModel userModel =
                                           userData.data as UserModel;
-                                      // !
 
                                       // !   This Container will be shown on the Homepage as a chatroom
 
-                                      // !
                                       return GestureDetector(
                                         onLongPress: () {
-                                          log("deleted");
                                           dialogBox(
+                                              chatRoomModel: chatRoomModel,
+                                              ref: ref,
                                               context: context,
-                                              onPressed: () {});
+                                              onPressed: () {
+                                                ref
+                                                    .doc(chatRoomModel
+                                                        .chatroomid)
+                                                    .delete();
+                                                log("deleted");
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(SnackBar(
+                                                        content: Text(
+                                                            "Deleted Succussfully")));
+                                              });
                                           // ! **********************
                                           // !    Delete
                                           // !  *********************
@@ -513,7 +529,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  dialogBox({required BuildContext context, required VoidCallback onPressed}) {
+  dialogBox(
+      {required BuildContext context,
+      required VoidCallback onPressed,
+      required CollectionReference ref,
+      required ChatRoomModel chatRoomModel}) {
     return showDialog(
         context: context,
         builder: (builder) {
@@ -546,9 +566,7 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.blue),
                         )),
                     CupertinoButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: onPressed,
                         child: Text(
                           "No",
                           style: TextStyle(
