@@ -9,9 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/chatroom.dart';
+import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
+import 'package:uuid/uuid.dart';
 
 import '../colors/colors.dart';
 import '../models/models.dart';
@@ -27,6 +30,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  bool isFriend = false;
   bool isClicked = false;
   final TextEditingController searchUserController = TextEditingController();
 
@@ -72,6 +76,8 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    checkFriend({required BuildContext context}) {}
+    final LoadingProvider provider = Provider.of<LoadingProvider>(context);
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
@@ -143,11 +149,8 @@ class _SearchPageState extends State<SearchPage> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.active) {
                 if (snapshot.hasData) {
-                  log("has Data");
-
                   QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
                   if (dataSnapshot.docs.isNotEmpty) {
-                    log("not Empty");
                     Map<String, dynamic> userMap =
                         dataSnapshot.docs[0].data() as Map<String, dynamic>;
                     UserModel searchedUser = UserModel.fromMap(userMap);
@@ -172,32 +175,107 @@ class _SearchPageState extends State<SearchPage> {
                                   minLeadingWidth: 50,
                                   onTap: () async {
                                     // !  ******************************
+                                    if (searchedUser.accountType == "Public") {
+                                      log("public");
+                                      Loading.showLoadingDialog(
+                                          context, "Creating a chatroom");
 
-                                    Loading.showLoadingDialog(
-                                        context, "Creating a chatroom");
+                                      ChatRoomModel? chatRoom =
+                                          await getChatroomModel(searchedUser);
+                                      Navigator.pop(context);
 
-                                    ChatRoomModel? chatRoom =
-                                        await getChatroomModel(searchedUser);
-                                    Navigator.pop(context);
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              duration: const Duration(
+                                                  milliseconds: 700),
+                                              type: PageTransitionType.fade,
+                                              child: ChatRoom(
+                                                chatRoomModel: chatRoom!,
+                                                enduser: searchedUser,
+                                                firebaseUser:
+                                                    widget.firebaseUser!,
+                                                currentUserModel:
+                                                    widget.userModel!,
+                                              ),
+                                              isIos: true));
+                                    } else if (widget.userModel!.friends!
+                                        .contains(searchedUser.uid)) {
+                                      Loading.showLoadingDialog(
+                                          context, "Creating a chatroom");
 
-                                    Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            duration: const Duration(
-                                                milliseconds: 700),
-                                            type: PageTransitionType.fade,
-                                            child: ChatRoom(
-                                              chatRoomModel: chatRoom!,
-                                              enduser: searchedUser,
-                                              firebaseUser:
-                                                  widget.firebaseUser!,
-                                              currentUserModel:
-                                                  widget.userModel!,
-                                            ),
-                                            isIos: true));
+                                      ChatRoomModel? chatRoom =
+                                          await getChatroomModel(searchedUser);
+                                      Navigator.pop(context);
+
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              duration: const Duration(
+                                                  milliseconds: 700),
+                                              type: PageTransitionType.fade,
+                                              child: ChatRoom(
+                                                chatRoomModel: chatRoom!,
+                                                enduser: searchedUser,
+                                                firebaseUser:
+                                                    widget.firebaseUser!,
+                                                currentUserModel:
+                                                    widget.userModel!,
+                                              ),
+                                              isIos: true));
+                                    } else {
+                                      log("private");
+                                      Loading.showAlertDialog(
+                                          context,
+                                          "Warning",
+                                          "in order to Communicate, You must first be friend with the user");
+                                    }
                                   },
-                                  trailing:
-                                      const Icon(Icons.keyboard_arrow_right),
+                                  trailing: searchedUser.accountType == "Public"
+                                      ? const Icon(Icons.keyboard_arrow_right)
+                                      : CircleAvatar(
+                                          backgroundColor:
+                                              AppColors.backgroudColor,
+                                          child: CupertinoButton(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.zero,
+                                            onPressed: () {
+                                              //? *****************************
+                                              //? *****************************
+
+                                              try {
+                                                if (!widget.userModel!.friends!
+                                                    .contains(
+                                                        searchedUser.uid)) {
+                                                  addFriend(
+                                                      context: context,
+                                                      currentUserModel:
+                                                          widget.userModel!,
+                                                      provider: provider,
+                                                      searchedUser:
+                                                          searchedUser);
+                                                }
+                                              } catch (e) {
+                                                log(e.toString());
+                                              }
+
+                                              //? *****************************
+                                              //? *****************************
+                                            },
+                                            child: widget.userModel!.friends!
+                                                    .contains(searchedUser.uid)
+                                                ? Icon(Icons.check)
+                                                : provider.sendRequest
+                                                    ? SpinKitSpinningLines(
+                                                        color: Colors.black,
+                                                        size: 15.0,
+                                                      )
+                                                    : Center(
+                                                        child: Icon(
+                                                        Icons.person_add_sharp,
+                                                        color: Colors.grey,
+                                                      )),
+                                          )),
                                   leading: Container(
                                     decoration: BoxDecoration(boxShadow: [
                                       AppColors.containerShadow,
@@ -240,9 +318,80 @@ class _SearchPageState extends State<SearchPage> {
                 );
               }
             },
-          )
+          ),
         ],
       ),
     );
+  }
+}
+
+addFriend(
+    {required BuildContext context,
+    required UserModel currentUserModel,
+    required UserModel searchedUser,
+    required LoadingProvider provider}) async {
+  bool sent = false;
+  List<UserModel> totalRequest = [];
+  log(totalRequest.length.toString());
+
+  // StatefulBuilder(
+  //   builder: (BuildContext context, setState) {
+  //     return StreamBuilder(
+  //       stream: FirebaseFirestore.instance.collection("requests").snapshots(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.active) {
+  //           if (snapshot.hasData) {
+  //             log(snapshot.data!.size.toString());
+
+  //             QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
+
+  //             CollectionReference ref =
+  //                 FirebaseFirestore.instance.collection('requests');
+
+  //             if (dataSnapshot.docs.isNotEmpty) {
+  //               return ListView.builder(
+  //                   itemCount: dataSnapshot.docs.length,
+  //                   itemBuilder: (context, index) {
+  //                     Map<String, dynamic> requestData =
+  //                         dataSnapshot.docs[index].data()
+  //                             as Map<String, dynamic>;
+
+  //                     UserModel requests = UserModel.fromMap(requestData);
+  //                     log("-------------------------->" + requests.toString());
+  //                     totalRequest.add(requests);
+  //                   });
+  //             } else {
+  //               log("--------------------------->Empty");
+  //               return SizedBox();
+  //             }
+  //           } else {
+  //             return Center(
+  //               child: Text("No Requests yet"),
+  //             );
+  //           }
+  //         } else {
+  //           return Center(
+  //             child: CircularProgressIndicator(),
+  //           );
+  //         }
+  //       },
+  //     );
+  //   },
+  // );
+
+  log(totalRequest.length.toString());
+
+  log("came");
+  if (totalRequest.contains(searchedUser.uid)) {
+    log("Contains");
+  } else {
+    log("not Containe");
+    searchedUser.sender = currentUserModel.uid;
+    searchedUser.reciever = searchedUser.uid;
+    await FirebaseFirestore.instance
+        .collection("requests")
+        .doc(searchedUser.uid)
+        .set(searchedUser.toMap())
+        .then((value) => provider.changeSendRequest(value: false));
   }
 }

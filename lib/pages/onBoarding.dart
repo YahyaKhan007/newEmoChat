@@ -299,8 +299,8 @@ class _OnBoardingState extends State<OnBoarding> {
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
                     prefs.setString("isFirstTime", "Not Anymore");
-
-                    Navigator.push(context,
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                    Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => MyApp()));
                   },
                   child: Text(

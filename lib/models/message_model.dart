@@ -5,6 +5,7 @@ class MessageModel {
   String? sender;
   String? reciever;
   String? text;
+  String? emotion;
   bool? seen;
   Timestamp? createdOn;
   Timestamp? readTime;
@@ -17,6 +18,7 @@ class MessageModel {
       this.reciever,
       this.text,
       this.seen,
+      this.emotion,
       this.createdOn,
       this.readTime,
       this.image});
@@ -29,6 +31,7 @@ class MessageModel {
     reciever = map["reciever"];
     text = map["text"];
     seen = map["seen"];
+    emotion = map["emotion"];
     createdOn = map["createdOn"];
     readTime = map["readTime"];
     image = map["image"];
@@ -42,6 +45,7 @@ class MessageModel {
       "reciever": reciever,
       "text": text,
       "seen": seen,
+      "emotion": emotion,
       "createdOn": createdOn,
       "readTime": readTime,
       "image": image

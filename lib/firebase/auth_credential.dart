@@ -42,10 +42,14 @@ class FirebaseController extends ChangeNotifier {
     if (credential != null) {
       String uid = credential.user!.uid;
       UserModel newUser = UserModel(
+          friends: [],
+          sender: "",
+          reciever: "",
           uid: uid,
           fullName: "",
           email: email,
           profilePicture: "",
+          accountType: "",
           bio: "",
           pushToken: "",
           memberSince: Timestamp.now());
@@ -55,7 +59,9 @@ class FirebaseController extends ChangeNotifier {
           .doc(uid)
           .set(newUser.toMap())
           .then((value) => provider.changeSigupLoading(value: false))
-          .then((value) => Navigator.push(
+          .then(
+              (value) => Navigator.popUntil(context, (route) => route.isFirst))
+          .then((value) => Navigator.pushReplacement(
               context,
               PageTransition(
                   duration: const Duration(milliseconds: 700),
@@ -94,6 +100,7 @@ class FirebaseController extends ChangeNotifier {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("User Logged in")));
       provider.changeLoginLoading(value: false);
+      Navigator.popUntil(context, (route) => route.isFirst);
       Navigator.pushReplacement(
           context,
           PageTransition(
@@ -107,8 +114,8 @@ class FirebaseController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      Loading.showAlertDialog(context, "Login Error", e.toString());
       provider.changeLoginLoading(value: false);
+      Loading.showAlertDialog(context, "Signup Error", e.toString());
       log("$e");
       return false;
     }

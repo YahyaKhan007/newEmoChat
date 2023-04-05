@@ -16,7 +16,9 @@ import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/notification/local_notification.dart';
+import 'package:simplechat/pages/my_friends.dart';
 import 'package:simplechat/pages/profile.dart';
+import 'package:simplechat/pages/requests.dart';
 
 import '../models/models.dart';
 import 'screens.dart';
@@ -82,6 +84,46 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
         actions: [
+          CircleAvatar(
+              backgroundColor: AppColors.backgroudColor,
+              child: CupertinoButton(
+                alignment: Alignment.center,
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          duration: const Duration(milliseconds: 700),
+                          type: PageTransitionType.fade,
+                          child: Requests(currentUserModel: widget.userModel),
+                          isIos: true));
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                  //? *****************************
+                },
+                child: Center(
+                    child: Icon(
+                  Icons.person_2,
+                  color: Colors.black,
+                )),
+              )),
           CupertinoButton(
               child: const Icon(CupertinoIcons.chat_bubble_2_fill,
                   color: Colors.black),
@@ -109,6 +151,7 @@ class _HomePageState extends State<HomePage> {
                 backgroundColor: Theme.of(context).colorScheme.onBackground),
             onPressed: () {
               log("message");
+              log(widget.firebaseUser.uid);
               Navigator.push(
                   context,
                   PageTransition(
@@ -168,6 +211,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onPressed: () {
                       setState(() {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (builder) => MyFirends(
+                                      firebaseUser: widget.firebaseUser,
+                                      currentUserModel: widget.userModel,
+                                    )));
                         // search(
                         //     context: context,
                         //     userEmail: searchUserController.text

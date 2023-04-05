@@ -20,4 +20,14 @@ class RandomName extends ChangeNotifier {
     _disable = value;
     notifyListeners();
   }
+
+  // ! check frnd
+
+  bool _frnd = false;
+
+  bool get frnd => _frnd;
+  void changeFrnd({required bool value}) {
+    _frnd = value;
+    notifyListeners();
+  }
 }

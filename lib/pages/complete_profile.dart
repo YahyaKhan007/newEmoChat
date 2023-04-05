@@ -115,6 +115,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.gallery);
+                    Navigator.of(context, rootNavigator: true).pop();
+                    // Navigator.pop(context);
                   },
                   title: const Text("Select from Gallery"),
                   leading: const Icon(Icons.photo_album),
@@ -122,6 +124,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.camera);
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   title: const Text("Take a Photo"),
                   leading: const Icon(Icons.camera),
@@ -168,6 +171,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
     widget.userModel.bio = bio.toString();
     widget.userModel.profilePicture = imageUrl;
     widget.userModel.pushToken = token!;
+    widget.userModel.accountType = dropdownvalue.toString();
 
     await FirebaseFirestore.instance
         .collection("users")
@@ -175,7 +179,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
         .set(widget.userModel.toMap())
         .then((value) => ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Data Uploaded"))))
-        .then((value) => Navigator.popUntil(context, (route) => route.isFirst))
+        // .then((value) => Navigator.popUntil(context, (route) => route.isFirst))
         .then((value) => provider.changeLoading(value: false))
         .then((value) => Navigator.pushReplacement(
             context,
@@ -188,6 +192,15 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ),
                 isIos: true)));
   }
+
+  // !    777&&&&&&&&&&&&&&&&&&&&&
+  String dropdownvalue = 'Private';
+
+  // List of items in our dropdown menu
+  var items = [
+    'Private',
+    'Public',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -259,6 +272,56 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 decoration: const InputDecoration(
                     labelText: "Bio",
                     labelStyle: TextStyle(fontSize: 16, color: Colors.black)),
+              ),
+              Container(
+                height: 70,
+                // decoration: BoxDecoration(
+                //     border: Border(bottom: BorderSide(color: Colors.black45))),
+                child: Row(
+                  children: [
+                    Text(
+                      "Account Type : ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 30.w,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: DropdownButton(
+                        isExpanded: true,
+                        // Initial Value
+                        value: dropdownvalue,
+                        alignment: Alignment.center,
+
+                        // Down Arrow Icon
+                        icon: const Icon(Icons.keyboard_arrow_down),
+                        underline: Container(
+                          color: Colors.black45,
+                          height: 0.5,
+                        ),
+
+                        // Array list of items
+                        items: items.map((String items) {
+                          return DropdownMenuItem(
+                            value: items,
+                            child: Text(items),
+                          );
+                        }).toList(),
+                        // After selecting the desired option,it will
+                        // change button value to selected value
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            dropdownvalue = newValue!;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(
                 height: 30,

@@ -12,7 +12,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/widgets/showLoading.dart';
@@ -96,6 +95,7 @@ class _EditProfileState extends State<EditProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.gallery);
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   title: const Text("Select from Gallery"),
                   leading: const Icon(Icons.photo_album),
@@ -103,6 +103,7 @@ class _EditProfileState extends State<EditProfile> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.camera);
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   title: const Text("Take a Photo"),
                   leading: const Icon(Icons.camera),

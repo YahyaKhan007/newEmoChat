@@ -62,22 +62,19 @@ class Loading {
         content,
         style: TextStyle(fontSize: 13.sp),
       ),
-      // actions: [
-      //   TextButton(
-      //     onPressed: () {
-      //       Navigator.of(context).pop();
-      //     },
-      //     child: const Text("Ok"),
-      //   ),
-      // ],
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+          child: const Text("Ok"),
+        ),
+      ],
     );
 
     showDialog(
         context: context,
         builder: (context) {
-          Future.delayed(Duration(seconds: 2), () {
-            Navigator.of(context).pop(true);
-          });
           return alertDialog;
         });
   }

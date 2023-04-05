@@ -89,7 +89,7 @@ class _AllUsersState extends State<AllUsers> {
                 color: Colors.grey.shade600,
               )),
           title: Text(
-            "Users",
+            "Public Users",
             style: TextStyle(letterSpacing: -2, color: Colors.grey.shade900),
           ),
         ),
@@ -114,66 +114,72 @@ class _AllUsersState extends State<AllUsers> {
 
                       UserModel endUser = UserModel.fromMap(userData);
 
-                      return Container(
-                        margin: EdgeInsets.only(bottom: 7),
-                        decoration: BoxDecoration(
-                            color: AppColors.foregroundColor,
-                            boxShadow: [AppColors.containerShadow]),
-                        child: ListTile(
-                          onTap: () async {
-                            // showWaiting(context: context, title: "creating");
-                            Loading.showLoadingDialog(context, "Creating");
-                            ChatRoomModel? chatRoom =
-                                await getChatroomModel(endUser);
-                            Navigator.push(
-                                context,
-                                PageTransition(
-                                    duration: const Duration(milliseconds: 700),
-                                    type: PageTransitionType.fade,
-                                    child: ChatRoom(
-                                      chatRoomModel: chatRoom!,
-                                      enduser: endUser,
-                                      firebaseUser: widget.firebaseUser!,
-                                      currentUserModel: widget.userModel!,
+                      return endUser.accountType == "Public"
+                          ? Container(
+                              margin: EdgeInsets.only(bottom: 7),
+                              decoration: BoxDecoration(
+                                  color: AppColors.foregroundColor,
+                                  boxShadow: [AppColors.containerShadow]),
+                              child: ListTile(
+                                onTap: () async {
+                                  // showWaiting(context: context, title: "creating");
+                                  Loading.showLoadingDialog(
+                                      context, "Creating");
+                                  ChatRoomModel? chatRoom =
+                                      await getChatroomModel(endUser);
+
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                          duration:
+                                              const Duration(milliseconds: 700),
+                                          type: PageTransitionType.fade,
+                                          child: ChatRoom(
+                                            chatRoomModel: chatRoom!,
+                                            enduser: endUser,
+                                            firebaseUser: widget.firebaseUser!,
+                                            currentUserModel: widget.userModel!,
+                                          ),
+                                          isIos: true));
+                                },
+                                leading: CircleAvatar(
+                                  radius: 28,
+                                  backgroundImage:
+                                      NetworkImage(endUser.profilePicture!),
+                                ),
+                                title: Text(
+                                  endUser.fullName!,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 14.sp),
+                                ),
+                                subtitle: Text(
+                                  endUser.bio!,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 11.sp),
+                                ),
+                                trailing: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Since",
+                                      style: TextStyle(
+                                          fontSize: 9.sp, color: Colors.grey),
                                     ),
-                                    isIos: true));
-                          },
-                          leading: CircleAvatar(
-                            radius: 28,
-                            backgroundImage:
-                                NetworkImage(endUser.profilePicture!),
-                          ),
-                          title: Text(
-                            endUser.fullName!,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 14.sp),
-                          ),
-                          subtitle: Text(
-                            endUser.bio!,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 11.sp),
-                          ),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "Since",
-                                style: TextStyle(
-                                    fontSize: 9.sp, color: Colors.grey),
+                                    Text(
+                                      DateFormat(" dd MMM yyy").format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              endUser.memberSince!
+                                                  .millisecondsSinceEpoch)),
+                                      style: TextStyle(
+                                          fontSize: 9.sp, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              Text(
-                                DateFormat(" dd MMM yyy").format(
-                                    DateTime.fromMillisecondsSinceEpoch(endUser
-                                        .memberSince!.millisecondsSinceEpoch)),
-                                style: TextStyle(
-                                    fontSize: 9.sp, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                            )
+                          : SizedBox();
                     },
                   );
                 } else {

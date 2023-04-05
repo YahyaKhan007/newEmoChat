@@ -54,4 +54,20 @@ class LoadingProvider extends ChangeNotifier {
     log("$_send");
     notifyListeners();
   }
+
+  // !   send Request
+  bool _sendRequest = false;
+  bool get sendRequest => _sendRequest;
+  void changeSendRequest({required bool value}) {
+    _sendRequest = value;
+    notifyListeners();
+  }
+
+  // !   send Request
+  bool _pending = false;
+  bool get pending => _pending;
+  void changePending({required bool value}) {
+    _pending = value;
+    notifyListeners();
+  }
 }

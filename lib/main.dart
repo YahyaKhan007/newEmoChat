@@ -10,6 +10,7 @@ import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/onBoarding.dart';
+import 'package:simplechat/pages/requests.dart';
 import 'package:simplechat/pages/splash_screen.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
@@ -101,7 +102,9 @@ class MyAppLoggedIn extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: user != null
-            ? HomePage(userModel: userModel!, firebaseUser: user!)
+            ?
+            // Requests()
+            HomePage(userModel: userModel!, firebaseUser: user!)
             : Login(),
       ),
     );
