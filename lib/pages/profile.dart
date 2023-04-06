@@ -8,7 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
+import 'package:simplechat/pages/zoom_drawer.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
 
 import '../colors/colors.dart';
 import 'screens.dart';
@@ -23,8 +26,10 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   static FirebaseMessaging messaging = FirebaseMessaging.instance;
   UserModel? userModel;
+  late UserModelProvider provider;
   @override
   void initState() {
+    provider = Provider.of<UserModelProvider>(context, listen: false);
     getoken();
     super.initState();
   }
@@ -46,6 +51,7 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
+          leadingWidth: 70.w,
           centerTitle: true,
           title: Text(
             "Profile",
@@ -88,13 +94,26 @@ class _ProfileState extends State<Profile> {
                 })
           ],
           elevation: 0,
-          leading: IconButton(
-              icon: const Icon(
-                CupertinoIcons.back,
-                color: Colors.black87,
-              ),
+          leading: CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 7),
+              child: CircleAvatar(
+                  // radius: 40,
+                  backgroundImage:
+                      NetworkImage(provider.userModel.profilePicture!),
+                  backgroundColor: Theme.of(context).colorScheme.onBackground),
               onPressed: () {
-                Navigator.of(context).pop();
+                log("message");
+                log(provider.firebaseUser!.uid);
+
+                drawerController.toggle!();
+
+                // Navigator.push(
+                // context,
+                // PageTransition(
+                //     duration: const Duration(milliseconds: 700),
+                //     type: PageTransitionType.fade,
+                //     child: const Profile(),
+                //     isIos: true));
               }),
           backgroundColor: AppColors.backgroudColor,
         ),

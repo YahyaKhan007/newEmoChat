@@ -10,11 +10,13 @@ import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:simplechat/pages/zoom_drawer.dart';
 
 import '../colors/colors.dart';
 import '../main.dart';
 import '../models/models.dart';
 import '../provider/randomNameGenerator.dart';
+import '../provider/user_model_provider.dart';
 import '../widgets/showLoading.dart';
 import 'screens.dart';
 
@@ -29,6 +31,15 @@ class MyFirends extends StatefulWidget {
 }
 
 class _MyFirendsState extends State<MyFirends> {
+  late UserModelProvider userProvider;
+
+  @override
+  void initState() {
+    userProvider = Provider.of<UserModelProvider>(context, listen: false);
+
+    super.initState();
+  }
+
   Future<ChatRoomModel?> getChatroomModel(
     UserModel targetUser,
   ) async {
@@ -99,16 +110,27 @@ class _MyFirendsState extends State<MyFirends> {
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
+          centerTitle: true,
           backgroundColor: AppColors.backgroudColor,
           elevation: 0.3,
-          leading: IconButton(
+          leading: CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 7),
+              child: CircleAvatar(
+                  // radius: 40,
+                  backgroundImage:
+                      NetworkImage(userProvider.userModel.profilePicture!),
+                  backgroundColor: Theme.of(context).colorScheme.onBackground),
               onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(
-                CupertinoIcons.back,
-                color: Colors.grey.shade600,
-              )),
+                drawerController.toggle!();
+
+                // Navigator.push(
+                // context,
+                // PageTransition(
+                //     duration: const Duration(milliseconds: 700),
+                //     type: PageTransitionType.fade,
+                //     child: const Profile(),
+                //     isIos: true));
+              }),
           title: Text(
             "My Friends",
             style: TextStyle(letterSpacing: -2, color: Colors.grey.shade900),

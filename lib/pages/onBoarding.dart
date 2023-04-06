@@ -10,7 +10,10 @@ import '../provider/loading_provider.dart';
 import '../provider/randomNameGenerator.dart';
 
 class OnBoardingScreen extends StatelessWidget {
-  const OnBoardingScreen({super.key});
+  final currentUser;
+  final thisUserModel;
+  const OnBoardingScreen(
+      {super.key, required this.currentUser, required this.thisUserModel});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,9 @@ class OnBoardingScreen extends StatelessWidget {
 }
 
 class OnBoarding extends StatefulWidget {
-  const OnBoarding({super.key});
+  final currentUser;
+  final thisUserModel;
+  const OnBoarding({super.key, this.currentUser, this.thisUserModel});
 
   @override
   _OnBoardingState createState() => _OnBoardingState();
@@ -300,8 +305,13 @@ class _OnBoardingState extends State<OnBoarding> {
                         await SharedPreferences.getInstance();
                     prefs.setString("isFirstTime", "Not Anymore");
                     Navigator.popUntil(context, (route) => route.isFirst);
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => MyApp()));
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MyApp(
+                                  currentUser: widget.currentUser,
+                                  thisUserModel: widget.thisUserModel,
+                                )));
                   },
                   child: Text(
                     "Skip",

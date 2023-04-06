@@ -63,7 +63,8 @@ class Signup extends StatelessWidget {
           children: [
             SizedBox(height: 200.h, child: Image.asset("assets/logo.png")),
             Container(
-              height: 310.h,
+              margin: EdgeInsets.symmetric(horizontal: 10.w),
+              height: 320.h,
               decoration: BoxDecoration(
                   boxShadow: [AppColors.containerShadow],
                   color: AppColors.foregroundColor,
@@ -170,12 +171,12 @@ class Signup extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 35.h,
+              height: 25.h,
             ),
             provider.signUpLoading
                 ? SpinKitSpinningLines(
                     color: Colors.black,
-                    size: 40.0,
+                    size: 30.0,
                   )
                 : GestureDetector(
                     onTap: () {
@@ -201,8 +202,8 @@ class Signup extends StatelessWidget {
                       //         builder: (builder) => const CompleteProfile()));
                     },
                     child: Container(
-                      height: 70,
-                      width: 100,
+                      height: 68.h,
+                      width: 90.w,
                       decoration: BoxDecoration(
                           boxShadow: [AppColors.containerShadow],
                           color: AppColors.foregroundColor,

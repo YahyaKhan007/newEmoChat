@@ -12,15 +12,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/my_friends.dart';
+import 'package:simplechat/pages/new_request.dart';
 import 'package:simplechat/pages/profile.dart';
 import 'package:simplechat/pages/requests.dart';
+import 'package:simplechat/pages/zoom_drawer.dart';
 
 import '../models/models.dart';
+import '../provider/user_model_provider.dart';
 import 'screens.dart';
 
 class HomePage extends StatefulWidget {
@@ -68,8 +72,14 @@ class _HomePageState extends State<HomePage> {
     color: Colors.white,
     size: 25.0,
   );
+  late UserModelProvider provider;
   @override
   void initState() {
+    provider = Provider.of<UserModelProvider>(context, listen: false);
+
+    log(provider.userModel.fullName.toString());
+    log(provider.firebaseUser.toString());
+
     FirebaseMessaging.onMessage.listen((event) {
       log("new Message  --->  ${event.notification!.title}");
       log("new Message  --->  ${event.notification!.body}");
@@ -84,46 +94,6 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
         actions: [
-          CircleAvatar(
-              backgroundColor: AppColors.backgroudColor,
-              child: CupertinoButton(
-                alignment: Alignment.center,
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  Navigator.push(
-                      context,
-                      PageTransition(
-                          duration: const Duration(milliseconds: 700),
-                          type: PageTransitionType.fade,
-                          child: Requests(currentUserModel: widget.userModel),
-                          isIos: true));
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                  //? *****************************
-                },
-                child: Center(
-                    child: Icon(
-                  Icons.person_2,
-                  color: Colors.black,
-                )),
-              )),
           CupertinoButton(
               child: const Icon(CupertinoIcons.chat_bubble_2_fill,
                   color: Colors.black),
@@ -141,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                 // FirebaseController().signout(context: context);
               })
         ],
-        leadingWidth: 80,
+        leadingWidth: 70.w,
         elevation: 0,
         leading: CupertinoButton(
             padding: const EdgeInsets.symmetric(horizontal: 7),
@@ -152,21 +122,24 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               log("message");
               log(widget.firebaseUser.uid);
-              Navigator.push(
-                  context,
-                  PageTransition(
-                      duration: const Duration(milliseconds: 700),
-                      type: PageTransitionType.fade,
-                      child: const Profile(),
-                      isIos: true));
+
+              drawerController.toggle!();
+
+              // Navigator.push(
+              // context,
+              // PageTransition(
+              //     duration: const Duration(milliseconds: 700),
+              //     type: PageTransitionType.fade,
+              //     child: const Profile(),
+              //     isIos: true));
             }),
         automaticallyImplyLeading: true,
         backgroundColor: AppColors.backgroudColor,
         centerTitle: true,
         title: const Text(
-          "Home Page",
+          "Chats",
           style: TextStyle(
-              letterSpacing: -5,
+              letterSpacing: -3,
               fontFamily: "zombie",
               fontSize: 32,
               color: Colors.black),
@@ -210,21 +183,26 @@ class _HomePageState extends State<HomePage> {
                       size: 25,
                     ),
                     onPressed: () {
-                      setState(() {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (builder) => MyFirends(
-                                      firebaseUser: widget.firebaseUser,
-                                      currentUserModel: widget.userModel,
-                                    )));
-                        // search(
-                        //     context: context,
-                        //     userEmail: searchUserController.text
-                        //         .toLowerCase()
-                        //         .toString(),
-                        //     currentUserModel: widget.userModel);
-                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          duration: Duration(milliseconds: 700),
+                          content:
+                              Text("To be implemented in the coming updates")));
+
+                      // setState(() {
+                      //   Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //           builder: (builder) => MyFirends(
+                      //                 firebaseUser: widget.firebaseUser,
+                      //                 currentUserModel: widget.userModel,
+                      //               )));
+                      //   // search(
+                      //   //     context: context,
+                      //   //     userEmail: searchUserController.text
+                      //   //         .toLowerCase()
+                      //   //         .toString(),
+                      //   //     currentUserModel: widget.userModel);
+                      // });
                     })
               ],
             ),

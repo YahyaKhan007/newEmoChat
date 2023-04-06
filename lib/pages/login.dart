@@ -65,6 +65,7 @@ class _LoginState extends State<Login> {
           children: [
             SizedBox(height: 230.h, child: Image.asset("assets/logo.png")),
             Container(
+              margin: EdgeInsets.symmetric(horizontal: 10.w),
               height: 300.h,
               decoration: BoxDecoration(
                   boxShadow: [
@@ -170,8 +171,8 @@ class _LoginState extends State<Login> {
                       //     (value) => provider.changeLoginLoading(value: false));
                     },
                     child: Container(
-                      height: 70,
-                      width: 100,
+                      height: 68.h,
+                      width: 90.w,
                       decoration: BoxDecoration(
                           boxShadow: [AppColors.containerShadow],
                           color: AppColors.foregroundColor,

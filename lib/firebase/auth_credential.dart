@@ -7,7 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
+import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -26,11 +28,14 @@ class FirebaseController extends ChangeNotifier {
     UserCredential? credential;
 
     var provider = Provider.of<LoadingProvider>(context, listen: false);
+    var userModelProvider =
+        Provider.of<UserModelProvider>(context, listen: false);
 
     try {
       provider.changeSigupLoading(value: true);
       credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.toString(), password: password.toString());
+
       log("just came here 2 ======================================>  $credential");
     } on FirebaseAuthException catch (e) {
       provider.changeSigupLoading(value: false);
@@ -59,6 +64,7 @@ class FirebaseController extends ChangeNotifier {
           .doc(uid)
           .set(newUser.toMap())
           .then((value) => provider.changeSigupLoading(value: false))
+          .then((value) => userModelProvider.updateUser(newUser))
           .then(
               (value) => Navigator.popUntil(context, (route) => route.isFirst))
           .then((value) => Navigator.pushReplacement(
@@ -81,6 +87,8 @@ class FirebaseController extends ChangeNotifier {
       required String email,
       required String password}) async {
     var provider = Provider.of<LoadingProvider>(context, listen: false);
+    var userModelProvider =
+        Provider.of<UserModelProvider>(context, listen: false);
     try {
       provider.changeLoginLoading(value: true);
 
@@ -97,19 +105,23 @@ class FirebaseController extends ChangeNotifier {
 
 // ! *****************************************
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("User Logged in")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          duration: Duration(milliseconds: 700),
+          content: Text("User Logged in")));
       provider.changeLoginLoading(value: false);
+
+      userModelProvider.updateUser(userModel);
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        userModelProvider.updateFirebaseUser(currentUser);
+      }
       Navigator.popUntil(context, (route) => route.isFirst);
       Navigator.pushReplacement(
           context,
           PageTransition(
               duration: const Duration(milliseconds: 700),
               type: PageTransitionType.fade,
-              child: HomePage(
-                firebaseUser: userCredential.user!,
-                userModel: userModel,
-              ),
+              child: MyHomePage(),
               isIos: true));
 
       return true;
@@ -122,8 +134,11 @@ class FirebaseController extends ChangeNotifier {
   }
 
   // ! Logout
-  void signout({required BuildContext context}) {
-    FirebaseAuth.instance.signOut();
+  static void signout({required BuildContext context}) async {
+    await FirebaseAuth.instance.signOut();
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        duration: Duration(milliseconds: 700),
+        content: Text("User Logged Out")));
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (builder) => Login()));
   }

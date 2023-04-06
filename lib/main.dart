@@ -4,20 +4,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/config.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/onBoarding.dart';
-import 'package:simplechat/pages/requests.dart';
 import 'package:simplechat/pages/splash_screen.dart';
+import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'pages/screens.dart';
 
 var uuid = const Uuid();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -50,63 +52,41 @@ void main() async {
         // !********************************
 
         return firstTime == null
-            ? OnBoardingScreen()
-            : Splash(
-                firebaseUser: currentUser,
-                userModel: thisUserModel,
+            ? OnBoardingScreen(
+                currentUser: currentUser,
+                thisUserModel: thisUserModel,
+              )
+            : MyApp(
+                currentUser: currentUser,
+                thisUserModel: thisUserModel,
               );
       }));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final currentUser;
+  final thisUserModel;
+  const MyApp(
+      {super.key, required this.currentUser, required this.thisUserModel});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ListenableProvider(create: (_) => LoadingProvider()),
+        ListenableProvider(create: (_) => UserModelProvider()),
         ListenableProvider(create: (_) => RandomName())
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Emochat',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: Login(),
-      ),
-    );
-  }
-}
-
-// ! Logged In
-class MyAppLoggedIn extends StatelessWidget {
-  const MyAppLoggedIn({super.key, required this.user, required this.userModel});
-  final User? user;
-  final UserModel? userModel;
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ListenableProvider(create: (_) => LoadingProvider()),
-        ListenableProvider(create: (_) => RandomName()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Emochat',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: user != null
-            ?
-            // Requests()
-            HomePage(userModel: userModel!, firebaseUser: user!)
-            : Login(),
-      ),
+          debugShowCheckedModeBanner: false,
+          title: 'Emochat',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: SplashScreen(
+            firebaseUser: currentUser,
+            userModel: thisUserModel,
+          )),
     );
   }
 }

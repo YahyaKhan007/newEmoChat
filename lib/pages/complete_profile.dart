@@ -16,7 +16,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/user_model.dart';
+import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
 import '../colors/colors.dart';
@@ -136,7 +138,9 @@ class _CompleteProfileState extends State<CompleteProfile> {
   }
 
 // ! Check either the data is entered or not
-  void checkValues({required LoadingProvider provider}) {
+  void checkValues(
+      {required LoadingProvider provider,
+      required UserModelProvider userModelProvider}) {
     String fullName = fullNameController.text.trim();
     if (fullName == "" ||
         imageFile == null ||
@@ -144,12 +148,14 @@ class _CompleteProfileState extends State<CompleteProfile> {
         token == "") {
       Loading.showAlertDialog(context, "Missing", "Entered all the data");
     } else {
-      uploadData(provider: provider);
+      uploadData(provider: provider, userModelProvider: userModelProvider);
     }
   }
 
 // ! Check either the data is entered or not
-  void uploadData({required LoadingProvider provider}) async {
+  void uploadData(
+      {required LoadingProvider provider,
+      required UserModelProvider userModelProvider}) async {
     // var provider = Provider.of<LoadingProvider>(context, listen: false);
     provider.changeLoading(value: true);
 
@@ -181,15 +187,15 @@ class _CompleteProfileState extends State<CompleteProfile> {
             .showSnackBar(const SnackBar(content: Text("Data Uploaded"))))
         // .then((value) => Navigator.popUntil(context, (route) => route.isFirst))
         .then((value) => provider.changeLoading(value: false))
+        .then((value) => userModelProvider.updateUser(widget.userModel))
+        .then((value) =>
+            userModelProvider.updateFirebaseUser(widget.firebaseUser))
         .then((value) => Navigator.pushReplacement(
             context,
             PageTransition(
                 duration: const Duration(milliseconds: 700),
                 type: PageTransitionType.fade,
-                child: HomePage(
-                  firebaseUser: widget.firebaseUser,
-                  userModel: widget.userModel,
-                ),
+                child: MyHomePage(),
                 isIos: true)));
   }
 
@@ -205,6 +211,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<LoadingProvider>(context, listen: true);
+    var userModelProvider =
+        Provider.of<UserModelProvider>(context, listen: true);
 
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
@@ -328,7 +336,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
               ),
               GestureDetector(
                 onTap: () {
-                  checkValues(provider: provider);
+                  checkValues(
+                      provider: provider, userModelProvider: userModelProvider);
                 },
                 child: provider.loading
                     ? spinkit
