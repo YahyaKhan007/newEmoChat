@@ -129,10 +129,18 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: ZombieFood
-  #     fonts:
-  #       - asset: "utils/fonts/ZombieFoodDemoRegular.ttf"
+fonts:
+  - family: Abrifat
+    fonts:
+      - asset: utils/fonts/AbrilFat.ttf
+
+  - family: Zombie
+    fonts:
+      - asset: utils/fonts/ZombieFoodDemoRegular.ttf
+
+    # - family: Abrifat
+    #   fonts:
+    #     - asset: utils/fonts/AbrilFat.ttf
 
     # - family: ZombieFoodDemoRegular
     #   fonts:

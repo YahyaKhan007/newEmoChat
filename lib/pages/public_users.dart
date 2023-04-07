@@ -14,18 +14,18 @@ import '../colors/colors.dart';
 import '../main.dart';
 import 'screens.dart';
 
-class AllUsers extends StatefulWidget {
+class PublicUsers extends StatefulWidget {
   final UserModel? userModel;
   final User? firebaseUser;
 
-  const AllUsers(
+  const PublicUsers(
       {super.key, required this.firebaseUser, required this.userModel});
 
   @override
-  State<AllUsers> createState() => _AllUsersState();
+  State<PublicUsers> createState() => _PublicUsersState();
 }
 
-class _AllUsersState extends State<AllUsers> {
+class _PublicUsersState extends State<PublicUsers> {
   Future<ChatRoomModel?> getChatroomModel(
     UserModel targetUser,
   ) async {
@@ -80,17 +80,21 @@ class _AllUsersState extends State<AllUsers> {
         appBar: AppBar(
           backgroundColor: AppColors.backgroudColor,
           elevation: 0.3,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(
-                CupertinoIcons.back,
-                color: Colors.grey.shade600,
-              )),
+          leading: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => Navigator.of(context).pop(),
+            child: Image.asset(
+              "assets/iconImages/back.png",
+            ),
+          ),
+          centerTitle: true,
           title: Text(
             "Public Users",
-            style: TextStyle(letterSpacing: -2, color: Colors.grey.shade900),
+            style: TextStyle(
+                letterSpacing: -2,
+                // fontFamily: "Zombie",
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade900),
           ),
         ),
         body: StreamBuilder(

@@ -84,7 +84,11 @@ class _SearchPageState extends State<SearchPage> {
         elevation: 0,
         title: const Text(
           "Search User",
-          style: TextStyle(color: Colors.black87, letterSpacing: -1.8),
+          style: TextStyle(
+            color: Colors.black87, letterSpacing: -2,
+            // fontFamily: "Zombie",
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: AppColors.backgroudColor,
         leading: CupertinoButton(

@@ -117,7 +117,11 @@ class _MyFirendsState extends State<MyFirends> {
           leading: drawerIcon(context),
           title: Text(
             "My Friends",
-            style: TextStyle(letterSpacing: -2, color: Colors.grey.shade900),
+            style: TextStyle(
+                letterSpacing: -2,
+                // fontFamily: "Zombie",
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade900),
           ),
         ),
         body: StreamBuilder(

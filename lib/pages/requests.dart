@@ -44,9 +44,14 @@ class _RequestsState extends State<Requests> {
         backgroundColor: AppColors.backgroudColor,
         elevation: 0.3,
         leading: drawerIcon(context),
+        centerTitle: true,
         title: Text(
           "Requests",
-          style: TextStyle(letterSpacing: -2, color: Colors.grey.shade900),
+          style: TextStyle(
+              letterSpacing: -2,
+              // fontFamily: "Zombie",
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade900),
         ),
       ),
       body: Column(

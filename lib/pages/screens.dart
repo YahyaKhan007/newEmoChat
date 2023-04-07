@@ -5,5 +5,5 @@ export 'homepage.dart';
 export 'chatroom.dart';
 export 'search.dart';
 export 'enduser_profile.dart';
-export 'allusers.dart';
+export 'public_users.dart';
 export 'edit_profile.dart';

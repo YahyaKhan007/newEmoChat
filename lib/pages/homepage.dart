@@ -20,6 +20,7 @@ import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/my_friends.dart';
 import 'package:simplechat/pages/new_request.dart';
 import 'package:simplechat/pages/profile.dart';
+import 'package:simplechat/pages/public_users.dart';
 import 'package:simplechat/pages/requests.dart';
 import 'package:simplechat/pages/zoom_drawer.dart';
 
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                     PageTransition(
                         duration: const Duration(milliseconds: 700),
                         type: PageTransitionType.fade,
-                        child: AllUsers(
+                        child: PublicUsers(
                             firebaseUser: widget.firebaseUser,
                             userModel: widget.userModel),
                         isIos: true));
@@ -123,8 +124,9 @@ class _HomePageState extends State<HomePage> {
         title: const Text(
           "Chats",
           style: TextStyle(
-              letterSpacing: -3,
-              fontFamily: "zombie",
+              letterSpacing: -2,
+              // fontFamily: "Zombie",
+              fontWeight: FontWeight.bold,
               fontSize: 32,
               color: Colors.black),
         ),
