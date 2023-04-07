@@ -14,6 +14,7 @@ import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 
 import '../colors/colors.dart';
+import '../widgets/widgets.dart';
 import 'screens.dart';
 
 class Profile extends StatefulWidget {
@@ -63,23 +64,7 @@ class _ProfileState extends State<Profile> {
           ),
           actions: [
             CupertinoButton(
-                child: Row(children: [
-                  Icon(
-                    CupertinoIcons.pencil_ellipsis_rectangle,
-                    size: 18,
-                    color: Colors.grey.shade900,
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Text(
-                    "Edit Profile",
-                    style: TextStyle(
-                        fontStyle: FontStyle.italic,
-                        fontSize: 13.sp,
-                        color: Colors.grey.shade900),
-                  )
-                ]),
+                child: Image.asset("assets/iconImages/editProfile.png"),
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -94,27 +79,7 @@ class _ProfileState extends State<Profile> {
                 })
           ],
           elevation: 0,
-          leading: CupertinoButton(
-              padding: const EdgeInsets.symmetric(horizontal: 7),
-              child: CircleAvatar(
-                  // radius: 40,
-                  backgroundImage:
-                      NetworkImage(provider.userModel.profilePicture!),
-                  backgroundColor: Theme.of(context).colorScheme.onBackground),
-              onPressed: () {
-                log("message");
-                log(provider.firebaseUser!.uid);
-
-                drawerController.toggle!();
-
-                // Navigator.push(
-                // context,
-                // PageTransition(
-                //     duration: const Duration(milliseconds: 700),
-                //     type: PageTransitionType.fade,
-                //     child: const Profile(),
-                //     isIos: true));
-              }),
+          leading: drawerIcon(context),
           backgroundColor: AppColors.backgroudColor,
         ),
         body: StreamBuilder(
@@ -183,11 +148,21 @@ class _ProfileState extends State<Profile> {
                                       .memberSince!.millisecondsSinceEpoch))),
                           option(context,
                               label: "Bio", value: userModel!.bio.toString()),
+                          option(context,
+                              label: "Account Type",
+                              value: userModel!.accountType.toString()),
                           Padding(
                             padding: EdgeInsets.only(
                                 top: 45.h, left: 10.w, right: 10.w),
-                            child: GestureDetector(
-                              onTap: () async {
+                            child: CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: Center(
+                                child: Image.asset(
+                                  "assets/iconImages/logout.png",
+                                  scale: 2,
+                                ),
+                              ),
+                              onPressed: () async {
                                 await FirebaseAuth.instance.signOut();
 
                                 Navigator.popUntil(
@@ -201,27 +176,6 @@ class _ProfileState extends State<Profile> {
                                         child: Login(),
                                         isIos: true));
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.r),
-                                    color: const Color.fromARGB(
-                                        255, 200, 220, 234)),
-                                height: 60,
-                                width: MediaQuery.of(context).size.width,
-                                child: const Padding(
-                                    padding:
-                                        EdgeInsets.only(bottom: 25, left: 25),
-                                    child: ListTile(
-                                      contentPadding:
-                                          EdgeInsets.only(right: 30),
-                                      leading: Icon(
-                                        Icons.logout_rounded,
-                                        color: Colors.black,
-                                        size: 26,
-                                      ),
-                                      title: Text("Logout from this Device"),
-                                    )),
-                              ),
                             ),
                           ),
                         ]),

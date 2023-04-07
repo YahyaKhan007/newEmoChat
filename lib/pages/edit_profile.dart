@@ -14,6 +14,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
 import '../colors/colors.dart';
@@ -115,7 +117,9 @@ class _EditProfileState extends State<EditProfile> {
   }
 
 // ! Check either the data is entered or not
-  void uploadData({required LoadingProvider provider}) async {
+  void uploadData(
+      {required LoadingProvider provider,
+      required UserModelProvider userModelProvider}) async {
     // var provider = Provider.of<LoadingProvider>(context, listen: false);
     try {
       provider.changeLoading(value: true);
@@ -142,6 +146,8 @@ class _EditProfileState extends State<EditProfile> {
         widget.userModel.profilePicture = imageUrl;
       }
       widget.userModel.bio = bioController.text.trim();
+
+      userModelProvider.updateUser(widget.userModel);
       // widget.userModel.pushToken = token!;
 
       await FirebaseFirestore.instance
@@ -166,6 +172,7 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<LoadingProvider>(context);
+    final userModelProvider = Provider.of<UserModelProvider>(context);
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
@@ -173,25 +180,14 @@ class _EditProfileState extends State<EditProfile> {
             provider.loading
                 ? spinkit
                 : CupertinoButton(
-                    child: Row(children: [
-                      Icon(
-                        CupertinoIcons.check_mark,
-                        size: 18,
-                        color: Colors.grey.shade900,
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        "Done",
-                        style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            fontSize: 13.sp,
-                            color: Colors.grey.shade900),
-                      )
-                    ]),
+                    child: CircleAvatar(
+                        backgroundColor: Colors.black,
+                        radius: 12.r,
+                        child: Image.asset("assets/iconImages/done.png")),
                     onPressed: () {
-                      uploadData(provider: provider);
+                      uploadData(
+                          provider: provider,
+                          userModelProvider: userModelProvider);
                     })
           ],
           centerTitle: true,
@@ -204,14 +200,13 @@ class _EditProfileState extends State<EditProfile> {
                 color: Colors.grey.shade900),
           ),
           elevation: 0,
-          leading: IconButton(
-              icon: const Icon(
-                CupertinoIcons.back,
-                color: Colors.black87,
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              }),
+          leading: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => Navigator.of(context).pop(),
+            child: Image.asset(
+              "assets/iconImages/back.png",
+            ),
+          ),
           backgroundColor: AppColors.backgroudColor,
         ),
         body: StreamBuilder(
@@ -258,17 +253,23 @@ class _EditProfileState extends State<EditProfile> {
                                                   userModel.profilePicture!),
                                             ),
                                       Positioned(
-                                          top: -15,
-                                          right: -10,
-                                          child: CupertinoButton(
-                                            child: Icon(
-                                              CupertinoIcons.pencil_circle_fill,
-                                              size: 30,
-                                              color: Colors.black,
+                                          top: 5,
+                                          right: 5,
+                                          child: CircleAvatar(
+                                            radius: 12.r,
+                                            backgroundColor: Colors.black,
+                                            child: CupertinoButton(
+                                              padding: EdgeInsets.zero,
+                                              child: Image.asset(
+                                                "assets/iconImages/editPicture.png",
+                                                cacheHeight: 40,
+                                                scale: 3,
+                                                color: Colors.white,
+                                              ),
+                                              onPressed: () {
+                                                showPhotoOption();
+                                              },
                                             ),
-                                            onPressed: () {
-                                              showPhotoOption();
-                                            },
                                           ))
                                     ],
                                   ),
@@ -331,7 +332,11 @@ class _EditProfileState extends State<EditProfile> {
                 return const CircularProgressIndicator();
               }
             } else {
-              return const CircularProgressIndicator();
+              return Center(
+                  child: const SpinKitSpinningLines(
+                color: Colors.black,
+                size: 40.0,
+              ));
             }
           },
         ));

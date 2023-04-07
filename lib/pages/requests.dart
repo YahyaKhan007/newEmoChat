@@ -13,6 +13,7 @@ import 'package:simplechat/provider/loading_provider.dart';
 import '../colors/colors.dart';
 import '../models/user_model.dart';
 import '../provider/user_model_provider.dart';
+import '../widgets/widgets.dart';
 
 class Requests extends StatefulWidget {
   final UserModel currentUserModel;
@@ -42,24 +43,7 @@ class _RequestsState extends State<Requests> {
         leadingWidth: 70.w,
         backgroundColor: AppColors.backgroudColor,
         elevation: 0.3,
-        leading: CupertinoButton(
-            padding: const EdgeInsets.symmetric(horizontal: 7),
-            child: CircleAvatar(
-                // radius: 40,
-                backgroundImage:
-                    NetworkImage(userProvider.userModel.profilePicture!),
-                backgroundColor: Theme.of(context).colorScheme.onBackground),
-            onPressed: () {
-              drawerController.toggle!();
-
-              // Navigator.push(
-              // context,
-              // PageTransition(
-              //     duration: const Duration(milliseconds: 700),
-              //     type: PageTransitionType.fade,
-              //     child: const Profile(),
-              //     isIos: true));
-            }),
+        leading: drawerIcon(context),
         title: Text(
           "Requests",
           style: TextStyle(letterSpacing: -2, color: Colors.grey.shade900),

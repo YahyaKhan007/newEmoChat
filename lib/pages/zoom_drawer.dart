@@ -57,7 +57,7 @@ class MyHomePage extends StatelessWidget {
                   draweroption(
                       context: context,
                       title: "Chats",
-                      icon: Icons.home,
+                      image: "assets/iconImages/home.png",
                       onTap: () {
                         provider.changeScreenIndex(0);
 
@@ -66,7 +66,7 @@ class MyHomePage extends StatelessWidget {
                   draweroption(
                       context: context,
                       title: "Profile",
-                      icon: Icons.person,
+                      image: "assets/iconImages/profile.png",
                       onTap: () {
                         provider.changeScreenIndex(1);
                         drawerController.toggle!();
@@ -74,7 +74,7 @@ class MyHomePage extends StatelessWidget {
                   draweroption(
                       context: context,
                       title: "Requests",
-                      icon: Icons.person_add,
+                      image: "assets/iconImages/request.png",
                       onTap: () {
                         provider.changeScreenIndex(2);
 
@@ -90,7 +90,7 @@ class MyHomePage extends StatelessWidget {
                   draweroption(
                       context: context,
                       title: "My Friends",
-                      icon: Icons.person_pin_circle_sharp,
+                      image: "assets/iconImages/friends.png",
                       onTap: () {
                         provider.changeScreenIndex(3);
 
@@ -108,7 +108,8 @@ class MyHomePage extends StatelessWidget {
                         onChanged: (value) {
                           provider.changeSendEmotionOption(value);
                         },
-                        activeTrackColor: Colors.lightGreenAccent,
+                        activeTrackColor: Color.fromARGB(255, 106, 111, 106),
+                        inactiveTrackColor: Colors.black,
                         activeColor: Colors.green,
                       ),
                     ),
@@ -128,7 +129,7 @@ class MyHomePage extends StatelessWidget {
                   draweroption(
                       context: context,
                       title: "Logout",
-                      icon: Icons.logout,
+                      image: "assets/iconImages/logout.png",
                       onTap: () {
                         FirebaseController.signout(context: context);
                         drawerController.toggle!();
@@ -142,15 +143,15 @@ class MyHomePage extends StatelessWidget {
   Widget draweroption(
       {required BuildContext context,
       required String title,
-      required IconData icon,
+      required String image,
       required VoidCallback onTap}) {
     return ListTile(
       contentPadding:
           EdgeInsets.only(left: 10.w, right: 10.w, top: 0.h, bottom: 0.h),
-      leading: Icon(
-        icon,
-        size: 25.sp,
-      ),
+      leading: CircleAvatar(
+          backgroundColor: Colors.transparent,
+          radius: 15,
+          child: Image.asset(image)),
       title: Text(
         title,
         style: TextStyle(fontSize: 14.sp),

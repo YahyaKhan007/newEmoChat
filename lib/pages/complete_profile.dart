@@ -290,12 +290,12 @@ class _CompleteProfileState extends State<CompleteProfile> {
                     Text(
                       "Account Type : ",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 13.sp,
                         color: Colors.black,
                       ),
                     ),
                     SizedBox(
-                      width: 30.w,
+                      width: 20.w,
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
@@ -331,8 +331,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 30,
+              SizedBox(
+                height: 30.h,
               ),
               GestureDetector(
                 onTap: () {
@@ -342,19 +342,26 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 child: provider.loading
                     ? spinkit
                     : Container(
-                        height: 70,
-                        width: 100,
+                        height: 50.h,
+                        width: 70.w,
                         decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              colors: [
+                                Color(0xff06beb6),
+                                Color.fromARGB(255, 69, 123, 130)
+                              ],
+                            ),
                             color: AppColors.foregroundColor,
                             boxShadow: [AppColors.containerShadow],
                             borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(50.r),
-                                bottomRight: Radius.circular(50.r))),
+                                topLeft: Radius.circular(30.r),
+                                bottomRight: Radius.circular(30.r))),
                         child: Center(
-                            child: Text(
-                          "Submit",
-                          style: kButtonTextStyle,
-                        )),
+                            child: Text("Submit",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13.sp))),
                       ),
               )
             ],

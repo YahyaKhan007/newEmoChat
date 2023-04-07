@@ -25,6 +25,7 @@ import 'package:simplechat/pages/zoom_drawer.dart';
 
 import '../models/models.dart';
 import '../provider/user_model_provider.dart';
+import '../widgets/widgets.dart';
 import 'screens.dart';
 
 class HomePage extends StatefulWidget {
@@ -95,8 +96,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         actions: [
           CupertinoButton(
-              child: const Icon(CupertinoIcons.chat_bubble_2_fill,
-                  color: Colors.black),
+              child: Image.asset(
+                "assets/iconImages/newMessage.png",
+                scale: 1,
+              ),
               onPressed: () {
                 // !   Logout here
                 Navigator.push(
@@ -113,26 +116,7 @@ class _HomePageState extends State<HomePage> {
         ],
         leadingWidth: 70.w,
         elevation: 0,
-        leading: CupertinoButton(
-            padding: const EdgeInsets.symmetric(horizontal: 7),
-            child: CircleAvatar(
-                // radius: 40,
-                backgroundImage: NetworkImage(widget.userModel.profilePicture!),
-                backgroundColor: Theme.of(context).colorScheme.onBackground),
-            onPressed: () {
-              log("message");
-              log(widget.firebaseUser.uid);
-
-              drawerController.toggle!();
-
-              // Navigator.push(
-              // context,
-              // PageTransition(
-              //     duration: const Duration(milliseconds: 700),
-              //     type: PageTransitionType.fade,
-              //     child: const Profile(),
-              //     isIos: true));
-            }),
+        leading: drawerIcon(context),
         automaticallyImplyLeading: true,
         backgroundColor: AppColors.backgroudColor,
         centerTitle: true,
@@ -152,13 +136,14 @@ class _HomePageState extends State<HomePage> {
             height: 15.h,
           ),
           SizedBox(
-            height: 40.h,
+            height: 35.h,
             child: Row(
               children: [
                 const SizedBox(
                   width: 15,
                 ),
                 Expanded(
+                  flex: 3,
                   child: Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -169,41 +154,47 @@ class _HomePageState extends State<HomePage> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15)),
                           labelText: "Search User",
-                          labelStyle: const TextStyle(fontSize: 16)),
+                          labelStyle: TextStyle(fontSize: 13.sp)),
                     ),
                   ),
                 ),
                 const SizedBox(
                   width: 0,
                 ),
-                CupertinoButton(
-                    child: const Icon(
-                      Icons.search,
-                      color: Colors.black,
-                      size: 25,
-                    ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          duration: Duration(milliseconds: 700),
-                          content:
-                              Text("To be implemented in the coming updates")));
+                Expanded(
+                  flex: 1,
+                  child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Container(
+                          width: 60.w,
+                          height: 30.h,
+                          child: Image.asset(
+                            "assets/iconImages/searchText.png",
+                            fit: BoxFit.fill,
+                          )),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            duration: Duration(milliseconds: 700),
+                            content: Text(
+                                "To be implemented in the coming updates")));
 
-                      // setState(() {
-                      //   Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //           builder: (builder) => MyFirends(
-                      //                 firebaseUser: widget.firebaseUser,
-                      //                 currentUserModel: widget.userModel,
-                      //               )));
-                      //   // search(
-                      //   //     context: context,
-                      //   //     userEmail: searchUserController.text
-                      //   //         .toLowerCase()
-                      //   //         .toString(),
-                      //   //     currentUserModel: widget.userModel);
-                      // });
-                    })
+                        // setState(() {
+                        //   Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //           builder: (builder) => MyFirends(
+                        //                 firebaseUser: widget.firebaseUser,
+                        //                 currentUserModel: widget.userModel,
+                        //               )));
+                        //   // search(
+                        //   //     context: context,
+                        //   //     userEmail: searchUserController.text
+                        //   //         .toLowerCase()
+                        //   //         .toString(),
+                        //   //     currentUserModel: widget.userModel);
+                        // });
+                      }),
+                )
               ],
             ),
           ),
@@ -538,10 +529,7 @@ class _HomePageState extends State<HomePage> {
           child: CircleAvatar(
               radius: 25,
               backgroundColor: AppColors.backgroudColor,
-              child: Icon(
-                Icons.search,
-                color: Colors.grey.shade800,
-              )),
+              child: Image.asset("assets/iconImages/searchIcon.png")),
           onPressed: () {
             Navigator.push(
                 context,

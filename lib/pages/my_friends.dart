@@ -18,6 +18,7 @@ import '../models/models.dart';
 import '../provider/randomNameGenerator.dart';
 import '../provider/user_model_provider.dart';
 import '../widgets/showLoading.dart';
+import '../widgets/widgets.dart';
 import 'screens.dart';
 
 class MyFirends extends StatefulWidget {
@@ -113,24 +114,7 @@ class _MyFirendsState extends State<MyFirends> {
           centerTitle: true,
           backgroundColor: AppColors.backgroudColor,
           elevation: 0.3,
-          leading: CupertinoButton(
-              padding: const EdgeInsets.symmetric(horizontal: 7),
-              child: CircleAvatar(
-                  // radius: 40,
-                  backgroundImage:
-                      NetworkImage(userProvider.userModel.profilePicture!),
-                  backgroundColor: Theme.of(context).colorScheme.onBackground),
-              onPressed: () {
-                drawerController.toggle!();
-
-                // Navigator.push(
-                // context,
-                // PageTransition(
-                //     duration: const Duration(milliseconds: 700),
-                //     type: PageTransitionType.fade,
-                //     child: const Profile(),
-                //     isIos: true));
-              }),
+          leading: drawerIcon(context),
           title: Text(
             "My Friends",
             style: TextStyle(letterSpacing: -2, color: Colors.grey.shade900),

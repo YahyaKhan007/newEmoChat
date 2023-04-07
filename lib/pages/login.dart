@@ -171,20 +171,28 @@ class _LoginState extends State<Login> {
                       //     (value) => provider.changeLoginLoading(value: false));
                     },
                     child: Container(
-                      height: 68.h,
-                      width: 90.w,
-                      decoration: BoxDecoration(
-                          boxShadow: [AppColors.containerShadow],
-                          color: AppColors.foregroundColor,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(50.r),
-                              bottomRight: Radius.circular(50.r))),
-                      child: Center(
-                          child: Text(
-                        "Login",
-                        style: kButtonTextStyle,
-                      )),
-                    ),
+                        height: 50.h,
+                        width: 70.w,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        decoration: BoxDecoration(
+                            boxShadow: [AppColors.containerShadow],
+                            color: AppColors.foregroundColor,
+                            gradient: LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              colors: [
+                                Color(0xff06beb6),
+                                Color.fromARGB(255, 69, 123, 130)
+                              ],
+                            ),
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30.r),
+                                bottomRight: Radius.circular(30.r))),
+                        child: Image.asset(
+                          "assets/iconImages/login.png",
+                          color: Colors.white,
+                          fit: BoxFit.fitHeight,
+                        )),
                   ),
           ],
         ),

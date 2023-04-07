@@ -87,13 +87,11 @@ class _SearchPageState extends State<SearchPage> {
           style: TextStyle(color: Colors.black87, letterSpacing: -1.8),
         ),
         backgroundColor: AppColors.backgroudColor,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: Icon(
-            CupertinoIcons.back,
-            color: Colors.grey.shade700,
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => Navigator.of(context).pop(),
+          child: Image.asset(
+            "assets/iconImages/back.png",
           ),
         ),
       ),
@@ -108,8 +106,9 @@ class _SearchPageState extends State<SearchPage> {
                 width: 15,
               ),
               Expanded(
+                flex: 3,
                 child: Container(
-                  height: 50.h,
+                  height: 40.h,
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(15.r)),
@@ -120,21 +119,30 @@ class _SearchPageState extends State<SearchPage> {
                             borderSide: const BorderSide(color: Colors.white),
                             borderRadius: BorderRadius.circular(15.r)),
                         hintText: "Search User",
-                        hintStyle: const TextStyle(fontSize: 16)),
+                        hintStyle: TextStyle(fontSize: 13.sp)),
                   ),
                 ),
               ),
               const SizedBox(
                 width: 0,
               ),
-              CupertinoButton(
-                  child: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {});
-                  })
+              Expanded(
+                flex: 1,
+                child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Container(
+                      width: 60.w,
+                      height: 30.h,
+                      child: Image.asset(
+                        "assets/iconImages/searchText.png",
+                        fit: BoxFit.fill,
+                        scale: 1,
+                      ),
+                    ),
+                    onPressed: () {
+                      setState(() {});
+                    }),
+              )
             ],
           ),
           SizedBox(
@@ -297,7 +305,7 @@ class _SearchPageState extends State<SearchPage> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 50),
                         child: Text(
-                          "NoOne Found with this specefic email",
+                          "No One ",
                           style:
                               TextStyle(fontSize: 14.sp, color: Colors.amber),
                         ),
@@ -312,7 +320,7 @@ class _SearchPageState extends State<SearchPage> {
                   padding: EdgeInsets.only(top: 30),
                   child: Center(
                       child: SpinKitSpinningLines(
-                    color: Colors.white,
+                    color: Colors.black,
                     size: 25.0,
                   )),
                 );
