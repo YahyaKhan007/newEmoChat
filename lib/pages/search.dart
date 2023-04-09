@@ -11,8 +11,10 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/main.dart';
+import 'package:simplechat/models/request_user_model.dart';
 import 'package:simplechat/pages/chatroom.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 import 'package:uuid/uuid.dart';
 
@@ -78,6 +80,8 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     checkFriend({required BuildContext context}) {}
     final LoadingProvider provider = Provider.of<LoadingProvider>(context);
+    final UserModelProvider userModelProvider =
+        Provider.of<UserModelProvider>(context);
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
@@ -189,14 +193,17 @@ class _SearchPageState extends State<SearchPage> {
                                     // !  ******************************
                                     if (searchedUser.accountType == "Public") {
                                       log("public");
-                                      Loading.showLoadingDialog(
-                                          context, "Creating a chatroom");
+                                      // Loading.showLoadingDialog(
+                                      //     context, "Creating a chatroom");
 
                                       ChatRoomModel? chatRoom =
                                           await getChatroomModel(searchedUser);
-                                      Navigator.pop(context);
+                                      // Navigator.of(context).pop(true);
+                                      // Navigator.pop(context);
+                                      Navigator.popUntil(
+                                          context, (route) => route.isFirst);
 
-                                      Navigator.push(
+                                      Navigator.pushReplacement(
                                           context,
                                           PageTransition(
                                               duration: const Duration(
@@ -256,16 +263,40 @@ class _SearchPageState extends State<SearchPage> {
                                               //? *****************************
 
                                               try {
-                                                if (!widget.userModel!.friends!
-                                                    .contains(
-                                                        searchedUser.uid)) {
+                                                if (!(userModelProvider
+                                                        .userModel.friends!
+                                                        .contains(
+                                                            searchedUser.uid) ||
+                                                    userModelProvider
+                                                        .userModel.sender!
+                                                        .contains(
+                                                            searchedUser.uid) ||
+                                                    searchedUser.reciever!
+                                                        .contains(
+                                                            userModelProvider
+                                                                .userModel
+                                                                .uid) ||
+                                                    searchedUser.sender!
+                                                        .contains(
+                                                            userModelProvider
+                                                                .userModel
+                                                                .uid))) {
                                                   addFriend(
+                                                      userModelProvider:
+                                                          userModelProvider,
                                                       context: context,
                                                       currentUserModel:
                                                           widget.userModel!,
                                                       provider: provider,
                                                       searchedUser:
                                                           searchedUser);
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                          duration: Duration(
+                                                              seconds: 1),
+                                                          content: Text(
+                                                              "Already requested")));
                                                 }
                                               } catch (e) {
                                                 log(e.toString());
@@ -274,19 +305,29 @@ class _SearchPageState extends State<SearchPage> {
                                               //? *****************************
                                               //? *****************************
                                             },
-                                            child: widget.userModel!.friends!
-                                                    .contains(searchedUser.uid)
+                                            child: (userModelProvider
+                                                        .userModel.friends!
+                                                        .contains(
+                                                            searchedUser.uid) ||
+                                                    userModelProvider
+                                                        .userModel.sender!
+                                                        .contains(
+                                                            searchedUser.uid) ||
+                                                    searchedUser.reciever!
+                                                        .contains(
+                                                            userModelProvider
+                                                                .userModel
+                                                                .uid) ||
+                                                    searchedUser.sender!
+                                                        .contains(
+                                                            userModelProvider
+                                                                .userModel.uid))
                                                 ? Icon(Icons.check)
-                                                : provider.sendRequest
-                                                    ? SpinKitSpinningLines(
-                                                        color: Colors.black,
-                                                        size: 15.0,
-                                                      )
-                                                    : Center(
-                                                        child: Icon(
-                                                        Icons.person_add_sharp,
-                                                        color: Colors.grey,
-                                                      )),
+                                                : Center(
+                                                    child: Icon(
+                                                    Icons.person_add_sharp,
+                                                    color: Colors.grey,
+                                                  )),
                                           )),
                                   leading: Container(
                                     decoration: BoxDecoration(boxShadow: [
@@ -337,73 +378,28 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-addFriend(
-    {required BuildContext context,
-    required UserModel currentUserModel,
-    required UserModel searchedUser,
-    required LoadingProvider provider}) async {
-  bool sent = false;
-  List<UserModel> totalRequest = [];
-  log(totalRequest.length.toString());
+addFriend({
+  required BuildContext context,
+  required UserModel currentUserModel,
+  required UserModel searchedUser,
+  required LoadingProvider provider,
+  required UserModelProvider userModelProvider,
+}) async {
+  currentUserModel.sender!.add(searchedUser.uid);
+  searchedUser.reciever!.add(currentUserModel.uid);
 
-  // StatefulBuilder(
-  //   builder: (BuildContext context, setState) {
-  //     return StreamBuilder(
-  //       stream: FirebaseFirestore.instance.collection("requests").snapshots(),
-  //       builder: (context, snapshot) {
-  //         if (snapshot.connectionState == ConnectionState.active) {
-  //           if (snapshot.hasData) {
-  //             log(snapshot.data!.size.toString());
+  await FirebaseFirestore.instance
+      .collection("users")
+      .doc(searchedUser.uid)
+      .set(searchedUser.toMap())
+      .then((value) => provider.changeSendRequest(value: false));
 
-  //             QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
-
-  //             CollectionReference ref =
-  //                 FirebaseFirestore.instance.collection('requests');
-
-  //             if (dataSnapshot.docs.isNotEmpty) {
-  //               return ListView.builder(
-  //                   itemCount: dataSnapshot.docs.length,
-  //                   itemBuilder: (context, index) {
-  //                     Map<String, dynamic> requestData =
-  //                         dataSnapshot.docs[index].data()
-  //                             as Map<String, dynamic>;
-
-  //                     UserModel requests = UserModel.fromMap(requestData);
-  //                     log("-------------------------->" + requests.toString());
-  //                     totalRequest.add(requests);
-  //                   });
-  //             } else {
-  //               log("--------------------------->Empty");
-  //               return SizedBox();
-  //             }
-  //           } else {
-  //             return Center(
-  //               child: Text("No Requests yet"),
-  //             );
-  //           }
-  //         } else {
-  //           return Center(
-  //             child: CircularProgressIndicator(),
-  //           );
-  //         }
-  //       },
-  //     );
-  //   },
-  // );
-
-  log(totalRequest.length.toString());
-
-  log("came");
-  if (totalRequest.contains(searchedUser.uid)) {
-    log("Contains");
-  } else {
-    log("not Containe");
-    searchedUser.sender = currentUserModel.uid;
-    searchedUser.reciever = searchedUser.uid;
-    await FirebaseFirestore.instance
-        .collection("requests")
-        .doc(searchedUser.uid)
-        .set(searchedUser.toMap())
-        .then((value) => provider.changeSendRequest(value: false));
-  }
+  await FirebaseFirestore.instance
+      .collection("users")
+      .doc(currentUserModel.uid)
+      .set(currentUserModel.toMap())
+      .then((value) => provider.changeSendRequest(value: false))
+      .then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          duration: Duration(seconds: 2),
+          content: Text("Request has been Sent"))));
 }

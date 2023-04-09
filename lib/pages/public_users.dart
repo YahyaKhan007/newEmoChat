@@ -101,6 +101,7 @@ class _PublicUsersState extends State<PublicUsers> {
           stream: FirebaseFirestore.instance
               .collection("users")
               .where("uid", isNotEqualTo: widget.firebaseUser!.uid)
+              // .where('accountType', isEqualTo: 'Public')
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.active) {
@@ -127,12 +128,13 @@ class _PublicUsersState extends State<PublicUsers> {
                               child: ListTile(
                                 onTap: () async {
                                   // showWaiting(context: context, title: "creating");
-                                  Loading.showLoadingDialog(
-                                      context, "Creating");
+                                  // Loading.showLoadingDialog(
+                                  //     context, "Creating");
                                   ChatRoomModel? chatRoom =
                                       await getChatroomModel(endUser);
+                                  log("object");
 
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                       context,
                                       PageTransition(
                                           duration:
@@ -198,7 +200,10 @@ class _PublicUsersState extends State<PublicUsers> {
                 // !   ***********
               } else {
                 return const Center(
-                  child: Text("No users in the Database"),
+                  child: Text(
+                    "No users in the Database",
+                    style: TextStyle(color: Colors.black),
+                  ),
                 );
               }
             } else {

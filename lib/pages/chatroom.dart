@@ -21,8 +21,10 @@ import 'package:simplechat/constants/emotions.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/screens.dart';
+import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
 
 import '../models/models.dart';
 
@@ -242,7 +244,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.gallery);
-                    // Navigator.pop(context);
+                    Navigator.of(context).pop(true);
                   },
                   title: const Text("Select from Gallery"),
                   leading: const Icon(Icons.photo_album),
@@ -250,8 +252,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 ListTile(
                   onTap: () {
                     selectImage(ImageSource.camera);
-
-                    // Navigator.pop(context);
+                    Navigator.of(context).pop(true);
                   },
                   title: const Text("Take a Photo"),
                   leading: const Icon(Icons.camera),
@@ -435,19 +436,17 @@ class _ChatRoomState extends State<ChatRoom> {
   Widget build(BuildContext context) {
     final provider = Provider.of<RandomName>(context);
     final secondProvider = Provider.of<LoadingProvider>(context);
+    final userModelProvider = Provider.of<UserModelProvider>(context);
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
         backgroundColor: AppColors.backgroudColor,
-        leadingWidth: 40,
+        leadingWidth: 60,
         elevation: 0.5,
         leading: IconButton(
-            icon: const Icon(
-              CupertinoIcons.back,
-              color: Colors.black87,
-            ),
+            icon: Image.asset("assets/iconImages/back.png"),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(context, rootNavigator: true).pop();
             }),
         title: GestureDetector(
           onTap: () {
@@ -599,10 +598,14 @@ class _ChatRoomState extends State<ChatRoom> {
           child: Row(
             children: [
               CupertinoButton(
-                  child: const Icon(
-                    Icons.photo_camera,
-                    color: Colors.black87,
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                  child: CircleAvatar(
+                      backgroundColor: AppColors.foregroundColor,
+                      radius: 15.r,
+                      child: Image.asset(
+                        "assets/iconImages/camera.png",
+                        scale: 3,
+                      )),
                   onPressed: () {
                     // sendMessage();
 
@@ -633,10 +636,10 @@ class _ChatRoomState extends State<ChatRoom> {
                     border: InputBorder.none),
               )),
               CupertinoButton(
-                  child: const Icon(
-                    Icons.send,
-                    color: Colors.black87,
-                  ),
+                  child: CircleAvatar(
+                      backgroundColor: AppColors.foregroundColor,
+                      radius: 20.r,
+                      child: Image.asset("assets/iconImages/send.png")),
                   onPressed: () {
                     sendMessage(msg: messageController.text.trim());
                     setState(() {

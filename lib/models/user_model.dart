@@ -8,8 +8,8 @@ class UserModel {
   String? profilePicture;
   String? accountType;
   List? friends;
-  String? sender;
-  String? reciever;
+  List? sender;
+  List? reciever;
   String? bio;
   Timestamp? memberSince;
 // ! simple Constructor

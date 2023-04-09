@@ -41,7 +41,8 @@ class Loading {
         barrierDismissible: false,
         builder: (context) {
           Future.delayed(Duration(seconds: 2), () {
-            Navigator.of(context).pop(true);
+            // Navigator.of(context).pop(true);
+            // Navigator.pop(context);
           });
           return loadingDialog;
         });

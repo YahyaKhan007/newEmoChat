@@ -1,12 +1,10 @@
 import 'dart:developer';
 
+import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_drawer/config.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
@@ -14,7 +12,6 @@ import 'package:simplechat/models/models.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/onBoarding.dart';
 import 'package:simplechat/pages/splash_screen.dart';
-import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
@@ -29,6 +26,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final cameras = await availableCameras();
+
   await Firebase.initializeApp();
   User? currentUser = FirebaseAuth.instance.currentUser;
   UserModel? thisUserModel;

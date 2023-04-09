@@ -12,6 +12,8 @@ import 'package:simplechat/pages/profile.dart';
 import 'package:simplechat/pages/requests.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 
+import '../checking camera/send_photo_check.dart';
+
 final drawerController = ZoomDrawerController();
 
 class MyHomePage extends StatelessWidget {
@@ -22,10 +24,14 @@ class MyHomePage extends StatelessWidget {
       HomePage(
           userModel: provider.userModel, firebaseUser: provider.firebaseUser!),
       Profile(),
-      Requests(currentUserModel: provider.userModel),
+      // Requests(currentUserModel: provider.userModel),
+      ReceiverListWidget(
+        uid: provider.firebaseUser!.uid,
+      ),
       MyFirends(
           currentUserModel: provider.userModel,
           firebaseUser: provider.firebaseUser!),
+      ChatPage()
     ];
     return Scaffold(
         body: ZoomDrawer(
@@ -97,6 +103,16 @@ class MyHomePage extends StatelessWidget {
                         drawerController.toggle!();
                       }),
 
+                  draweroption(
+                      context: context,
+                      title: "take captures demo",
+                      image: "assets/iconImages/friends.png",
+                      onTap: () {
+                        provider.changeScreenIndex(4);
+
+                        drawerController.toggle!();
+                      }),
+
                   ListTile(
                     contentPadding: EdgeInsets.only(
                         left: 0.w, right: 10.w, top: 0.h, bottom: 0.h),
@@ -115,7 +131,8 @@ class MyHomePage extends StatelessWidget {
                     ),
                     title: Text(
                       "Send Emotions",
-                      style: TextStyle(fontSize: 14.sp),
+                      style: TextStyle(
+                          fontSize: 13.sp, fontWeight: FontWeight.w600),
                     ),
                     onTap: () {},
                   ),
@@ -154,7 +171,7 @@ class MyHomePage extends StatelessWidget {
           child: Image.asset(image)),
       title: Text(
         title,
-        style: TextStyle(fontSize: 14.sp),
+        style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
       ),
       onTap: onTap,
     );

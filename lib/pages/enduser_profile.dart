@@ -16,14 +16,21 @@ class EndUserProfile extends StatelessWidget {
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
-            elevation: 0,
+            centerTitle: true,
+            title: Text(
+              "Profile",
+              style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  letterSpacing: -2),
+            ),
+            leadingWidth: 60,
+            elevation: 0.5,
             leading: IconButton(
-                icon: const Icon(
-                  CupertinoIcons.back,
-                  color: Colors.black87,
-                ),
+                icon: Image.asset("assets/iconImages/back.png"),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(true);
                 }),
             backgroundColor: AppColors.backgroudColor),
         body: Center(

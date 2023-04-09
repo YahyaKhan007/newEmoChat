@@ -70,4 +70,12 @@ class LoadingProvider extends ChangeNotifier {
     _pending = value;
     notifyListeners();
   }
+
+  // !   count friends
+  bool _friendsCOunt = true;
+  bool get friendsCOunt => _friendsCOunt;
+  void changeFriendsCount({required bool value}) {
+    _friendsCOunt = value;
+    notifyListeners();
+  }
 }

@@ -2,22 +2,17 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:simplechat/pages/zoom_drawer.dart';
+import 'package:simplechat/provider/loading_provider.dart';
 
 import '../colors/colors.dart';
 import '../main.dart';
 import '../models/models.dart';
-import '../provider/randomNameGenerator.dart';
 import '../provider/user_model_provider.dart';
-import '../widgets/showLoading.dart';
 import '../widgets/widgets.dart';
 import 'screens.dart';
 
@@ -108,6 +103,7 @@ class _MyFirendsState extends State<MyFirends> {
 
   @override
   Widget build(BuildContext context) {
+    final LoadingProvider provider = Provider.of<LoadingProvider>(context);
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
@@ -128,6 +124,8 @@ class _MyFirendsState extends State<MyFirends> {
           stream: FirebaseFirestore.instance
               .collection("users")
               .where("uid", isNotEqualTo: widget.currentUserModel!.uid)
+              // .where('friends', arrayContains: '')
+              // .where('friends', arrayContains: '')
               // .where('friends',arrayContains: )
               // .where("friends", )
               // .where('accountType', isNull: true)
@@ -140,6 +138,8 @@ class _MyFirendsState extends State<MyFirends> {
                 QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
 
                 if (dataSnapshot.docs.isNotEmpty) {
+                  var friends = 0;
+                  print("came 1");
                   return ListView.builder(
                     itemCount: dataSnapshot.docs.length,
                     itemBuilder: (context, index) {
@@ -147,26 +147,6 @@ class _MyFirendsState extends State<MyFirends> {
                           .data() as Map<String, dynamic>;
 
                       UserModel endUser = UserModel.fromMap(userData);
-
-                      //? *****************************************
-                      //? *****************************************
-                      //? *****************************************
-                      //? *****************************************
-                      //? *****************************************
-                      //? *****************************************
-                      //? *****************************************
-                      //? *****************************************
-                      //! addUser();
-                      //                   List frnds = await widget.userModel!.friends!;
-                      // Set myfrnds = frnds.toSet();
-                      // widget.userModel!.friends!.contains(endUser.uid)
-                      final provider = Provider.of<RandomName>(context);
-                      // log("Length of frnds array are    --->  ");
-                      // log(endUser.uid.toString());
-
-                      log(widget.currentUserModel!.friends!
-                          .contains(" " + endUser.uid.toString())
-                          .toString());
 
                       return widget.currentUserModel!.friends!
                               .contains(endUser.uid.toString())
@@ -182,6 +162,10 @@ class _MyFirendsState extends State<MyFirends> {
                                         context, "Creating");
                                     ChatRoomModel? chatRoom =
                                         await getChatroomModel(endUser);
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
+                                    // Navigator.of(context, rootNavigator: true)
+                                    // .pop();
 
                                     Navigator.push(
                                         context,
@@ -215,39 +199,11 @@ class _MyFirendsState extends State<MyFirends> {
                                     style: TextStyle(fontSize: 11.sp),
                                   ),
                                   trailing: CircleAvatar(
-                                    backgroundColor: AppColors.backgroudColor,
-                                    child: CupertinoButton(
-                                      alignment: Alignment.center,
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () {},
-                                      child: Center(
-                                          child: Icon(
-                                        Icons.person_add_sharp,
-                                        color: Colors.grey,
-                                      )),
+                                    radius: 18,
+                                    child: Image.asset(
+                                      "assets/iconImages/sendMessage.png",
                                     ),
-                                  )
-                                  // Column(
-                                  //   mainAxisAlignment: MainAxisAlignment.center,
-                                  //   crossAxisAlignment: CrossAxisAlignment.center,
-                                  //   mainAxisSize: MainAxisSize.min,
-                                  //   children: [
-                                  //     Text(
-                                  //       "Since",
-                                  //       style: TextStyle(
-                                  //           fontSize: 9.sp, color: Colors.grey),
-                                  //     ),
-                                  //     Text(
-                                  //       DateFormat(" dd MMM yyy").format(
-                                  //           DateTime.fromMillisecondsSinceEpoch(
-                                  //               endUser.memberSince!
-                                  //                   .millisecondsSinceEpoch)),
-                                  //       style: TextStyle(
-                                  //           fontSize: 9.sp, color: Colors.grey),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  ),
+                                  )),
                             )
                           : SizedBox();
                     },

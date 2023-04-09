@@ -48,8 +48,8 @@ class FirebaseController extends ChangeNotifier {
       String uid = credential.user!.uid;
       UserModel newUser = UserModel(
           friends: [],
-          sender: "",
-          reciever: "",
+          sender: [],
+          reciever: [],
           uid: uid,
           fullName: "",
           email: email,
@@ -67,6 +67,7 @@ class FirebaseController extends ChangeNotifier {
           .then((value) => userModelProvider.updateUser(newUser))
           .then(
               (value) => Navigator.popUntil(context, (route) => route.isFirst))
+          .then((value) => userModelProvider.changeScreenIndex(0))
           .then((value) => Navigator.pushReplacement(
               context,
               PageTransition(
@@ -114,6 +115,7 @@ class FirebaseController extends ChangeNotifier {
       User? currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
         userModelProvider.updateFirebaseUser(currentUser);
+        userModelProvider.changeScreenIndex(0);
       }
       Navigator.popUntil(context, (route) => route.isFirst);
       Navigator.pushReplacement(

@@ -62,6 +62,8 @@ dependencies:
   get: ^4.6.5
   easy_localization: ^3.0.1
   flutter_platform_widgets: ^3.2.0
+  camera: ^0.10.3+2
+  # fluttertoast: ^8.2.1
 
 dev_dependencies:
   flutter_test:

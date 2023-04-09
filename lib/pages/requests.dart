@@ -1,43 +1,110 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
-import 'package:simplechat/firebase/firebase_helper.dart';
-import 'package:simplechat/pages/zoom_drawer.dart';
-import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/user_model_provider.dart';
+import 'package:simplechat/widgets/drawer_icon.dart';
+
 import '../colors/colors.dart';
 import '../models/user_model.dart';
-import '../provider/user_model_provider.dart';
-import '../widgets/widgets.dart';
+import '../provider/loading_provider.dart';
 
-class Requests extends StatefulWidget {
-  final UserModel currentUserModel;
+class ReceiverListWidget extends StatefulWidget {
+  final String uid;
 
-  const Requests({super.key, required this.currentUserModel});
+  ReceiverListWidget({required this.uid});
 
   @override
-  State<Requests> createState() => _RequestsState();
+  _ReceiverListWidgetState createState() => _ReceiverListWidgetState();
 }
 
-class _RequestsState extends State<Requests> {
-  late UserModelProvider userProvider;
+class _ReceiverListWidgetState extends State<ReceiverListWidget> {
+  List<Map<String, dynamic>> receiverNames = [];
+  List<Map<String, dynamic>> senderNames = [];
+  late UserModelProvider userModelProvider;
+  void _initState() {
+    // Your initState code here
+    print('InitState executed');
+  }
 
   @override
   void initState() {
-    userProvider = Provider.of<UserModelProvider>(context, listen: false);
-
+    userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
+    _getReceiverNames();
+    _getSenderNames();
     super.initState();
+    _initState();
+
+    log("Original init executed");
+  }
+
+  Future<void> _getReceiverNames() async {
+    final userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userModelProvider.userModel.uid);
+    final userSnapshot = await userRef.get();
+    final receiverList = userSnapshot.get('reciever');
+
+    for (final receiverUid in receiverList) {
+      final receiverRef =
+          FirebaseFirestore.instance.collection('users').doc(receiverUid);
+      final receiverSnapshot = await receiverRef.get();
+      final receiverData = receiverSnapshot.data();
+
+      setState(() {
+        try {
+          receiverNames.add(receiverData!);
+          log("=============> " + receiverData.toString());
+        } catch (e) {
+          log(e.toString());
+        }
+      });
+    }
+  }
+
+  Future<void> _getSenderNames() async {
+    final userRef =
+        FirebaseFirestore.instance.collection('users').doc(widget.uid);
+    final userSnapshot = await userRef.get();
+    final senderList = userSnapshot.get('sender');
+
+    if (senderList != null) {
+      for (final senderUid in senderList) {
+        final senderRef =
+            FirebaseFirestore.instance.collection('users').doc(senderUid);
+        final senderSnapshot = await senderRef.get();
+        final senderData = senderSnapshot.data();
+
+        if (senderData != null) {
+          setState(() {
+            senderNames.add(senderData);
+          });
+        }
+      }
+    } else {
+      print("null");
+    }
+  }
+
+  void userReference(String uid) async {
+    final receiverRef =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final receiverData = receiverRef.data();
+
+    List recievers = receiverData!['reciever'];
+    log(recievers.toString());
   }
 
   @override
   Widget build(BuildContext context) {
-    bool pending = true;
+    // _getReceiverNames();
+    // _getSenderNames();
     final LoadingProvider provider = Provider.of<LoadingProvider>(context);
+    final UserModelProvider userModelProvider =
+        Provider.of<UserModelProvider>(context);
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 70.w,
@@ -55,7 +122,6 @@ class _RequestsState extends State<Requests> {
         ),
       ),
       body: Column(
-        mainAxisSize: MainAxisSize.max,
         children: [
           SizedBox(
             height: 10.h,
@@ -70,6 +136,7 @@ class _RequestsState extends State<Requests> {
                     CupertinoButton(
                       padding: EdgeInsets.zero,
                       onPressed: () {
+                        setState(() {});
                         provider.changePending(value: true);
                         log(provider.pending.toString());
                       },
@@ -78,7 +145,7 @@ class _RequestsState extends State<Requests> {
                             horizontal: 10.w, vertical: 4.h),
                         decoration:
                             BoxDecoration(color: AppColors.backgroudColor),
-                        height: 35,
+                        height: 35.h,
                         child: Text(
                           "Pending Requests",
                           style: TextStyle(
@@ -92,6 +159,7 @@ class _RequestsState extends State<Requests> {
                     CupertinoButton(
                       padding: EdgeInsets.zero,
                       onPressed: () {
+                        setState(() {});
                         provider.changePending(value: false);
                         log(provider.pending.toString());
                       },
@@ -100,7 +168,7 @@ class _RequestsState extends State<Requests> {
                             horizontal: 10.w, vertical: 4.h),
                         decoration:
                             BoxDecoration(color: AppColors.backgroudColor),
-                        height: 35,
+                        height: 35.h,
                         child: Text(
                           "Sent Requests",
                           style: TextStyle(
@@ -114,259 +182,167 @@ class _RequestsState extends State<Requests> {
                   ]),
             ),
           ),
-          Expanded(
-            child: StreamBuilder(
-              stream: userDataController.stream,
-              // FirebaseFirestore.instance
-              //     .collection("requests")
-              //     .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.active) {
-                  if (snapshot.hasData) {
-                    QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
+          if (provider.pending)
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: receiverNames.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            receiverNames[index]['profilePicture'])),
+                    title: Text(receiverNames[index]['fullName']),
+                    subtitle: Text(receiverNames[index]['bio']),
+                    trailing: SizedBox(
+                        width: 90.w,
+                        child: Row(children: [
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () async {
+                              // log("Yes   Clicked");
+                              log("=========>>  " +
+                                  senderNames.length.toString());
 
-                    CollectionReference ref =
-                        FirebaseFirestore.instance.collection('requests');
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(receiverNames[index]['uid'])
+                                  .snapshots()
+                                  .listen((snapshot) {
+                                if (snapshot.data() != null) {
+                                  Map<String, dynamic> userData =
+                                      snapshot.data()!;
+                                  String username = userData['fullName'];
+                                  String age = userData['bio'];
+                                  // Do something with the user data
 
-                    if (dataSnapshot.docs.isNotEmpty) {
-                      return ListView.builder(
-                          itemCount: dataSnapshot.docs.length,
-                          itemBuilder: (context, index) {
-                            Map<String, dynamic> userData =
-                                dataSnapshot.docs[index].data()
-                                    as Map<String, dynamic>;
+                                  print('Username: $username');
+                                  print('Age: $age');
+                                } else {
+                                  print("Empty");
+                                }
+                              });
 
-                            UserModel endUser = UserModel.fromMap(userData);
+                              // !   Stuff remaining
+                              // !   Stuff remaining
+                              // !   Stuff remaining
+                              // !   Stuff remaining
 
-                            UserModel? pendingModel;
+                              // !   Stuff remaining
 
-                            try {
-                              log(endUser.reciever.toString());
-                              Future.delayed(
-                                Duration(seconds: 3),
-                                () async {
-                                  pendingModel =
-                                      await FirebaseHelper.getUserModelById(
-                                          endUser.reciever.toString());
-                                },
-                              );
-                              log(pendingModel.toString());
-                              // log(pendingModel.);
-                            } catch (e) {
-                              log(e.toString());
-                            }
+                              var updatedUser = UserModel(
+                                  uid: receiverNames[index]['uid'],
+                                  fullName: receiverNames[index]['fullName'],
+                                  email: receiverNames[index]['email'],
+                                  bio: receiverNames[index]['bio'],
+                                  sender: receiverNames[index]['sender'],
+                                  reciever: receiverNames[index]['reciever'],
+                                  friends: receiverNames[index]['friends'],
+                                  memberSince: receiverNames[index]
+                                      ['memberSince'],
+                                  accountType: receiverNames[index]
+                                      ['accountType'],
+                                  pushToken: receiverNames[index]['pushToken'],
+                                  profilePicture: receiverNames[index]
+                                      ['profilePicture']);
 
-                            return endUser.reciever ==
-                                    FirebaseAuth.instance.currentUser!.uid
-                                ? ListTile(
-                                    trailing: Container(
-                                      width: 70.w,
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            CircleAvatar(
-                                                radius: 15.r,
-                                                backgroundColor:
-                                                    AppColors.backgroudColor,
-                                                child: CupertinoButton(
-                                                  alignment: Alignment.center,
-                                                  padding: EdgeInsets.zero,
-                                                  onPressed: () async {
-                                                    log("Current User Model -================>>>>" +
-                                                        widget.currentUserModel
-                                                            .uid
-                                                            .toString());
-                                                    log("End User Model -================>>>>" +
-                                                        endUser.uid.toString());
-                                                    try {
-                                                      provider.changeLoading(
-                                                          value: true);
+                              updatedUser.friends!
+                                  .add(userModelProvider.userModel.uid);
+                              updatedUser.sender!.removeAt(index);
 
-                                                      widget.currentUserModel
-                                                          .friends!
-                                                          .add(endUser.uid);
+                              userModelProvider.userModel.friends!
+                                  .add(updatedUser.uid);
 
-                                                      endUser.friends!.add(
-                                                          widget
-                                                              .currentUserModel
-                                                              .uid);
+                              userModelProvider.userModel.reciever!
+                                  .removeAt(index);
+                              // .remove(receiverNames[index]['uid']);
 
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .collection("users")
-                                                          .doc(widget
-                                                              .currentUserModel
-                                                              .uid!)
-                                                          .set(widget
-                                                              .currentUserModel
-                                                              .toMap());
+                              final receiverRef = FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(updatedUser.uid);
+                              final receiverSnapshot = await receiverRef.get();
 
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .collection("users")
-                                                          .doc(endUser.uid!)
-                                                          .set(endUser.toMap());
-                                                      provider.changeLoading(
-                                                          value: false);
+                              userReference(receiverNames[index]['uid']);
 
-                                                      ref
-                                                          .doc(endUser.uid)
-                                                          .delete();
-                                                    } catch (e) {
-                                                      provider.changeLoading(
-                                                          value: false);
-                                                      log(e.toString());
-                                                    }
-                                                  },
-                                                  child: provider.loading
-                                                      ? SpinKitSpinningLines(
-                                                          color: Colors.black,
-                                                          size: 15.0,
-                                                        )
-                                                      : Center(
-                                                          child: Icon(
-                                                          Icons.check,
-                                                          size: 20,
-                                                          color: Colors.grey,
-                                                        )),
-                                                )),
-                                            CircleAvatar(
-                                                radius: 15.r,
-                                                backgroundColor:
-                                                    AppColors.backgroudColor,
-                                                child: CupertinoButton(
-                                                  alignment: Alignment.center,
-                                                  padding: EdgeInsets.zero,
-                                                  onPressed: () {
-                                                    ref
-                                                        .doc(endUser.uid)
-                                                        .delete();
-                                                  },
-                                                  child: Center(
-                                                      child: Icon(
-                                                    Icons.close,
-                                                    size: 20,
-                                                    color: Colors.grey,
-                                                  )),
-                                                )),
-                                          ]),
-                                    ),
-                                    leading: CircleAvatar(
-                                      radius: 28,
-                                      backgroundImage:
-                                          NetworkImage(endUser.profilePicture!),
-                                    ),
-                                    title: Text(
-                                      endUser.fullName!,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(fontSize: 14.sp),
-                                    ),
-                                    subtitle: Text(
-                                      endUser.bio!,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(fontSize: 11.sp),
-                                    ),
-                                  )
-                                : Center(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(top: 250.h),
-                                      child: Text("No Requests"),
-                                    ),
-                                  );
-                          });
-                    } else {
-                      return SizedBox();
-                    }
-                  } else {
-                    return Center(
-                      child: Text("No Requests yet"),
-                    );
-                  }
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(updatedUser.uid)
+                                  .set(updatedUser.toMap());
+
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(userModelProvider.userModel.uid)
+                                  .set(userModelProvider.userModel.toMap())
+                                  .then((value) => userModelProvider
+                                      .updateUser(userModelProvider.userModel))
+                                  .then((value) => ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                          duration: Duration(seconds: 1),
+                                          content: Text(
+                                              "You are now Officially Friends"))));
+
+                              setState(() {
+                                _initState();
+                              });
+                              // await FirebaseFirestore.instance
+                              //     .collection('users')
+                              //     .doc(receiverNames[index]['uid'])
+                              //     .set(userModelProvider.userModel.toMap());
+                            },
+                            child: CircleAvatar(
+                              radius: 15.r,
+                              backgroundColor: AppColors.foregroundColor,
+                              child: Icon(
+                                Icons.check,
+                                size: 18.sp,
+                              ),
+                            ),
+                          ),
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {},
+                            child: CircleAvatar(
+                              radius: 15.r,
+                              backgroundColor: AppColors.foregroundColor,
+                              child: Icon(
+                                Icons.close,
+                                size: 18.sp,
+                              ),
+                            ),
+                          )
+                        ])),
                   );
-                }
-              },
+                },
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: senderNames.length,
+                itemBuilder: (context, index) {
+                  log(senderNames.length.toString());
+                  return ListTile(
+                    onTap: () {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text("Waiting")));
+                    },
+                    leading: CircleAvatar(
+                        backgroundImage:
+                            NetworkImage(senderNames[index]['profilePicture'])),
+                    title: Text(senderNames[index]['fullName']),
+                    subtitle: Text(senderNames[index]['bio']),
+                    trailing: Text(
+                      "Status\nPending",
+                      style: TextStyle(
+                          fontSize: 11.sp,
+                          color: Colors.green,
+                          fontStyle: FontStyle.italic),
+                    ),
+                  );
+                },
+              ),
             ),
-          )
-          // : Expanded(
-          //     child: StreamBuilder(
-          //       stream: FirebaseFirestore.instance
-          //           .collection("requests")
-          //           .snapshots(),
-          //       builder: (context, snapshot) {
-          //         if (snapshot.connectionState == ConnectionState.active) {
-          //           if (snapshot.hasData) {
-          //             log(snapshot.data!.size.toString());
-
-          //             QuerySnapshot dataSnapshot =
-          //                 snapshot.data as QuerySnapshot;
-
-          //             CollectionReference ref =
-          //                 FirebaseFirestore.instance.collection('requests');
-
-          //             if (dataSnapshot.docs.isNotEmpty) {
-          //               return ListView.builder(
-          //                   itemCount: dataSnapshot.docs.length,
-          //                   itemBuilder: (context, index) {
-          //                     Map<String, dynamic> userData =
-          //                         dataSnapshot.docs[index].data()
-          //                             as Map<String, dynamic>;
-
-          //                     UserModel endUser =
-          //                         UserModel.fromMap(userData);
-          //                     return endUser.sender ==
-          //                             FirebaseAuth.instance.currentUser!.uid
-          //                         ? ListTile(
-          //                             trailing: Text(
-          //                               "Status\nPending",
-          //                               style: TextStyle(
-          //                                   fontSize: 11.sp,
-          //                                   fontStyle: FontStyle.italic,
-          //                                   color: Colors.green),
-          //                             ),
-          //                             leading: CircleAvatar(
-          //                               radius: 28,
-          //                               backgroundImage: NetworkImage(
-          //                                   endUser.profilePicture!),
-          //                             ),
-          //                             title: Text(
-          //                               endUser.fullName!,
-          //                               overflow: TextOverflow.ellipsis,
-          //                               style: TextStyle(fontSize: 14.sp),
-          //                             ),
-          //                             subtitle: Text(
-          //                               endUser.bio!,
-          //                               overflow: TextOverflow.ellipsis,
-          //                               style: TextStyle(fontSize: 11.sp),
-          //                             ),
-          //                           )
-          //                         : Center(
-          //                             child: Padding(
-          //                               padding:
-          //                                   EdgeInsets.only(top: 250.h),
-          //                               child: Text("No Requests"),
-          //                             ),
-          //                           );
-          //                   });
-          //             } else {
-          //               return SizedBox();
-          //             }
-          //           } else {
-          //             return Center(
-          //               child: Text("No Requests yet"),
-          //             );
-          //           }
-          //         } else {
-          //           return Center(
-          //             child: CircularProgressIndicator(),
-          //           );
-          //         }
-          //       },
-          //     ),
-          //   )
         ],
       ),
     );

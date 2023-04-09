@@ -267,6 +267,9 @@ class _HomePageState extends State<HomePage> {
                                                     .doc(chatRoomModel
                                                         .chatroomid)
                                                     .delete();
+                                                Navigator.of(context,
+                                                        rootNavigator: true)
+                                                    .pop();
                                                 log("deleted");
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(SnackBar(
@@ -278,30 +281,13 @@ class _HomePageState extends State<HomePage> {
                                           // !  *********************
                                         },
                                         onTap: () {
-                                          // !8888888888888888888888888888888888888888
-                                          log("Yahya --->  ${chatRoomModel.fromUser.toString()}");
-
-                                          log("Random --->  ${FirebaseAuth.instance.currentUser!.uid}");
-
-                                          if (chatRoomModel.fromUser
-                                                  .toString() ==
-                                              FirebaseAuth
-                                                  .instance.currentUser!.uid) {
-                                            log("same user");
-                                            chatRoomModel.readMessage = null;
-                                          } else {
-                                            log("Different user");
-                                            chatRoomModel.readMessage =
-                                                Timestamp.now();
-                                          }
-
-                                          // chatRoomModel.fromUser.toString() !=
-                                          //         FirebaseAuth
-                                          //             .instance.currentUser!.uid
-                                          //     ? chatRoomModel.readMessage =
-                                          //         Timestamp.now()
-                                          //     : chatRoomModel.readMessage =
-                                          //         null;
+                                          chatRoomModel.fromUser.toString() !=
+                                                  FirebaseAuth
+                                                      .instance.currentUser!.uid
+                                              ? chatRoomModel.readMessage =
+                                                  Timestamp.now()
+                                              : chatRoomModel.readMessage =
+                                                  null;
 
                                           FirebaseFirestore.instance
                                               .collection("chatrooms")
@@ -350,7 +336,7 @@ class _HomePageState extends State<HomePage> {
                                                             right: 10,
                                                             left: 7),
                                                     leading: CircleAvatar(
-                                                      radius: 30.r,
+                                                      radius: 22.r,
                                                       backgroundColor:
                                                           Colors.grey.shade500,
                                                       backgroundImage:
@@ -584,7 +570,8 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.blue),
                         )),
                     CupertinoButton(
-                        onPressed: onPressed,
+                        onPressed: () =>
+                            Navigator.of(context, rootNavigator: true).pop(),
                         child: Text(
                           "No",
                           style: TextStyle(
