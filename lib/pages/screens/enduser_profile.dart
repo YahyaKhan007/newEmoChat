@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:simplechat/colors/colors.dart';
+import 'package:simplechat/pages/screens/screens.dart';
 
-import '../models/models.dart';
+import '../../models/models.dart';
+import '../../widgets/glass_morphism.dart';
 
 class EndUserProfile extends StatelessWidget {
   const EndUserProfile({super.key, required this.endUser});
@@ -15,24 +17,36 @@ class EndUserProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
-        appBar: AppBar(
-            centerTitle: true,
-            title: Text(
-              "Profile",
-              style: TextStyle(
-                  fontSize: 25.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  letterSpacing: -2),
-            ),
-            leadingWidth: 60,
-            elevation: 0.5,
-            leading: IconButton(
-                icon: Image.asset("assets/iconImages/back.png"),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                }),
-            backgroundColor: AppColors.backgroudColor),
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(120.h),
+            child: GlassDrop(
+              width: MediaQuery.of(context).size.width,
+              height: 120.h,
+              blur: 20.0,
+              opacity: 0.1,
+              child: AppBar(
+                backgroundColor: Colors.blue.shade100,
+                leadingWidth: 70.w,
+                centerTitle: true,
+                title: Text(
+                  "Profile",
+                  style: TextStyle(
+                      fontSize: 22.sp,
+                      letterSpacing: -1.3,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black.withOpacity(0.7)),
+                ),
+                elevation: 0,
+                leading: CupertinoButton(
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.black.withOpacity(0.7),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    }),
+              ),
+            )),
         body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -43,31 +57,41 @@ class EndUserProfile extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage: NetworkImage(endUser.profilePicture!),
+                      Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, boxShadow: [avatarShadow]),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage:
+                              NetworkImage(endUser.profilePicture!),
+                        ),
                       ),
                       SizedBox(
                         width: 20.w,
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            endUser.fullName!,
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w600),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(right: 5.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                endUser.fullName!,
+                                style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              Text(
+                                endUser.email!,
+                                style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w300),
+                              )
+                            ],
                           ),
-                          Text(
-                            endUser.email!,
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w300),
-                          )
-                        ],
+                        ),
                       )
                     ],
                   ),
@@ -111,7 +135,7 @@ Widget option(
           child: Text(
             label,
             style: TextStyle(
-                color: Colors.black87,
+                color: Colors.blue,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600),
           ),
@@ -138,16 +162,13 @@ Widget option(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FittedBox(
-                fit: BoxFit.cover,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 15,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w300),
-                ),
+              Text(
+                value,
+                style: const TextStyle(
+                    color: Colors.black87,
+                    fontSize: 15,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w300),
               ),
               SizedBox(
                 height: 4.h,

@@ -11,15 +11,14 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/main.dart';
-import 'package:simplechat/models/request_user_model.dart';
-import 'package:simplechat/pages/chatroom.dart';
+import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
-import 'package:uuid/uuid.dart';
 
-import '../colors/colors.dart';
-import '../models/models.dart';
+import '../../colors/colors.dart';
+import '../../models/models.dart';
+import '../../widgets/glass_morphism.dart';
 
 class SearchPage extends StatefulWidget {
   final UserModel? userModel;
@@ -84,26 +83,38 @@ class _SearchPageState extends State<SearchPage> {
         Provider.of<UserModelProvider>(context);
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        title: const Text(
-          "Search User",
-          style: TextStyle(
-            color: Colors.black87, letterSpacing: -2,
-            // fontFamily: "Zombie",
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: AppColors.backgroudColor,
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => Navigator.of(context).pop(),
-          child: Image.asset(
-            "assets/iconImages/back.png",
-          ),
-        ),
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(120.h),
+          child: GlassDrop(
+            width: MediaQuery.of(context).size.width,
+            height: 120.h,
+            blur: 20.0,
+            opacity: 0.1,
+            child: AppBar(
+              centerTitle: true,
+              elevation: 0,
+              title: Text(
+                "Search User",
+                style: TextStyle(
+                  color: Colors.black.withOpacity(0.7), letterSpacing: -1,
+                  // fontFamily: "Zombie",
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              backgroundColor: Colors.blue.shade100,
+              leading: CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => Navigator.of(context).pop(),
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.black.withOpacity(0.7),
+                ),
+                // Image.asset(
+                //   "assets/iconImages/back.png",
+                // ),
+              ),
+            ),
+          )),
       body: Column(
         children: [
           const SizedBox(
@@ -115,7 +126,7 @@ class _SearchPageState extends State<SearchPage> {
                 width: 15,
               ),
               Expanded(
-                flex: 4,
+                flex: 5,
                 child: Container(
                   height: 40.h,
                   decoration: BoxDecoration(
@@ -123,6 +134,7 @@ class _SearchPageState extends State<SearchPage> {
                       borderRadius: BorderRadius.circular(15.r)),
                   child: TextField(
                     controller: searchUserController,
+                    style: TextStyle(fontSize: 13.sp),
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderSide: const BorderSide(color: Colors.white),
@@ -140,14 +152,20 @@ class _SearchPageState extends State<SearchPage> {
                 child: CupertinoButton(
                     padding: EdgeInsets.zero,
                     child: Container(
-                      width: 35.w,
-                      height: 30.h,
-                      child: Image.asset(
-                        "assets/iconImages/searchIcon.png",
-                        fit: BoxFit.fill,
-                        scale: 1,
-                      ),
-                    ),
+                        decoration: BoxDecoration(
+                            color: Colors.white, shape: BoxShape.circle),
+                        width: 35.w,
+                        height: 30.h,
+                        child: Icon(
+                          Icons.search,
+                          color: Colors.black.withOpacity(0.7),
+                        )
+                        //  Image.asset(
+                        //   "assets/iconImages/searchIcon.png",
+                        //   fit: BoxFit.fill,
+                        //   scale: 1,
+                        // ),
+                        ),
                     onPressed: () {
                       setState(() {});
                     }),
@@ -180,7 +198,7 @@ class _SearchPageState extends State<SearchPage> {
                           margin: EdgeInsets.symmetric(
                               horizontal: 15.w, vertical: 10.h),
                           decoration: BoxDecoration(
-                              boxShadow: [AppColors.containerShadow],
+                              boxShadow: [shadow],
                               color: AppColors.foregroundColor,
                               borderRadius: BorderRadius.circular(8)),
                           child: Column(
@@ -252,7 +270,10 @@ class _SearchPageState extends State<SearchPage> {
                                     }
                                   },
                                   trailing: searchedUser.accountType == "Public"
-                                      ? const Icon(Icons.keyboard_arrow_right)
+                                      ? const Icon(
+                                          Icons.keyboard_arrow_right,
+                                          color: Colors.blue,
+                                        )
                                       : CircleAvatar(
                                           backgroundColor:
                                               AppColors.backgroudColor,
@@ -340,15 +361,27 @@ class _SearchPageState extends State<SearchPage> {
                                           )),
                                   leading: Container(
                                     decoration: BoxDecoration(boxShadow: [
-                                      AppColors.containerShadow,
+                                      shadow,
                                     ], shape: BoxShape.circle),
                                     child: CircleAvatar(
                                       backgroundImage: NetworkImage(
                                           searchedUser.profilePicture!),
                                     ),
                                   ),
-                                  title: Text("${searchedUser.fullName}"),
-                                  subtitle: Text("${searchedUser.email}"))
+                                  title: Text(
+                                    "${searchedUser.fullName}",
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text(
+                                    "${searchedUser.email}",
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: Colors.black,
+                                    ),
+                                  ))
                             ],
                           ),
                         ),
@@ -360,8 +393,7 @@ class _SearchPageState extends State<SearchPage> {
                         padding: const EdgeInsets.only(top: 50),
                         child: Text(
                           "No One ",
-                          style:
-                              TextStyle(fontSize: 14.sp, color: Colors.amber),
+                          style: TextStyle(fontSize: 14.sp, color: Colors.blue),
                         ),
                       ),
                     );

@@ -10,8 +10,10 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/widgets/showLoading.dart';
-import '../colors/colors.dart';
-import '../main.dart';
+import '../../colors/colors.dart';
+import '../../main.dart';
+import '../../widgets/drawer_icon.dart';
+import '../../widgets/glass_morphism.dart';
 import 'screens.dart';
 
 class PublicUsers extends StatefulWidget {
@@ -77,26 +79,37 @@ class _PublicUsersState extends State<PublicUsers> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
-        appBar: AppBar(
-          backgroundColor: AppColors.backgroudColor,
-          elevation: 0.3,
-          leading: CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () => Navigator.of(context).pop(),
-            child: Image.asset(
-              "assets/iconImages/back.png",
-            ),
-          ),
-          centerTitle: true,
-          title: Text(
-            "Public Users",
-            style: TextStyle(
-                letterSpacing: -2,
-                // fontFamily: "Zombie",
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade900),
-          ),
-        ),
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(120.h),
+            child: GlassDrop(
+              width: MediaQuery.of(context).size.width,
+              height: 120.h,
+              blur: 20.0,
+              opacity: 0.1,
+              child: AppBar(
+                backgroundColor: Colors.blue.shade100,
+                leadingWidth: 70.w,
+                centerTitle: true,
+                title: Text(
+                  "Public User",
+                  style: TextStyle(
+                      fontSize: 22.sp,
+                      letterSpacing: -1.3,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black.withOpacity(0.7)),
+                ),
+                elevation: 0,
+                leading: CupertinoButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.black.withOpacity(0.7),
+                  ),
+                ),
+              ),
+            )),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection("users")
@@ -120,11 +133,11 @@ class _PublicUsersState extends State<PublicUsers> {
                       UserModel endUser = UserModel.fromMap(userData);
 
                       return endUser.accountType == "Public"
-                          ? Container(
-                              margin: EdgeInsets.only(bottom: 7),
-                              decoration: BoxDecoration(
-                                  color: AppColors.foregroundColor,
-                                  boxShadow: [AppColors.containerShadow]),
+                          ? GlassMorphism(
+                              width: MediaQuery.of(context).size.width,
+                              height: 60.h,
+                              blur: 20.0,
+                              borderRadius: 20.0,
                               child: ListTile(
                                 onTap: () async {
                                   // showWaiting(context: context, title: "creating");

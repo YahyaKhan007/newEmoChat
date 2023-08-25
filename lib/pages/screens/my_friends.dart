@@ -4,18 +4,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/widgets/glass_morphism.dart';
 
-import '../colors/colors.dart';
-import '../firebase/firebase_helper.dart';
-import '../main.dart';
-import '../models/models.dart';
-import '../provider/user_model_provider.dart';
-import '../widgets/widgets.dart';
-import 'screens.dart';
+import '../../colors/colors.dart';
+import '../../firebase/firebase_helper.dart';
+import '../../main.dart';
+import '../../models/models.dart';
+import '../../provider/user_model_provider.dart';
+import '../../widgets/drawer_icon.dart';
 
 class MyFirends extends StatefulWidget {
   final UserModel? currentUserModel;
@@ -109,7 +109,7 @@ class _MyFirendsState extends State<MyFirends> {
         backgroundColor: AppColors.backgroudColor,
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: AppColors.backgroudColor,
+          backgroundColor: Colors.blue.shade100,
           elevation: 0.3,
           leading: drawerIcon(context),
           title: Text(
@@ -118,7 +118,7 @@ class _MyFirendsState extends State<MyFirends> {
                 letterSpacing: -2,
                 // fontFamily: "Zombie",
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade900),
+                color: Colors.blue.shade900),
           ),
         ),
         body: StreamBuilder(
@@ -148,19 +148,63 @@ class _MyFirendsState extends State<MyFirends> {
                                 ConnectionState.done) {
                               if (snapshot.hasData) {
                                 log("has data");
-                                return ListTile(
-                                    leading: CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                            snapshot.data!.profilePicture!)),
-                                    title: Text(
-                                        snapshot.data!.fullName.toString()),
-                                    subtitle:
-                                        Text(snapshot.data!.bio.toString()),
-                                    trailing: CircleAvatar(
-                                      radius: 18,
-                                      child: Image.asset(
-                                        "assets/iconImages/sendMessage.png",
-                                      ),
+                                return GlassMorphism(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 70.h,
+                                    blur: 20,
+                                    borderRadius: 20,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                            leading: CircleAvatar(
+                                                radius: 25.r,
+                                                backgroundImage: NetworkImage(
+                                                    snapshot.data!
+                                                        .profilePicture!)),
+                                            title: Text(
+                                              snapshot.data!.fullName
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            subtitle: Text(
+                                              snapshot.data!.bio.toString(),
+                                              style: TextStyle(
+                                                fontSize: 11.sp,
+                                                color: Colors.blue.shade300,
+                                              ),
+                                            ),
+                                            trailing: Container(
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  boxShadow: [shadow]),
+                                              child: CircleAvatar(
+                                                  backgroundColor: Colors.white,
+                                                  radius: 14.r,
+                                                  child: Icon(
+                                                    Icons.messenger,
+                                                    // Icons.child_care_outlined,
+
+                                                    color: Colors.blue,
+                                                    size: 12.r,
+                                                  )
+                                                  // Image.asset(
+                                                  //   "assets/iconImages/sendMessage.png",
+                                                  // ),
+                                                  ),
+                                            )),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 60.w, right: 30.w),
+                                          height: 0.6,
+                                          color: Colors.blue.shade200,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                        )
+                                      ],
                                     ));
                               } else {
                                 return Center(
@@ -169,7 +213,10 @@ class _MyFirendsState extends State<MyFirends> {
                               }
                             } else {
                               return Center(
-                                child: CircularProgressIndicator(),
+                                child: SpinKitCircle(
+                                  color: Colors.blue,
+                                  size: 20.r,
+                                ),
                               );
                             }
                           }));
@@ -205,7 +252,10 @@ class _MyFirendsState extends State<MyFirends> {
               }
             } else {
               return Center(
-                child: CircularProgressIndicator.adaptive(),
+                child: SpinKitCircle(
+                  color: Colors.blue,
+                  size: 20.r,
+                ),
               );
             }
           },

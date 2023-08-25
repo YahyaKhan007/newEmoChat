@@ -1,32 +1,70 @@
-import 'dart:developer';
+import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/models/models.dart';
+import 'package:simplechat/newScreen.dart';
 import 'package:simplechat/notification/local_notification.dart';
-import 'package:simplechat/pages/onBoarding.dart';
-import 'package:simplechat/pages/splash_screen.dart';
+import 'package:simplechat/pages/onboarding/onBoarding.dart';
+import 'package:simplechat/pages/screens/complete_profile.dart';
+import 'package:simplechat/pages/screens/forgetPassword.dart';
+import 'package:simplechat/pages/screens/screens.dart';
+import 'package:simplechat/pages/splash/splash_screen.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
+import 'package:simplechat/widgets/glass_morphism.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'bloc/internetBloc.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+
 var uuid = const Uuid();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  log(message.data.toString());
-  log(message.notification.toString());
+  String? title = message.notification!.title;
+  String? body = message.notification!.body;
+
+  AwesomeNotifications().createNotification(
+      content: NotificationContent(
+          id: 123,
+          channelKey: 'call_channel',
+          title: title,
+          body: body,
+          category: NotificationCategory.Call,
+          wakeUpScreen: true,
+          fullScreenIntent: true,
+          autoDismissible: true,
+          backgroundColor: Colors.orange),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'ACCEPT',
+          color: Colors.green,
+          label: 'Accept Call',
+          autoDismissible: true,
+        ),
+        NotificationActionButton(
+          key: 'REJECT',
+          label: 'Reject Call',
+          color: Colors.red,
+          autoDismissible: true,
+        ),
+      ]);
 }
+
+List<CameraDescription>? cameras;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final cameras = await availableCameras();
+  cameras = await availableCameras();
 
   await Firebase.initializeApp();
   User? currentUser = FirebaseAuth.instance.currentUser;
@@ -35,6 +73,21 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
 
   LocalNotificationServic.initialize();
+  AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+          channelKey: 'call_channel',
+          channelName: 'Call Channel',
+          channelDescription: 'Channel of Calling',
+          defaultColor: Colors.redAccent,
+          ledColor: Colors.white,
+          importance: NotificationImportance.Max,
+          channelShowBadge: true,
+          locked: true,
+          defaultRingtoneType: DefaultRingtoneType.Ringtone),
+    ],
+  );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   if (currentUser != null) {
@@ -74,19 +127,29 @@ class MyApp extends StatelessWidget {
       providers: [
         ListenableProvider(create: (_) => LoadingProvider()),
         ListenableProvider(create: (_) => UserModelProvider()),
-        ListenableProvider(create: (_) => RandomName())
+        ListenableProvider(create: (_) => RandomName()),
+        ListenableProvider(create: (_) => TokenProvider()),
+        BlocProvider(create: (_) => InternetCubit())
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Emochat',
           theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            primaryColor: Color.fromARGB(255, 134, 77, 232),
             useMaterial3: true,
-            primarySwatch: Colors.blue,
           ),
-          home: SplashScreen(
+          home:
+              // ForgetPassword()
+              //  CompleteProfile(
+              //     userModel: thisUserModel, firebaseUser: currentUser),
+              // NewScreen()
+              SplashScreen(
             firebaseUser: currentUser,
             userModel: thisUserModel,
-          )),
+          ),
+          ),
     );
   }
 }
+

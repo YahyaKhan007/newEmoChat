@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,17 +17,22 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import 'package:simplechat/colors/colors.dart';
 import 'package:simplechat/constants/emotions.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/notification/local_notification.dart';
-import 'package:simplechat/pages/screens.dart';
-import 'package:simplechat/pages/zoom_drawer.dart';
+import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
+import 'package:simplechat/widgets/glass_morphism.dart';
+import 'package:simplechat/widgets/show_connection.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
-import '../models/models.dart';
+import '../../colors/colors.dart';
+import '../../models/models.dart';
+import '../../provider/tokenProvider.dart';
+import '../../widgets/static.dart';
+import 'package:http/http.dart' as http;
 
 class ChatRoom extends StatefulWidget {
   const ChatRoom(
@@ -425,12 +431,94 @@ class _ChatRoomState extends State<ChatRoom> {
     });
   }
 
-  var spinkit = const SpinKitSpinningLines(
-    color: Colors.black,
-    size: 50.0,
+  var spinkit = const SpinKitCircle(
+    color: Colors.blue,
+    size: 25.0,
   );
 
   // !  provider
+
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+// ? *****************************************************
+  @override
+  void initState() {
+    super.initState();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      String? title = message.notification!.title;
+      String? body = message.notification!.body;
+      AwesomeNotifications().createNotification(
+          content: NotificationContent(
+              id: 123,
+              channelKey: 'call_channel',
+              title: title,
+              body: body,
+              category: NotificationCategory.Call,
+              wakeUpScreen: true,
+              fullScreenIntent: true,
+              autoDismissible: true,
+              backgroundColor: Colors.orange),
+          actionButtons: [
+            NotificationActionButton(
+              key: 'ACCEPT',
+              color: Colors.green,
+              label: 'Accept Call',
+              autoDismissible: true,
+            ),
+            NotificationActionButton(
+              key: 'REJECT',
+              label: 'Reject Call',
+              color: Colors.red,
+              autoDismissible: true,
+            ),
+          ]);
+
+      AwesomeNotifications().actionStream.listen((event) {
+        if (event.buttonKeyPressed == "REJECT") {
+          /// 1.2.2. de-initialization ZegoUIKitPrebuiltCallInvitationService
+          /// when app's user is logged out
+          ZegoUIKitPrebuiltCallInvitationService().uninitCallkitService();
+          print("Call Rejected");
+        } else if (event.buttonKeyPressed == 'ACCEPT') {
+          print("Call Accepted");
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (builder) => CallPage(
+                      currentUserModel: widget.currentUserModel,
+                      endUserModel: widget.enduser,
+                      callId: widget.enduser.pushToken!)));
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -438,42 +526,113 @@ class _ChatRoomState extends State<ChatRoom> {
     final secondProvider = Provider.of<LoadingProvider>(context);
     final userModelProvider = Provider.of<UserModelProvider>(context);
     return Scaffold(
-      backgroundColor: AppColors.backgroudColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroudColor,
-        leadingWidth: 60,
-        elevation: 0.5,
-        leading: IconButton(
-            icon: Image.asset("assets/iconImages/back.png"),
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop();
-            }),
-        title: GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context,
-                PageTransition(
-                    duration: const Duration(milliseconds: 700),
-                    type: PageTransitionType.fade,
-                    child: EndUserProfile(endUser: widget.enduser)));
-          },
-          child: Row(
-            children: [
-              CircleAvatar(
-                  backgroundImage: NetworkImage(
-                widget.enduser.profilePicture!,
-              )),
-              const SizedBox(
-                width: 15,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: GlassDrop(
+          width: MediaQuery.of(context).size.width,
+          height: 110.h,
+          blur: 0.0,
+          opacity: 0.4,
+          child: AppBar(
+            // actions: [
+            //   // Padding(
+            //   //   padding: const EdgeInsets.only(right: 15.0),
+            //   //   child: showConnection(context: context),
+            //   // )
+            //   IconButton(
+            //     onPressed: () {
+            //       sendPushNotification();
+            //       Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (builder) => CallPage(
+            //                     currentUserModel: widget.currentUserModel,
+            //                     endUserModel: widget.enduser,
+            //                     callId: widget.currentUserModel.pushToken!,
+            //                   )));
+            //     },
+            //     icon: Icon(
+            //       Icons.call,
+            //     ),
+            //   ),
+            //   IconButton(
+            //     onPressed: () async {
+            //       String? _token = await FirebaseMessaging.instance.getToken();
+            //       print(_token);
+            //       print(
+            //           "userModel.pushToken --------------->   ${widget.currentUserModel.pushToken}");
+            //       print(
+            //           "TOkenProvider  --------------->   ${widget.currentUserModel.pushToken}");
+            //     },
+            //     icon: Icon(
+            //       Icons.video_call,
+            //     ),
+            //   ),
+            // ],
+            backgroundColor: Colors.blue.shade100,
+            // backgroundColor: Colors.transparent,
+            leadingWidth: 50,
+            elevation: 0.3,
+            leading: InkWell(
+              onTap: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black.withOpacity(0.7),
               ),
-              Text(
-                widget.enduser.fullName!,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 14,
-                ),
+            ),
+            //  Image.asset("assets/iconImages/back.png"),
+
+            title: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    PageTransition(
+                        duration: const Duration(milliseconds: 700),
+                        type: PageTransitionType.fade,
+                        child: EndUserProfile(endUser: widget.enduser)));
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                      radius: 23.r,
+                      backgroundImage: NetworkImage(
+                        widget.enduser.profilePicture!,
+                      )),
+                  SizedBox(
+                    width: 15.sp,
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.enduser.fullName!,
+                        style: TextStyle(
+                            color: Colors.black.withOpacity(0.7),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15.sp,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      Text(
+                        widget.enduser.email!,
+                        style: TextStyle(
+                            color: Colors.black.withOpacity(0.7),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10.sp,
+                            fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -602,10 +761,7 @@ class _ChatRoomState extends State<ChatRoom> {
                   child: CircleAvatar(
                       backgroundColor: AppColors.foregroundColor,
                       radius: 15.r,
-                      child: Image.asset(
-                        "assets/iconImages/camera.png",
-                        scale: 3,
-                      )),
+                      child: Icon(Icons.camera_alt)),
                   onPressed: () {
                     // sendMessage();
 
@@ -650,6 +806,74 @@ class _ChatRoomState extends State<ChatRoom> {
           ),
         )
       ]),
+      // bottomSheet: Container(
+      //   color: Colors.blue.shade100,
+      //   child: Row(
+      //     children: [
+      //       CupertinoButton(
+      //           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      //           child: CircleAvatar(
+      //               backgroundColor: Colors.white,
+      //               radius: 15.r,
+      //               child: Icon(
+      //                 Icons.camera_enhance_rounded,
+      //                 size: 20.sp,
+      //                 color: Colors.blue,
+      //               )
+      //               // Image.asset(
+      //               //   "assets/iconImages/camera.png",
+      //               //   scale: 3,
+      //               // ),
+      //               ),
+      //           onPressed: () {
+      //             // sendMessage();
+
+      //             provider.randomNameChanger(value: provider.randomName + 1);
+      //             randomName = provider.randomName;
+      //             setState(() {});
+      //             showPhotoOption();
+      //           }),
+      //       TextFormField(
+      //         // textAlignVertical: TextAlignVertical.top,
+      //         // textAlign: TextAlign.center,
+      //         controller: messageController,
+      //         style: TextStyle(fontSize: 11.sp, color: Colors.black87),
+      //         cursorColor: Colors.black87,
+      //         maxLines: null,
+      //         // enabled: imageFile != null ? false : true,
+      //         decoration: const InputDecoration(
+      //             contentPadding: EdgeInsets.only(
+      //               left: 15,
+      //             ),
+      //             hintText: "Type a messgae ...",
+      //             hintStyle: TextStyle(
+      //               fontStyle: FontStyle.italic,
+      //               color: Colors.black87,
+      //               fontSize: 11,
+      //             ),
+      //             border: InputBorder.none),
+      //       ),
+      //       CupertinoButton(
+      //           child: CircleAvatar(
+      //               backgroundColor: Colors.white,
+      //               // backgroundColor: AppColors.foregroundColor,
+      //               radius: 16.r,
+      //               child: Icon(
+      //                 Icons.send_outlined,
+      //                 color: Colors.blue,
+      //                 size: 20,
+      //               )
+      //               //  Image.asset("assets/iconImages/send.png"),
+      //               ),
+      //           onPressed: () {
+      //             sendMessage(msg: messageController.text.trim());
+      //             setState(() {
+      //               imageFile = null;
+      //             });
+      //           })
+      //     ],
+      //   ),
+      // ),
     );
   }
 // !  This is Widget in which we will show messages to the user
@@ -663,8 +887,8 @@ class _ChatRoomState extends State<ChatRoom> {
       required bool sender}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: 7.h,
-          bottom: 7.h,
+          top: 3.h,
+          bottom: 3.h,
           left: sender ? 40.w : 7.w,
           right: sender ? 7.w : 40.w),
       child: Row(
@@ -680,6 +904,7 @@ class _ChatRoomState extends State<ChatRoom> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 CircleAvatar(
+                  radius: 13.sp,
                   backgroundColor: Colors.grey.shade300,
                   backgroundImage: AssetImage(Emotions.emotions[emotion]),
                 ),
@@ -709,9 +934,7 @@ class _ChatRoomState extends State<ChatRoom> {
                       bottomRight:
                           sender ? Radius.circular(0.r) : Radius.circular(15.r),
                     ),
-                    color: sender
-                        ? Colors.green.shade300
-                        : Colors.blueGrey.shade300),
+                    color: sender ? Colors.blueGrey.shade500 : Colors.blue),
                 child: ConstrainedBox(
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.7),
@@ -774,11 +997,11 @@ class _ChatRoomState extends State<ChatRoom> {
                         messageText != null
                             ? Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: 12.w, vertical: 8.h),
+                                    horizontal: 10.w, vertical: 5.h),
                                 child: Text(
                                   messageText,
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 14.sp),
+                                      color: Colors.white, fontSize: 11.sp),
                                 ),
                               )
                             : const SizedBox(),
@@ -797,25 +1020,103 @@ class _ChatRoomState extends State<ChatRoom> {
               ),
             ],
           ),
-          Visibility(
-            visible: sender,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 7,
-                ),
-                CircleAvatar(
-                  backgroundColor: Colors.green.shade300,
-                  backgroundImage: AssetImage(Emotions.emotions[emotion]),
-                ),
-              ],
-            ),
-          ),
+          // Visibility(
+          //   visible: sender,
+          //   child: Row(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       SizedBox(
+          //         width: 7,
+          //       ),
+          //       CircleAvatar(
+          //         radius: 13.sp,
+          //         backgroundColor: Colors.green.shade300,
+          //         backgroundImage: AssetImage(Emotions.emotions[emotion]),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
+  }
+
+  Future<void> sendPushNotification() async {
+    try {
+      print(
+          "====================================================================\n============================================ CAME HEREEEEEEEEEEEEEEEEEEEEEE\n========================================================\n================================");
+      String url = 'https://fcm.googleapis.com/fcm/send';
+
+      http.Response response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization':
+              'key=AAAAXk1Z2Yw:APA91bEJJT8NzzNAbx-pNe3_h6uB5x84hga6FtIatZmRSXk40p6FzF9H7iVoQ9jmVa_rDM79hfuQxSjssxJQMuXMCCfn_X3q_4dvZXl7z-MxPCxMG5-hyfPYlxI5A0DQlIxq5ib0SqCV',
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{
+              'body': widget.currentUserModel.fullName,
+              'title': 'Incoming Call',
+            },
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'EmoChat Incoming Call',
+              'id': '1',
+              'status': 'done'
+            },
+            'to': widget.enduser.pushToken,
+          },
+        ),
+      );
+      response;
+    } catch (e) {
+      e;
+    }
+  }
+}
+
+class TextFieldCustom extends StatelessWidget {
+  const TextFieldCustom({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+        child: TextFormField(
+      decoration: InputDecoration(border: OutlineInputBorder()),
+    ));
+  }
+}
+
+class CallPage extends StatelessWidget {
+  final UserModel endUserModel;
+  final UserModel currentUserModel;
+  final String callId;
+  const CallPage(
+      {super.key,
+      required this.endUserModel,
+      required this.currentUserModel,
+      required this.callId});
+
+  @override
+  Widget build(BuildContext context) {
+    TokenProvider tokenProvider =
+        Provider.of<TokenProvider>(context, listen: false);
+    return SafeArea(
+        child: Scaffold(
+            body: ZegoUIKitPrebuiltCall(
+                appID: Statics.appID,
+                appSign: Statics.appSign,
+                callID: "123",
+                userID: currentUserModel.pushToken!,
+                userName: currentUserModel.fullName!,
+                // userName: 'userName _1234',
+                config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
+                  ..onOnlySelfInRoom = (context) {
+                    Navigator.of(context).pop();
+                  })));
   }
 }

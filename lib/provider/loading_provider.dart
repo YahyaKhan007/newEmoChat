@@ -7,12 +7,46 @@ class LoadingProvider extends ChangeNotifier {
   bool _creating = false;
   bool _loading = false;
   bool _loginLoading = false;
+  bool _show = true;
+  bool _Show = true;
 
+  bool _otpVisibility = false;
+  bool get otpVisibility => _otpVisibility;
+  void changeOtpVisibility({required bool value}) {
+    _otpVisibility = value;
+    notifyListeners();
+  }
+
+  bool _signupText = false;
+  bool get signupText => _signupText;
+  void changeSignupText({required bool value}) {
+    _signupText = value;
+    notifyListeners();
+  }
+
+  bool _showOtpButton = false;
+  bool get showOtpButton => _showOtpButton;
+  void changShowOtpButton({required bool value}) {
+    _showOtpButton = value;
+    notifyListeners();
+  }
   // !   Signup Loading
 
   bool get signUpLoading => _signUpLoading;
   void changeSigupLoading({required bool value}) {
     _signUpLoading = value;
+    notifyListeners();
+  }
+
+  bool get show => _show;
+  void changeShow({required bool value}) {
+    _show = value;
+    notifyListeners();
+  }
+
+  bool get Show => _show;
+  void ChangeShow({required bool value}) {
+    _Show = value;
     notifyListeners();
   }
 

@@ -3,14 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/colors/colors.dart';
-import 'package:simplechat/main.dart';
 import 'package:simplechat/models/models.dart';
-import 'package:simplechat/pages/screens.dart';
-import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
-
-import '../provider/loading_provider.dart';
-import '../provider/randomNameGenerator.dart';
+import '../../zoom_drawer.dart';
+import '../screens/screens.dart';
 
 // class Splash extends StatelessWidget {
 //   final User? firebaseUser;
@@ -80,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // provider = Provider.of<UserModelProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroudColor,
+      backgroundColor: Colors.blue.shade100,
       body: Center(
         child: Image.asset("assets/logo.png"),
       ),

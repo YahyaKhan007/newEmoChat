@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simplechat/constants/images.dart';
 
-import '../main.dart';
-import '../provider/loading_provider.dart';
-import '../provider/randomNameGenerator.dart';
+import '../../main.dart';
+import '../../provider/loading_provider.dart';
+import '../../provider/randomNameGenerator.dart';
 
 class OnBoardingScreen extends StatelessWidget {
   final currentUser;

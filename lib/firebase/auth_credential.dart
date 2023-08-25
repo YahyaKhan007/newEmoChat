@@ -7,13 +7,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
-import 'package:simplechat/pages/zoom_drawer.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 import 'package:page_transition/page_transition.dart';
-
-import '../pages/screens.dart';
+import 'package:simplechat/zoom_drawer.dart';
+import '../pages/screens/screens.dart';
 
 enum Status {
   done,
