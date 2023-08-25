@@ -12,6 +12,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
+import 'package:simplechat/widgets/utils.dart';
 
 import '../../colors/colors.dart';
 import '../../widgets/drawer_icon.dart';
@@ -28,10 +29,10 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   static FirebaseMessaging messaging = FirebaseMessaging.instance;
   UserModel? userModel;
-  late UserModelProvider provider;
+  late UserModelProvider userModelProvider;
   @override
   void initState() {
-    provider = Provider.of<UserModelProvider>(context, listen: false);
+    userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
     getoken();
     super.initState();
   }
@@ -46,6 +47,36 @@ class _ProfileState extends State<Profile> {
     });
 
     // log("Push Token ----->   $messaging.getToken()");
+  }
+
+  Future sendVarificationEmail() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      await user!.sendEmailVerification();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void uploaddata(
+      {required User user,
+      required UserModelProvider userModelProvider}) async {
+    print(
+        "*****************************************************\n********************************\n\n\nDONE\n************************\n***************************");
+    userModel!.isVarified = user.emailVerified;
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userModel!.uid!)
+        .set(userModel!.toMap())
+        .then((value) => userModelProvider.updateUser(userModel!));
+  }
+
+  Future<void> checkEmailVerificationStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    await user!.reload(); // Reloads the user's authentication state
+    uploaddata(user: user, userModelProvider: userModelProvider);
+    print(user.emailVerified);
   }
 
   @override
@@ -115,20 +146,88 @@ class _ProfileState extends State<Profile> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Visibility(
+                            visible: !userModel!.isVarified!,
+                            child: GlassMorphism(
+                                width: MediaQuery.of(context).size.width,
+                                height: 60.0,
+                                blur: 20.0,
+                                borderRadius: 20.0,
+                                child: Center(
+                                  child: Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 12.w),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Flexible(
+                                            child: Text(
+                                          "Your Account is Not varified",
+                                          style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontSize: 12.sp),
+                                        )),
+                                        InkWell(
+                                            onTap: () {
+                                              sendVarificationEmail()
+                                                  .then((value) =>
+                                                      utils.showSnackbar(
+                                                          context: context,
+                                                          color: Colors.green,
+                                                          content:
+                                                              "An Email has been sent to your Email, Click to Varify your account",
+                                                          seconds: 2))
+                                                  .then((value) =>
+                                                      Future.delayed(
+                                                        Duration(seconds: 15),
+                                                        () =>
+                                                            checkEmailVerificationStatus(),
+                                                      ));
+                                            },
+                                            child: Text(
+                                              "Click to Varify",
+                                              style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 13.sp),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                )),
+                          ),
                           Padding(
-                            padding: EdgeInsets.only(left: 25.w, top: 40.h),
+                            padding: EdgeInsets.only(
+                                left: 25.w,
+                                top: userModel!.isVarified! ? 40.h : 20.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      boxShadow: [avatarShadow],
-                                      shape: BoxShape.circle),
-                                  child: CircleAvatar(
-                                    radius: 60,
-                                    backgroundImage: NetworkImage(
-                                        userModel!.profilePicture!),
-                                  ),
+                                Stack(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          boxShadow: [avatarShadow],
+                                          shape: BoxShape.circle),
+                                      child: CircleAvatar(
+                                        radius: 60,
+                                        backgroundImage: NetworkImage(
+                                            userModel!.profilePicture!),
+                                      ),
+                                    ),
+                                    Visibility(
+                                      visible: userModel!.isVarified!,
+                                      child: Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: CircleAvatar(
+                                              radius: 15.r,
+                                              child: Image.asset(
+                                                "assets/iconImages/blueTick.png",
+                                                color: Colors.blue,
+                                              ))),
+                                    )
+                                  ],
                                 ),
                                 SizedBox(
                                   width: 20.w,

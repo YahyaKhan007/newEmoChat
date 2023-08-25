@@ -60,14 +60,31 @@ class MyHomePage extends StatelessWidget {
                   //     fit: BoxFit.cover,
                   //   ),
                   // ),
-                  Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle, boxShadow: [avatarShadow]),
-                    child: CircleAvatar(
-                      radius: 60.r,
-                      backgroundImage:
-                          NetworkImage(provider.userModel.profilePicture!),
-                    ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, boxShadow: [avatarShadow]),
+                        child: CircleAvatar(
+                          radius: 60.r,
+                          backgroundImage:
+                              NetworkImage(provider.userModel.profilePicture!),
+                        ),
+                      ),
+                      Visibility(
+                        visible: provider.userModel.isVarified!,
+                        child: Positioned(
+                            bottom: 0,
+                            right: 50.w,
+                            child: CircleAvatar(
+                                radius: 15.r,
+                                child: Image.asset(
+                                  "assets/iconImages/blueTick.png",
+                                  color: Colors.blue,
+                                ))),
+                      )
+                    ],
                   ),
                   SizedBox(
                     height: 10.h,

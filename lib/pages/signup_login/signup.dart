@@ -1,4 +1,3 @@
-import 'package:email_auth/email_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -47,43 +46,43 @@ class _SignupState extends State<Signup> {
   //   emailAuth.config(remoteServerConfiguration);
   // }
 
-  void verifyOTP() {
-    EmailAuth emailAuth = new EmailAuth(sessionName: "OTP FOR SIGNUP");
-    var res = emailAuth.validateOtp(
-        recipientMail: emailController.value.text,
-        userOtp: _otpController.value.text);
-    if (res) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: Duration(seconds: 2),
-        content: Text(
-          "OTP has been sent to ${emailController.text}",
-          style: TextStyle(fontSize: 14.sp, color: Colors.black),
-        ),
-        backgroundColor: Colors.green.shade300,
-      ));
-    } else {
-      print("Invalid Verification Code");
-    }
-  }
+  // void verifyOTP() {
+  //   EmailAuth emailAuth = new EmailAuth(sessionName: "OTP FOR SIGNUP");
+  //   var res = emailAuth.validateOtp(
+  //       recipientMail: emailController.value.text,
+  //       userOtp: _otpController.value.text);
+  //   if (res) {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       duration: Duration(seconds: 2),
+  //       content: Text(
+  //         "OTP has been sent to ${emailController.text}",
+  //         style: TextStyle(fontSize: 14.sp, color: Colors.black),
+  //       ),
+  //       backgroundColor: Colors.green.shade300,
+  //     ));
+  //   } else {
+  //     print("Invalid Verification Code");
+  //   }
+  // }
 
 // ! SEND OTP
-  void sendOTP() async {
-    EmailAuth emailAuth = new EmailAuth(sessionName: "Test Session");
-    var res = await emailAuth.sendOtp(
-        recipientMail: emailController.value.text, otpLength: 6);
-    if (res) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: Duration(seconds: 2),
-        content: Text(
-          "OTP has been sent to ${emailController.text}",
-          style: TextStyle(fontSize: 14.sp, color: Colors.black),
-        ),
-        backgroundColor: Colors.green.shade300,
-      ));
-    } else {
-      print("Failed to send the verification code");
-    }
-  }
+  // void sendOTP() async {
+  //   EmailAuth emailAuth = new EmailAuth(sessionName: "Test Session");
+  //   var res = await emailAuth.sendOtp(
+  //       recipientMail: emailController.value.text, otpLength: 6);
+  //   if (res) {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       duration: Duration(seconds: 2),
+  //       content: Text(
+  //         "OTP has been sent to ${emailController.text}",
+  //         style: TextStyle(fontSize: 14.sp, color: Colors.black),
+  //       ),
+  //       backgroundColor: Colors.green.shade300,
+  //     ));
+  //   } else {
+  //     print("Failed to send the verification code");
+  //   }
+  // }
   // void sendOtp() async {
   //   // EmailAuth(sessionName: "OTP For Signup Profile of EMoChat");
 
@@ -107,16 +106,16 @@ class _SignupState extends State<Signup> {
   // }
 
   // ! Validate OTP
-  bool validateOTP() {
-    var result = EmailAuth(sessionName: "OTP For Signup Profile of EmoChat")
-        .validateOtp(
-            recipientMail: emailController.text, userOtp: _otpController.text);
-    if (result) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  // bool validateOTP() {
+  //   var result = EmailAuth(sessionName: "OTP For Signup Profile of EmoChat")
+  //       .validateOtp(
+  //           recipientMail: emailController.text, userOtp: _otpController.text);
+  //   if (result) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   void signup({required BuildContext context}) {
     FirebaseController authController = FirebaseController();
@@ -282,109 +281,7 @@ class _SignupState extends State<Signup> {
                       ],
                     ),
                   ),
-                  Visibility(
-                    visible: provider.showOtpButton,
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 30.w),
-                      child: Align(
-                          alignment: Alignment.centerRight,
-                          child: InkWell(
-                            onTap: () {
-                              provider.changeOtpVisibility(value: true);
-                              provider.changShowOtpButton(value: false);
-                              sendOTP();
-                            },
-                            child: Text(
-                              "Send OTP",
-                              style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.green,
-                                  fontStyle: FontStyle.italic),
-                            ),
-                          )),
-                    ),
-                  ),
-                  Visibility(
-                    visible: provider.otpVisibility,
-                    child: Container(
-                      height: 90.h,
-                      padding: EdgeInsets.symmetric(horizontal: 50),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 300.w,
-                            height: 50.h,
-                            decoration: BoxDecoration(
-                              boxShadow: [shadow],
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.only(left: 70),
-                              child: TextFormField(
-                                controller: _otpController,
-                                cursorColor: Colors.black,
-                                cursorHeight: 17.sp,
-                                // controller: ,
-                                style: kTextFieldInputStyle,
-                                onChanged: (value) {
-                                  if (true) {}
-                                },
 
-                                decoration: InputDecoration(
-                                  suffix: Visibility(
-                                      visible: true,
-                                      child: CircleAvatar(
-                                        radius: 15,
-                                        backgroundColor: Colors.green,
-                                        child: Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                        ),
-                                      )),
-
-                                  hintText: 'Enter OTP',
-                                  hintStyle: TextStyle(
-                                      fontSize: 13.sp,
-                                      fontStyle: FontStyle.italic),
-                                  // label: Text(
-                                  //   'Email',
-                                  //   style: TextStyle(
-                                  //       color: Colors.black, fontSize: 13.sp),
-                                  // ),
-                                  border: InputBorder.none,
-                                  // enabledBorder: kTextFieldBorder,
-                                  // focusedBorder: kTextFieldBorder
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 0.w,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [avatarShadow],
-                              ),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 25,
-                                child: Center(
-                                    child: Text(
-                                  "OTP",
-                                  style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: Colors.blue,
-                                      fontStyle: FontStyle.italic),
-                                )),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
                   Container(
                     height: 90.h,
                     child: Stack(
@@ -654,17 +551,14 @@ class _SignupState extends State<Signup> {
                               if (!_formkey.currentState!.validate()) {
                               } else {
                                 // return "Enter";
-                                if (validateOTP()) {
-                                  if (passwordController.text.toString() ==
-                                      confirmPasswordController.text
-                                          .toString()) {
-                                    FirebaseController().signup(
-                                        context: context,
-                                        email:
-                                            emailController.text.toLowerCase(),
-                                        password: passwordController.text
-                                            .toLowerCase());
-                                  }
+
+                                if (passwordController.text.toString() ==
+                                    confirmPasswordController.text.toString()) {
+                                  FirebaseController().signup(
+                                      context: context,
+                                      email: emailController.text.toLowerCase(),
+                                      password: passwordController.text
+                                          .toLowerCase());
                                 } else {
                                   Loading.showAlertDialog(
                                       context,

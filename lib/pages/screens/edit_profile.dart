@@ -271,6 +271,18 @@ class _EditProfileState extends State<EditProfile> {
                                                 backgroundImage: NetworkImage(
                                                     userModel.profilePicture!),
                                               ),
+                                        Visibility(
+                                          visible: userModel.isVarified!,
+                                          child: Positioned(
+                                              bottom: 0,
+                                              right: 0,
+                                              child: CircleAvatar(
+                                                  radius: 15.r,
+                                                  child: Image.asset(
+                                                    "assets/iconImages/blueTick.png",
+                                                    color: Colors.blue,
+                                                  ))),
+                                        ),
                                         Positioned(
                                             top: 5,
                                             right: 5,

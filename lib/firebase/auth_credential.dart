@@ -56,7 +56,8 @@ class FirebaseController extends ChangeNotifier {
           accountType: "",
           bio: "",
           pushToken: "",
-          memberSince: Timestamp.now());
+          memberSince: Timestamp.now(),
+          isVarified: false);
 
       await FirebaseFirestore.instance
           .collection("users")

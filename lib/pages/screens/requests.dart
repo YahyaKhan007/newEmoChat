@@ -11,6 +11,7 @@ import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/drawer_icon.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
+import 'package:simplechat/widgets/utils.dart';
 
 import '../../colors/colors.dart';
 import '../../models/models.dart';
@@ -211,10 +212,26 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                       child: ListTile(
                         // minLeadingWidth: -30,
                         contentPadding: EdgeInsets.only(right: -10, left: 15),
-                        leading: CircleAvatar(
-                            radius: 25.r,
-                            backgroundImage: NetworkImage(
-                                receiverNames[index]['profilePicture'])),
+                        leading: Stack(
+                          children: [
+                            CircleAvatar(
+                                radius: 25.r,
+                                backgroundImage: NetworkImage(
+                                    receiverNames[index]['profilePicture'])),
+                            Visibility(
+                              visible: receiverNames[index]['isVarified'],
+                              child: Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: CircleAvatar(
+                                      radius: 10.r,
+                                      child: Image.asset(
+                                        "assets/iconImages/blueTick.png",
+                                        color: Colors.blue,
+                                      ))),
+                            )
+                          ],
+                        ),
                         title: Text(
                           receiverNames[index]['fullName'],
                           style: TextStyle(
@@ -239,61 +256,74 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                                 onPressed: () async {
                                   // ! For                 Confirm Click
 
-                                  var updatedUser = UserModel(
-                                      uid: receiverNames[index]['uid'],
-                                      fullName: receiverNames[index]
-                                          ['fullName'],
-                                      email: receiverNames[index]['email'],
-                                      bio: receiverNames[index]['bio'],
-                                      sender: receiverNames[index]['sender'],
-                                      reciever: receiverNames[index]
-                                          ['reciever'],
-                                      friends: receiverNames[index]['friends'],
-                                      memberSince: receiverNames[index]
-                                          ['memberSince'],
-                                      accountType: receiverNames[index]
-                                          ['accountType'],
-                                      pushToken: receiverNames[index]
-                                          ['pushToken'],
-                                      profilePicture: receiverNames[index]
-                                          ['profilePicture']);
+                                  if (userModelProvider.userModel.isVarified!) {
+                                    var updatedUser = UserModel(
+                                        uid: receiverNames[index]['uid'],
+                                        fullName: receiverNames[index]
+                                            ['fullName'],
+                                        email: receiverNames[index]['email'],
+                                        bio: receiverNames[index]['bio'],
+                                        sender: receiverNames[index]['sender'],
+                                        reciever: receiverNames[index]
+                                            ['reciever'],
+                                        friends: receiverNames[index]
+                                            ['friends'],
+                                        memberSince: receiverNames[index]
+                                            ['memberSince'],
+                                        accountType: receiverNames[index]
+                                            ['accountType'],
+                                        pushToken: receiverNames[index]
+                                            ['pushToken'],
+                                        profilePicture: receiverNames[index]
+                                            ['profilePicture'],
+                                        isVarified: receiverNames[index]
+                                            ['isVarified']);
 
-                                  updatedUser.friends!
-                                      .add(userModelProvider.userModel.uid);
-                                  updatedUser.reciever!
-                                      .remove(userModelProvider.userModel.uid);
+                                    updatedUser.friends!
+                                        .add(userModelProvider.userModel.uid);
+                                    updatedUser.reciever!.remove(
+                                        userModelProvider.userModel.uid);
 
-                                  userModelProvider.userModel.sender!
-                                      .remove(updatedUser.uid);
+                                    userModelProvider.userModel.sender!
+                                        .remove(updatedUser.uid);
 
-                                  userModelProvider.userModel.friends!
-                                      .add(updatedUser.uid);
+                                    userModelProvider.userModel.friends!
+                                        .add(updatedUser.uid);
 
-                                  userModelProvider
-                                      .updateUser(userModelProvider.userModel);
+                                    userModelProvider.updateUser(
+                                        userModelProvider.userModel);
 
-                                  await FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(updatedUser.uid)
-                                      .set(updatedUser.toMap());
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(updatedUser.uid)
+                                        .set(updatedUser.toMap());
 
-                                  await FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(userModelProvider.userModel.uid)
-                                      .set(userModelProvider.userModel.toMap())
-                                      .then((value) =>
-                                          userModelProvider.updateUser(
-                                              userModelProvider.userModel))
-                                      .then((value) => ScaffoldMessenger.of(
-                                              context)
-                                          .showSnackBar(SnackBar(
-                                              duration: Duration(seconds: 1),
-                                              content: Text(
-                                                  "You are now Officially Friends"))));
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(userModelProvider.userModel.uid)
+                                        .set(
+                                            userModelProvider.userModel.toMap())
+                                        .then((value) =>
+                                            userModelProvider.updateUser(
+                                                userModelProvider.userModel))
+                                        .then((value) => ScaffoldMessenger.of(
+                                                context)
+                                            .showSnackBar(SnackBar(
+                                                duration: Duration(seconds: 1),
+                                                content: Text(
+                                                    "You are now Officially Friends"))));
 
-                                  setState(() {
-                                    receiverNames.removeAt(index);
-                                  });
+                                    setState(() {
+                                      receiverNames.removeAt(index);
+                                    });
+                                  } else {
+                                    utils.showSnackbar(
+                                        context: context,
+                                        color: Colors.redAccent.shade400,
+                                        content:
+                                            "to Perform the Action, You must varify your acoount",
+                                        seconds: 2);
+                                  }
                                 },
                                 child: CircleAvatar(
                                   radius: 15.r,
@@ -308,56 +338,69 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                               CupertinoButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () async {
-                                  var updatedUser = UserModel(
-                                      uid: receiverNames[index]['uid'],
-                                      fullName: receiverNames[index]
-                                          ['fullName'],
-                                      email: receiverNames[index]['email'],
-                                      bio: receiverNames[index]['bio'],
-                                      sender: receiverNames[index]['sender'],
-                                      reciever: receiverNames[index]
-                                          ['reciever'],
-                                      friends: receiverNames[index]['friends'],
-                                      memberSince: receiverNames[index]
-                                          ['memberSince'],
-                                      accountType: receiverNames[index]
-                                          ['accountType'],
-                                      pushToken: receiverNames[index]
-                                          ['pushToken'],
-                                      profilePicture: receiverNames[index]
-                                          ['profilePicture']);
+                                  if (userModelProvider.userModel.isVarified!) {
+                                    var updatedUser = UserModel(
+                                        uid: receiverNames[index]['uid'],
+                                        fullName: receiverNames[index]
+                                            ['fullName'],
+                                        email: receiverNames[index]['email'],
+                                        bio: receiverNames[index]['bio'],
+                                        sender: receiverNames[index]['sender'],
+                                        reciever: receiverNames[index]
+                                            ['reciever'],
+                                        friends: receiverNames[index]
+                                            ['friends'],
+                                        memberSince: receiverNames[index]
+                                            ['memberSince'],
+                                        accountType: receiverNames[index]
+                                            ['accountType'],
+                                        pushToken: receiverNames[index]
+                                            ['pushToken'],
+                                        profilePicture: receiverNames[index]
+                                            ['profilePicture'],
+                                        isVarified: receiverNames[index]
+                                            ['isVarified']);
 
-                                  updatedUser.sender!
-                                      .remove(userModelProvider.userModel.uid);
+                                    updatedUser.sender!.remove(
+                                        userModelProvider.userModel.uid);
 
-                                  userModelProvider.userModel.reciever!
-                                      .remove(updatedUser.uid);
+                                    userModelProvider.userModel.reciever!
+                                        .remove(updatedUser.uid);
 
-                                  userModelProvider
-                                      .updateUser(userModelProvider.userModel);
+                                    userModelProvider.updateUser(
+                                        userModelProvider.userModel);
 
-                                  await FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(updatedUser.uid)
-                                      .set(updatedUser.toMap());
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(updatedUser.uid)
+                                        .set(updatedUser.toMap());
 
-                                  await FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(userModelProvider.userModel.uid)
-                                      .set(userModelProvider.userModel.toMap())
-                                      .then((value) =>
-                                          userModelProvider.updateUser(
-                                              userModelProvider.userModel))
-                                      .then((value) => ScaffoldMessenger.of(
-                                              context)
-                                          .showSnackBar(SnackBar(
-                                              duration: Duration(seconds: 1),
-                                              content: Text(
-                                                  "You are now Officially Friends"))));
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(userModelProvider.userModel.uid)
+                                        .set(
+                                            userModelProvider.userModel.toMap())
+                                        .then((value) =>
+                                            userModelProvider.updateUser(
+                                                userModelProvider.userModel))
+                                        .then((value) => ScaffoldMessenger.of(
+                                                context)
+                                            .showSnackBar(SnackBar(
+                                                duration: Duration(seconds: 1),
+                                                content: Text(
+                                                    "You are now Officially Friends"))));
 
-                                  setState(() {
-                                    receiverNames.removeAt(index);
-                                  });
+                                    setState(() {
+                                      receiverNames.removeAt(index);
+                                    });
+                                  } else {
+                                    utils.showSnackbar(
+                                        context: context,
+                                        color: Colors.redAccent.shade400,
+                                        content:
+                                            "to Perform the Action, You must varify your acoount",
+                                        seconds: 3);
+                                  }
                                 },
                                 child: CircleAvatar(
                                   radius: 15.r,
@@ -414,11 +457,29 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                                             decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
                                                 boxShadow: [shadow]),
-                                            child: CircleAvatar(
-                                                radius: 25.r,
-                                                backgroundImage: NetworkImage(
-                                                    snapshot.data!
-                                                        .profilePicture!)),
+                                            child: Stack(
+                                              children: [
+                                                CircleAvatar(
+                                                    radius: 25.r,
+                                                    backgroundImage:
+                                                        NetworkImage(snapshot
+                                                            .data!
+                                                            .profilePicture!)),
+                                                Visibility(
+                                                  visible: snapshot
+                                                      .data!.isVarified!,
+                                                  child: Positioned(
+                                                      bottom: 0,
+                                                      right: 0,
+                                                      child: CircleAvatar(
+                                                          radius: 10.r,
+                                                          child: Image.asset(
+                                                            "assets/iconImages/blueTick.png",
+                                                            color: Colors.blue,
+                                                          ))),
+                                                )
+                                              ],
+                                            ),
                                           ),
                                           title: Text(
                                             snapshot.data!.fullName.toString(),

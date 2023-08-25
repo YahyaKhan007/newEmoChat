@@ -157,11 +157,29 @@ class _MyFirendsState extends State<MyFirends> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         ListTile(
-                                            leading: CircleAvatar(
-                                                radius: 25.r,
-                                                backgroundImage: NetworkImage(
-                                                    snapshot.data!
-                                                        .profilePicture!)),
+                                            leading: Stack(
+                                              children: [
+                                                CircleAvatar(
+                                                    radius: 25.r,
+                                                    backgroundImage:
+                                                        NetworkImage(snapshot
+                                                            .data!
+                                                            .profilePicture!)),
+                                                Visibility(
+                                                  visible: snapshot
+                                                      .data!.isVarified!,
+                                                  child: Positioned(
+                                                      bottom: 0,
+                                                      right: 0,
+                                                      child: CircleAvatar(
+                                                          radius: 10.r,
+                                                          child: Image.asset(
+                                                            "assets/iconImages/blueTick.png",
+                                                            color: Colors.blue,
+                                                          ))),
+                                                )
+                                              ],
+                                            ),
                                             title: Text(
                                               snapshot.data!.fullName
                                                   .toString(),

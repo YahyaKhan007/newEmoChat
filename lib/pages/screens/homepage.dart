@@ -20,6 +20,7 @@ import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
 import 'package:simplechat/widgets/show_connection.dart';
+import 'package:simplechat/widgets/utils.dart';
 
 import '../../models/chatroom_model.dart';
 import '../../models/user_model.dart';
@@ -72,16 +73,38 @@ class _HomePageState extends State<HomePage> {
     color: Colors.white,
     size: 25.0,
   );
-  late UserModelProvider provider;
+  late UserModelProvider userModelProvider;
   late TokenProvider tokenProvider;
+  void uploaddata(
+      {required User user,
+      required UserModelProvider userModelProvider}) async {
+    print(
+        "*****************************************************\n********************************\n\n\nDONE\n************************\n***************************");
+    widget.userModel.isVarified = user.emailVerified;
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.userModel.uid!)
+        .set(widget.userModel.toMap())
+        .then((value) => userModelProvider.updateUser(widget.userModel!));
+  }
+
+  Future<void> checkEmailVerificationStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    await user!.reload(); // Reloads the user's authentication state
+    uploaddata(user: user, userModelProvider: userModelProvider);
+    print(user.emailVerified);
+  }
 
   @override
   void initState() {
-    provider = Provider.of<UserModelProvider>(context, listen: false);
+    userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
     tokenProvider = Provider.of<TokenProvider>(context, listen: false);
 
-    log(provider.userModel.fullName.toString());
-    log(provider.firebaseUser.toString());
+    checkEmailVerificationStatus();
+
+    log(userModelProvider.userModel.fullName.toString());
+    log(userModelProvider.firebaseUser.toString());
 
     FirebaseMessaging.onMessage.listen((event) {
       log("new Message  --->  ${event.notification!.title}");
@@ -320,36 +343,49 @@ class _HomePageState extends State<HomePage> {
                                               // !  *********************
                                             },
                                             onTap: () {
-                                              chatRoomModel.fromUser
-                                                          .toString() !=
-                                                      FirebaseAuth.instance
-                                                          .currentUser!.uid
-                                                  ? chatRoomModel.readMessage =
-                                                      Timestamp.now()
-                                                  : chatRoomModel.readMessage =
-                                                      null;
+                                              if (widget
+                                                  .userModel.isVarified!) {
+                                                chatRoomModel.fromUser
+                                                            .toString() !=
+                                                        FirebaseAuth.instance
+                                                            .currentUser!.uid
+                                                    ? chatRoomModel
+                                                            .readMessage =
+                                                        Timestamp.now()
+                                                    : chatRoomModel
+                                                        .readMessage = null;
 
-                                              FirebaseFirestore.instance
-                                                  .collection("chatrooms")
-                                                  .doc(chatRoomModel.chatroomid)
-                                                  .set(chatRoomModel.toMap());
+                                                FirebaseFirestore.instance
+                                                    .collection("chatrooms")
+                                                    .doc(chatRoomModel
+                                                        .chatroomid)
+                                                    .set(chatRoomModel.toMap());
 
-                                              log("chatRoom updated");
+                                                log("chatRoom updated");
 
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (builder) =>
-                                                          ChatRoom(
-                                                            chatRoomModel:
-                                                                chatRoomModel,
-                                                            enduser: userModel,
-                                                            firebaseUser: widget
-                                                                .firebaseUser,
-                                                            currentUserModel:
-                                                                widget
-                                                                    .userModel,
-                                                          )));
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (builder) =>
+                                                            ChatRoom(
+                                                              chatRoomModel:
+                                                                  chatRoomModel,
+                                                              enduser:
+                                                                  userModel,
+                                                              firebaseUser: widget
+                                                                  .firebaseUser,
+                                                              currentUserModel:
+                                                                  widget
+                                                                      .userModel,
+                                                            )));
+                                              } else {
+                                                utils.showSnackbar(
+                                                    context: context,
+                                                    color: Colors.redAccent,
+                                                    content:
+                                                        "to Perform the Action, You must varify your acoount",
+                                                    seconds: 2);
+                                              }
                                             },
                                             child: GlassMorphism(
                                               height: 70.h,
@@ -390,16 +426,34 @@ class _HomePageState extends State<HomePage> {
                                                                       bottom: 0,
                                                                       right: 10,
                                                                       left: 0),
-                                                              leading:
+                                                              leading: Stack(
+                                                                children: [
                                                                   CircleAvatar(
-                                                                radius: 30.r,
-                                                                backgroundColor:
-                                                                    Colors.grey
-                                                                        .shade500,
-                                                                backgroundImage:
-                                                                    NetworkImage(
+                                                                    radius:
+                                                                        30.r,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .grey
+                                                                            .shade500,
+                                                                    backgroundImage:
+                                                                        NetworkImage(
+                                                                            userModel.profilePicture!),
+                                                                  ),
+                                                                  Visibility(
+                                                                    visible:
                                                                         userModel
-                                                                            .profilePicture!),
+                                                                            .isVarified!,
+                                                                    child: Positioned(
+                                                                        bottom: 0,
+                                                                        right: 0,
+                                                                        child: CircleAvatar(
+                                                                            radius: 10.r,
+                                                                            child: Image.asset(
+                                                                              "assets/iconImages/blueTick.png",
+                                                                              color: Colors.blue,
+                                                                            ))),
+                                                                  )
+                                                                ],
                                                               ),
                                                               title: Text(
                                                                 userModel

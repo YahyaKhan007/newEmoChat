@@ -9,30 +9,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.1"
-  agora_rtc_engine:
-    dependency: transitive
-    description:
-      name: agora_rtc_engine
-      sha256: "2b9ea091c9123be01e9289167e0bcdd91aa7d8fdc24c94e23f1629c3a6e5391a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.2.2"
-  agora_rtm:
-    dependency: transitive
-    description:
-      name: agora_rtm
-      sha256: f53057125845494048e19ee6b8826fcee88937512d4c206d47a74345914e9a04
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.8"
-  agora_uikit:
-    dependency: "direct main"
-    description:
-      name: agora_uikit
-      sha256: "0aa9569934d2f96426010332006870b0393efb1a41e389c37b8b3cf8d2800040"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.6"
   archive:
     dependency: transitive
     description:
@@ -353,14 +329,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.8"
-  email_auth:
-    dependency: "direct main"
-    description:
-      name: email_auth
-      sha256: a382b6d510c2f6a5dad5e424b693168c65681fff29d36d0abec7916472aaba1b
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   encrypt:
     dependency: transitive
     description:
@@ -792,14 +760,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.17.0"
-  iris_method_channel:
-    dependency: transitive
-    description:
-      name: iris_method_channel
-      sha256: "195a3224b26a6eb60dadd96d04da9f013a00541adac60cc8fdc9dbb104e581db"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   js:
     dependency: transitive
     description:
@@ -816,14 +776,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.8.0"
-  lints:
-    dependency: transitive
-    description:
-      name: lints
-      sha256: "5e4a9cd06d447758280a8ac2405101e0e2094d2a1dbdd3756aec3fe7775ba593"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   matcher:
     dependency: transitive
     description:

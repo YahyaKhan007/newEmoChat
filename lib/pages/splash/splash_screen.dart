@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -40,16 +41,40 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late UserModelProvider provider;
+  late UserModelProvider userModelProvider;
+
+  void uploaddata(
+      {required User user,
+      required UserModelProvider userModelProvider}) async {
+    print(
+        "*****************************************************\n********************************\n\n\nDONE\n************************\n***************************");
+    widget.userModel!.isVarified = user.emailVerified;
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.userModel!.uid!)
+        .set(widget.userModel!.toMap())
+        .then((value) => userModelProvider.updateUser(widget.userModel!));
+  }
+
+  Future<void> checkEmailVerificationStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    await user!.reload(); // Reloads the user's authentication state
+    uploaddata(user: user, userModelProvider: userModelProvider);
+    print(user.emailVerified);
+  }
 
   @override
   void initState() {
-    provider = Provider.of<UserModelProvider>(context, listen: false);
-    Future.delayed(const Duration(seconds: 1), () {
+    userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
+
+    Future.delayed(const Duration(seconds: 0), () {
       if (widget.firebaseUser != null) {
-        provider.updateUser(widget.userModel!);
-        provider.updateFirebaseUser(widget.firebaseUser!);
+        userModelProvider.updateUser(widget.userModel!);
+        userModelProvider.updateFirebaseUser(widget.firebaseUser!);
+        checkEmailVerificationStatus();
       }
+
       return Navigator.pushReplacement(
           context,
           PageTransition(

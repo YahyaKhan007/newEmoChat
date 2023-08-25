@@ -7,11 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/widgets/showLoading.dart';
+import 'package:simplechat/widgets/utils.dart';
 import '../../colors/colors.dart';
 import '../../main.dart';
+import '../../provider/user_model_provider.dart';
 import '../../widgets/drawer_icon.dart';
 import '../../widgets/glass_morphism.dart';
 import 'screens.dart';
@@ -77,6 +80,8 @@ class _PublicUsersState extends State<PublicUsers> {
 
   @override
   Widget build(BuildContext context) {
+    final userModelProvider = Provider.of<UserModelProvider>(context);
+
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: PreferredSize(
@@ -141,30 +146,57 @@ class _PublicUsersState extends State<PublicUsers> {
                               child: ListTile(
                                 onTap: () async {
                                   // showWaiting(context: context, title: "creating");
-                                  Loading.showLoadingDialog(
-                                      context, "Creating");
-                                  ChatRoomModel? chatRoom =
-                                      await getChatroomModel(endUser);
-                                  log("object");
 
-                                  Navigator.pushReplacement(
-                                      context,
-                                      PageTransition(
-                                          duration:
-                                              const Duration(milliseconds: 700),
-                                          type: PageTransitionType.fade,
-                                          child: ChatRoom(
-                                            chatRoomModel: chatRoom!,
-                                            enduser: endUser,
-                                            firebaseUser: widget.firebaseUser!,
-                                            currentUserModel: widget.userModel!,
-                                          ),
-                                          isIos: true));
+                                  log("object");
+                                  if (userModelProvider.userModel.isVarified!) {
+                                    Loading.showLoadingDialog(
+                                        context, "Creating");
+                                    ChatRoomModel? chatRoom =
+                                        await getChatroomModel(endUser);
+                                    Navigator.pushReplacement(
+                                        context,
+                                        PageTransition(
+                                            duration: const Duration(
+                                                milliseconds: 700),
+                                            type: PageTransitionType.fade,
+                                            child: ChatRoom(
+                                              chatRoomModel: chatRoom!,
+                                              enduser: endUser,
+                                              firebaseUser:
+                                                  widget.firebaseUser!,
+                                              currentUserModel:
+                                                  widget.userModel!,
+                                            ),
+                                            isIos: true));
+                                  } else {
+                                    utils.showSnackbar(
+                                        context: context,
+                                        color: Colors.redAccent.shade400,
+                                        content:
+                                            "to Perform the Action, You must varify your acoount",
+                                        seconds: 2);
+                                  }
                                 },
-                                leading: CircleAvatar(
-                                  radius: 28,
-                                  backgroundImage:
-                                      NetworkImage(endUser.profilePicture!),
+                                leading: Stack(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 28,
+                                      backgroundImage:
+                                          NetworkImage(endUser.profilePicture!),
+                                    ),
+                                    Visibility(
+                                      visible: endUser.isVarified!,
+                                      child: Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: CircleAvatar(
+                                              radius: 10.r,
+                                              child: Image.asset(
+                                                "assets/iconImages/blueTick.png",
+                                                color: Colors.blue,
+                                              ))),
+                                    )
+                                  ],
                                 ),
                                 title: Text(
                                   endUser.fullName!,

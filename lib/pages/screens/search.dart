@@ -210,63 +210,80 @@ class _SearchPageState extends State<SearchPage> {
                                   minLeadingWidth: 50,
                                   onTap: () async {
                                     // !  ******************************
-                                    if (searchedUser.accountType == "Public") {
-                                      log("public");
-                                      // Loading.showLoadingDialog(
-                                      //     context, "Creating a chatroom");
+                                    if (userModelProvider
+                                        .userModel.isVarified!) {
+                                      if (searchedUser.accountType ==
+                                          "Public") {
+                                        log("public");
+                                        // Loading.showLoadingDialog(
+                                        //     context, "Creating a chatroom");
 
-                                      ChatRoomModel? chatRoom =
-                                          await getChatroomModel(searchedUser);
-                                      // Navigator.of(context).pop(true);
-                                      // Navigator.pop(context);
-                                      Navigator.popUntil(
-                                          context, (route) => route.isFirst);
+                                        ChatRoomModel? chatRoom =
+                                            await getChatroomModel(
+                                                searchedUser);
+                                        // Navigator.of(context).pop(true);
+                                        // Navigator.pop(context);
+                                        Navigator.popUntil(
+                                            context, (route) => route.isFirst);
 
-                                      Navigator.pushReplacement(
-                                          context,
-                                          PageTransition(
-                                              duration: const Duration(
-                                                  milliseconds: 700),
-                                              type: PageTransitionType.fade,
-                                              child: ChatRoom(
-                                                chatRoomModel: chatRoom!,
-                                                enduser: searchedUser,
-                                                firebaseUser:
-                                                    widget.firebaseUser!,
-                                                currentUserModel:
-                                                    widget.userModel!,
-                                              ),
-                                              isIos: true));
-                                    } else if (widget.userModel!.friends!
-                                        .contains(searchedUser.uid)) {
-                                      Loading.showLoadingDialog(
-                                          context, "Creating a chatroom");
+                                        Navigator.pushReplacement(
+                                            context,
+                                            PageTransition(
+                                                duration: const Duration(
+                                                    milliseconds: 700),
+                                                type: PageTransitionType.fade,
+                                                child: ChatRoom(
+                                                  chatRoomModel: chatRoom!,
+                                                  enduser: searchedUser,
+                                                  firebaseUser:
+                                                      widget.firebaseUser!,
+                                                  currentUserModel:
+                                                      widget.userModel!,
+                                                ),
+                                                isIos: true));
+                                      } else if (widget.userModel!.friends!
+                                          .contains(searchedUser.uid)) {
+                                        Loading.showLoadingDialog(
+                                            context, "Creating a chatroom");
 
-                                      ChatRoomModel? chatRoom =
-                                          await getChatroomModel(searchedUser);
-                                      Navigator.pop(context);
+                                        ChatRoomModel? chatRoom =
+                                            await getChatroomModel(
+                                                searchedUser);
+                                        Navigator.pop(context);
 
-                                      Navigator.push(
-                                          context,
-                                          PageTransition(
-                                              duration: const Duration(
-                                                  milliseconds: 700),
-                                              type: PageTransitionType.fade,
-                                              child: ChatRoom(
-                                                chatRoomModel: chatRoom!,
-                                                enduser: searchedUser,
-                                                firebaseUser:
-                                                    widget.firebaseUser!,
-                                                currentUserModel:
-                                                    widget.userModel!,
-                                              ),
-                                              isIos: true));
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                duration: const Duration(
+                                                    milliseconds: 700),
+                                                type: PageTransitionType.fade,
+                                                child: ChatRoom(
+                                                  chatRoomModel: chatRoom!,
+                                                  enduser: searchedUser,
+                                                  firebaseUser:
+                                                      widget.firebaseUser!,
+                                                  currentUserModel:
+                                                      widget.userModel!,
+                                                ),
+                                                isIos: true));
+                                      } else {
+                                        log("private");
+                                        Loading.showAlertDialog(
+                                            context,
+                                            "Warning",
+                                            "in order to Communicate, You must first be friend with the user");
+                                      }
                                     } else {
-                                      log("private");
-                                      Loading.showAlertDialog(
-                                          context,
-                                          "Warning",
-                                          "in order to Communicate, You must first be friend with the user");
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              duration: Duration(seconds: 2),
+                                              backgroundColor:
+                                                  Colors.redAccent.shade400,
+                                              content: Text(
+                                                "to Perform the Action, You must varify your acoount",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )));
                                     }
                                   },
                                   trailing: searchedUser.accountType == "Public"
@@ -285,40 +302,59 @@ class _SearchPageState extends State<SearchPage> {
                                               //? *****************************
 
                                               try {
-                                                if (!(userModelProvider
-                                                        .userModel.friends!
-                                                        .contains(
-                                                            searchedUser.uid) ||
-                                                    userModelProvider
-                                                        .userModel.sender!
-                                                        .contains(
-                                                            searchedUser.uid) ||
-                                                    searchedUser.reciever!
-                                                        .contains(
-                                                            userModelProvider
-                                                                .userModel
-                                                                .uid) ||
-                                                    searchedUser.sender!
-                                                        .contains(
-                                                            userModelProvider
-                                                                .userModel
-                                                                .uid))) {
-                                                  addFriend(
-                                                      userModelProvider:
-                                                          userModelProvider,
-                                                      context: context,
-                                                      currentUserModel:
-                                                          widget.userModel!,
-                                                      provider: provider,
-                                                      searchedUser:
-                                                          searchedUser);
-                                                } else {
+                                                if (!userModelProvider
+                                                    .userModel.isVarified!) {
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(SnackBar(
                                                           duration: Duration(
-                                                              seconds: 1),
+                                                              seconds: 2),
+                                                          backgroundColor:
+                                                              Colors.redAccent
+                                                                  .shade400,
                                                           content: Text(
-                                                              "Already requested")));
+                                                            "to Perform the Action, You must varify your acoount",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          )));
+                                                } else {
+                                                  if (!(userModelProvider
+                                                          .userModel.friends!
+                                                          .contains(searchedUser
+                                                              .uid) ||
+                                                      userModelProvider
+                                                          .userModel.sender!
+                                                          .contains(
+                                                              searchedUser
+                                                                  .uid) ||
+                                                      searchedUser.reciever!
+                                                          .contains(
+                                                              userModelProvider
+                                                                  .userModel
+                                                                  .uid) ||
+                                                      searchedUser.sender!
+                                                          .contains(
+                                                              userModelProvider
+                                                                  .userModel
+                                                                  .uid))) {
+                                                    addFriend(
+                                                        userModelProvider:
+                                                            userModelProvider,
+                                                        context: context,
+                                                        currentUserModel:
+                                                            widget.userModel!,
+                                                        provider: provider,
+                                                        searchedUser:
+                                                            searchedUser);
+                                                  } else {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(SnackBar(
+                                                            duration: Duration(
+                                                                seconds: 1),
+                                                            content: Text(
+                                                                "Already requested")));
+                                                  }
                                                 }
                                               } catch (e) {
                                                 log(e.toString());
@@ -359,14 +395,30 @@ class _SearchPageState extends State<SearchPage> {
                                                         color: Colors.grey,
                                                       )),
                                           )),
-                                  leading: Container(
-                                    decoration: BoxDecoration(boxShadow: [
-                                      shadow,
-                                    ], shape: BoxShape.circle),
-                                    child: CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          searchedUser.profilePicture!),
-                                    ),
+                                  leading: Stack(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(boxShadow: [
+                                          shadow,
+                                        ], shape: BoxShape.circle),
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              searchedUser.profilePicture!),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: searchedUser.isVarified!,
+                                        child: Positioned(
+                                            bottom: 0,
+                                            right: 0,
+                                            child: CircleAvatar(
+                                                radius: 8.r,
+                                                child: Image.asset(
+                                                  "assets/iconImages/blueTick.png",
+                                                  color: Colors.blue,
+                                                ))),
+                                      ),
+                                    ],
                                   ),
                                   title: Text(
                                     "${searchedUser.fullName}",

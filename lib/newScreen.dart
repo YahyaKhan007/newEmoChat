@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:agora_uikit/agora_uikit.dart';
-import 'package:agora_uikit/controllers/rtc_buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -80,11 +78,11 @@ class _EmailvarifiedPageState extends State<EmailvarifiedPage> {
     if (!isEmailVarified) {
       sendVarificationEmail();
 
-      timer = Timer.periodic(Duration(seconds: 3), (_) => checkEmailVarified());
+      // timer = Timer.periodic(Duration(seconds: 3), (_) => checkEmailVarified());
     } else {}
   }
 
-  Future checkEmailVarified() async {
+  void checkEmailVarified() {
     setState(() {
       isEmailVarified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
@@ -93,7 +91,7 @@ class _EmailvarifiedPageState extends State<EmailvarifiedPage> {
   @override
   void dispose() {
     super.dispose();
-    timer!.cancel();
+    // timer!.cancel();
   }
 
   Future sendVarificationEmail() async {

@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
+import 'package:simplechat/widgets/utils.dart';
 
 class ForgetPassword extends StatefulWidget {
   ForgetPassword({super.key});
@@ -13,17 +15,33 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   final TextEditingController email = TextEditingController();
 
   final _formkey = GlobalKey<FormState>();
+  Future<void> resetPassword() async {
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: email.text)
+          .then((value) => utils.showSnackbar(
+              context: context,
+              color: Colors.green,
+              content: "An Email has been sent to your Email",
+              seconds: 2));
+      // Show a success message or navigate to a success screen
+      print('Password reset email sent');
+    } catch (error) {
+      // Show an error message
+      print('Error sending password reset email: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     Size _size = MediaQuery.of(context).size;
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.blue.shade100,
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(120),
           child: AppBar(
-            backgroundColor: Colors.blue.shade100,
+            backgroundColor: Colors.white,
 
             leading: InkWell(
               onTap: () {
@@ -37,124 +55,93 @@ class _ForgetPasswordState extends State<ForgetPassword> {
             //  Image.asset("assets/iconImages/back.png"),
           ),
         ),
-        body: Container(
-          // padding: EdgeInsets.only(bottom: _size.height * 0.3),
-          height: _size.height,
-          decoration: BoxDecoration(
-            color: Colors.blue.shade100,
-          ),
-
-          child: Form(
-            key: _formkey,
-            child: LayoutBuilder(
-              builder: (context, constraints) => Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Spacer(),
-                    Image.asset("assets/logo.png"),
-                    Spacer(),
-                    Spacer(),
-                    Spacer(),
-                    Spacer(),
-                    GlassMorphism(
-                        width: _size.width,
-                        height: _size.height * 0.4,
-                        blur: 0.3,
-                        borderRadius: 20.0,
-                        child: Container(
-                            child: SingleChildScrollView(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: _size.height * 0.02816541,
-                                ),
-                                Image.asset("assets/iconImages/Indicator.png"),
-                                SizedBox(
-                                  height: _size.height * 0.02816541,
-                                ),
-                                Text(
-                                  'Forgot your password?',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Poppins-Medium',
-                                    fontSize: 15.sp,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: _size.height * 0.04,
-                                ),
-                                Text(
-                                  'Enter Your registerd email below to receive \n password reset instruction',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Poppins-Medium',
-                                    fontSize: 13.sp,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                _emailTextfield(context),
-                                _loginButton(context),
-                              ]),
-                        ))),
-                  ]),
-            ),
+        body: Form(
+          key: _formkey,
+          child: SingleChildScrollView(
+            child: Column(
+                // mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Image.asset("assets/logo.png"),
+                  SizedBox(
+                    height: _size.height * 0.0216541,
+                  ),
+                  SizedBox(
+                    height: _size.height * 0.02816541,
+                  ),
+                  Text(
+                    'Forgot your password?',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Poppins-Medium',
+                      fontSize: 15.sp,
+                    ),
+                  ),
+                  SizedBox(
+                    height: _size.height * 0.04,
+                  ),
+                  Text(
+                    'Enter Your registerd email below to receive \n password reset instruction',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Poppins-Medium',
+                      fontSize: 13.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                    child: SizedBox(
+                      height: 50.h,
+                      child: TextFormField(
+                        style: TextStyle(fontSize: 13.sp, color: Colors.black),
+                        controller: email,
+                        validator: (value) {
+                          if (!RegExp(
+                                  r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
+                              .hasMatch(value!)) {
+                            return "Enter Correct Email";
+                          } else {
+                            return null;
+                          }
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Email",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                    child: InkWell(
+                      onTap: () {
+                        if (!_formkey.currentState!.validate()) {
+                        } else {
+                          resetPassword();
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20)),
+                        height: 40.h,
+                        child: Center(
+                          child: Text(
+                            "Send Email",
+                            style:
+                                TextStyle(fontSize: 14.sp, color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ]),
           ),
         ));
-  }
-
-  Widget _emailTextfield(context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-      child: SizedBox(
-        height: 50.h,
-        child: TextFormField(
-          style: TextStyle(fontSize: 13.sp, color: Colors.black),
-          controller: email,
-          validator: (value) {
-            if (!RegExp(
-                    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
-                .hasMatch(value!)) {
-              return "Enter Correct Email";
-            } else {
-              return null;
-            }
-          },
-          decoration: InputDecoration(
-            hintText: "Email",
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _loginButton(context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-      child: InkWell(
-        onTap: () {
-          if (!_formkey.currentState!.validate()) {
-          } else {}
-        },
-        child: Container(
-          decoration: BoxDecoration(
-              color: Colors.blue.shade100,
-              borderRadius: BorderRadius.circular(20)),
-          height: 40.h,
-          child: Center(
-            child: Text(
-              "Send Email",
-              style: TextStyle(fontSize: 14.sp, color: Colors.black),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -10,18 +10,13 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/models/models.dart';
-import 'package:simplechat/newScreen.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/onboarding/onBoarding.dart';
-import 'package:simplechat/pages/screens/complete_profile.dart';
-import 'package:simplechat/pages/screens/forgetPassword.dart';
-import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/pages/splash/splash_screen.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
-import 'package:simplechat/widgets/glass_morphism.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -132,24 +127,23 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => InternetCubit())
       ],
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Emochat',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            primaryColor: Color.fromARGB(255, 134, 77, 232),
-            useMaterial3: true,
-          ),
-          home:
-              // ForgetPassword()
-              //  CompleteProfile(
-              //     userModel: thisUserModel, firebaseUser: currentUser),
-              // NewScreen()
-              SplashScreen(
-            firebaseUser: currentUser,
-            userModel: thisUserModel,
-          ),
-          ),
+        debugShowCheckedModeBanner: false,
+        title: 'Emochat',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          primaryColor: Color.fromARGB(255, 134, 77, 232),
+          useMaterial3: true,
+        ),
+        home:
+            // ForgetPassword()
+            //  CompleteProfile(
+            //     userModel: thisUserModel, firebaseUser: currentUser),
+            // NewScreen()
+            SplashScreen(
+          firebaseUser: currentUser,
+          userModel: thisUserModel,
+        ),
+      ),
     );
   }
 }
-

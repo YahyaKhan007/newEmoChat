@@ -12,6 +12,7 @@ class UserModel {
   List? reciever;
   String? bio;
   Timestamp? memberSince;
+  bool? isVarified;
 // ! simple Constructor
   UserModel(
       {required this.uid,
@@ -24,6 +25,7 @@ class UserModel {
       required this.memberSince,
       required this.accountType,
       required this.pushToken,
+      required this.isVarified,
       required this.profilePicture});
 
 //  !  will be Used to change your Map/Json data into UserModel
@@ -37,6 +39,7 @@ class UserModel {
     memberSince = map["memberSince"];
     pushToken = map["pushToken"];
     accountType = map["accountType"];
+    isVarified = map['isVarified'];
     profilePicture = map["profilePicture"];
     bio = map["bio"];
   }
@@ -54,6 +57,7 @@ class UserModel {
       "accountType": accountType,
       "profilePicture": profilePicture,
       "pushToken": pushToken,
+      'isVarified': isVarified,
       "bio": bio
     };
   }
