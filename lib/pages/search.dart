@@ -78,13 +78,14 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    checkFriend({required BuildContext context}) {}
+    // checkFriend({required BuildContext context}) {}
     final LoadingProvider provider = Provider.of<LoadingProvider>(context);
     final UserModelProvider userModelProvider =
         Provider.of<UserModelProvider>(context);
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
       appBar: AppBar(
+        centerTitle: true,
         elevation: 0,
         title: const Text(
           "Search User",
@@ -114,7 +115,7 @@ class _SearchPageState extends State<SearchPage> {
                 width: 15,
               ),
               Expanded(
-                flex: 3,
+                flex: 4,
                 child: Container(
                   height: 40.h,
                   decoration: BoxDecoration(
@@ -139,10 +140,10 @@ class _SearchPageState extends State<SearchPage> {
                 child: CupertinoButton(
                     padding: EdgeInsets.zero,
                     child: Container(
-                      width: 60.w,
+                      width: 35.w,
                       height: 30.h,
                       child: Image.asset(
-                        "assets/iconImages/searchText.png",
+                        "assets/iconImages/searchIcon.png",
                         fit: BoxFit.fill,
                         scale: 1,
                       ),
@@ -306,28 +307,36 @@ class _SearchPageState extends State<SearchPage> {
                                               //? *****************************
                                             },
                                             child: (userModelProvider
-                                                        .userModel.friends!
-                                                        .contains(
-                                                            searchedUser.uid) ||
-                                                    userModelProvider
-                                                        .userModel.sender!
-                                                        .contains(
-                                                            searchedUser.uid) ||
-                                                    searchedUser.reciever!
-                                                        .contains(
-                                                            userModelProvider
-                                                                .userModel
-                                                                .uid) ||
-                                                    searchedUser.sender!
-                                                        .contains(
-                                                            userModelProvider
-                                                                .userModel.uid))
+                                                    .userModel.friends!
+                                                    .contains(searchedUser.uid))
                                                 ? Icon(Icons.check)
-                                                : Center(
-                                                    child: Icon(
-                                                    Icons.person_add_sharp,
-                                                    color: Colors.grey,
-                                                  )),
+                                                : (userModelProvider.userModel.sender!
+                                                            .contains(
+                                                                searchedUser
+                                                                    .uid) ||
+                                                        searchedUser.reciever!
+                                                            .contains(
+                                                                userModelProvider
+                                                                    .userModel
+                                                                    .uid) ||
+                                                        searchedUser.sender!
+                                                            .contains(
+                                                                userModelProvider
+                                                                    .userModel
+                                                                    .uid))
+                                                    ? Padding(
+                                                        padding: EdgeInsets.all(
+                                                            5.0.r),
+                                                        child: Image.asset(
+                                                          'assets/iconImages/sendRequest.png',
+                                                          scale: 3,
+                                                        ),
+                                                      )
+                                                    : Center(
+                                                        child: Icon(
+                                                        Icons.person_add_sharp,
+                                                        color: Colors.grey,
+                                                      )),
                                           )),
                                   leading: Container(
                                     decoration: BoxDecoration(boxShadow: [

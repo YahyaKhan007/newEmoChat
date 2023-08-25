@@ -128,8 +128,8 @@ class _PublicUsersState extends State<PublicUsers> {
                               child: ListTile(
                                 onTap: () async {
                                   // showWaiting(context: context, title: "creating");
-                                  // Loading.showLoadingDialog(
-                                  //     context, "Creating");
+                                  Loading.showLoadingDialog(
+                                      context, "Creating");
                                   ChatRoomModel? chatRoom =
                                       await getChatroomModel(endUser);
                                   log("object");

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/drawer_icon.dart';
 
@@ -118,6 +119,7 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
               letterSpacing: -2,
               // fontFamily: "Zombie",
               fontWeight: FontWeight.bold,
+              fontSize: 20.sp,
               color: Colors.grey.shade900),
         ),
       ),
@@ -149,6 +151,7 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                         child: Text(
                           "Pending Requests",
                           style: TextStyle(
+                              fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
                               color: provider.pending == true
                                   ? Colors.black
@@ -173,6 +176,7 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                           "Sent Requests",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
+                              fontSize: 15.sp,
                               color: provider.pending == true
                                   ? Colors.grey
                                   : Colors.black),
@@ -200,35 +204,7 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                           CupertinoButton(
                             padding: EdgeInsets.zero,
                             onPressed: () async {
-                              // log("Yes   Clicked");
-                              log("=========>>  " +
-                                  senderNames.length.toString());
-
-                              FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(receiverNames[index]['uid'])
-                                  .snapshots()
-                                  .listen((snapshot) {
-                                if (snapshot.data() != null) {
-                                  Map<String, dynamic> userData =
-                                      snapshot.data()!;
-                                  String username = userData['fullName'];
-                                  String age = userData['bio'];
-                                  // Do something with the user data
-
-                                  print('Username: $username');
-                                  print('Age: $age');
-                                } else {
-                                  print("Empty");
-                                }
-                              });
-
-                              // !   Stuff remaining
-                              // !   Stuff remaining
-                              // !   Stuff remaining
-                              // !   Stuff remaining
-
-                              // !   Stuff remaining
+                              // ! For                 Confirm Click
 
                               var updatedUser = UserModel(
                                   uid: receiverNames[index]['uid'],
@@ -248,21 +224,17 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
 
                               updatedUser.friends!
                                   .add(userModelProvider.userModel.uid);
-                              updatedUser.sender!.removeAt(index);
+                              updatedUser.reciever!
+                                  .remove(userModelProvider.userModel.uid);
+
+                              userModelProvider.userModel.sender!
+                                  .remove(updatedUser.uid);
 
                               userModelProvider.userModel.friends!
                                   .add(updatedUser.uid);
 
-                              userModelProvider.userModel.reciever!
-                                  .removeAt(index);
-                              // .remove(receiverNames[index]['uid']);
-
-                              final receiverRef = FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(updatedUser.uid);
-                              final receiverSnapshot = await receiverRef.get();
-
-                              userReference(receiverNames[index]['uid']);
+                              userModelProvider
+                                  .updateUser(userModelProvider.userModel);
 
                               await FirebaseFirestore.instance
                                   .collection('users')
@@ -282,12 +254,8 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                                               "You are now Officially Friends"))));
 
                               setState(() {
-                                _initState();
+                                receiverNames.removeAt(index);
                               });
-                              // await FirebaseFirestore.instance
-                              //     .collection('users')
-                              //     .doc(receiverNames[index]['uid'])
-                              //     .set(userModelProvider.userModel.toMap());
                             },
                             child: CircleAvatar(
                               radius: 15.r,
@@ -300,7 +268,53 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                           ),
                           CupertinoButton(
                             padding: EdgeInsets.zero,
-                            onPressed: () {},
+                            onPressed: () async {
+                              var updatedUser = UserModel(
+                                  uid: receiverNames[index]['uid'],
+                                  fullName: receiverNames[index]['fullName'],
+                                  email: receiverNames[index]['email'],
+                                  bio: receiverNames[index]['bio'],
+                                  sender: receiverNames[index]['sender'],
+                                  reciever: receiverNames[index]['reciever'],
+                                  friends: receiverNames[index]['friends'],
+                                  memberSince: receiverNames[index]
+                                      ['memberSince'],
+                                  accountType: receiverNames[index]
+                                      ['accountType'],
+                                  pushToken: receiverNames[index]['pushToken'],
+                                  profilePicture: receiverNames[index]
+                                      ['profilePicture']);
+
+                              updatedUser.sender!
+                                  .remove(userModelProvider.userModel.uid);
+
+                              userModelProvider.userModel.reciever!
+                                  .remove(updatedUser.uid);
+
+                              userModelProvider
+                                  .updateUser(userModelProvider.userModel);
+
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(updatedUser.uid)
+                                  .set(updatedUser.toMap());
+
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(userModelProvider.userModel.uid)
+                                  .set(userModelProvider.userModel.toMap())
+                                  .then((value) => userModelProvider
+                                      .updateUser(userModelProvider.userModel))
+                                  .then((value) => ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                          duration: Duration(seconds: 1),
+                                          content: Text(
+                                              "You are now Officially Friends"))));
+
+                              setState(() {
+                                receiverNames.removeAt(index);
+                              });
+                            },
                             child: CircleAvatar(
                               radius: 15.r,
                               backgroundColor: AppColors.foregroundColor,
@@ -317,32 +331,79 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
             )
           else
             Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: senderNames.length,
-                itemBuilder: (context, index) {
-                  log(senderNames.length.toString());
-                  return ListTile(
-                    onTap: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text("Waiting")));
-                    },
-                    leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(senderNames[index]['profilePicture'])),
-                    title: Text(senderNames[index]['fullName']),
-                    subtitle: Text(senderNames[index]['bio']),
-                    trailing: Text(
-                      "Status\nPending",
-                      style: TextStyle(
-                          fontSize: 11.sp,
-                          color: Colors.green,
-                          fontStyle: FontStyle.italic),
-                    ),
+                child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .where('uid', isEqualTo: userModelProvider.firebaseUser!.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.active) {
+                  if (snapshot.hasData) {
+                    QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
+                    if (dataSnapshot.docs.isNotEmpty) {
+                      Map<String, dynamic> userData =
+                          dataSnapshot.docs[0].data() as Map<String, dynamic>;
+
+                      UserModel endUser = UserModel.fromMap(userData);
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: endUser.sender!.length,
+                        itemBuilder: (context, index) {
+                          log(dataSnapshot.docs.length.toString());
+                          return FutureBuilder(
+                              future: FirebaseHelper.getUserModelById(
+                                  endUser.sender![index]),
+                              builder: ((context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  if (snapshot.hasData) {
+                                    log("has data");
+                                    return ListTile(
+                                      leading: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              snapshot.data!.profilePicture!)),
+                                      title: Text(
+                                          snapshot.data!.fullName.toString()),
+                                      subtitle:
+                                          Text(snapshot.data!.bio.toString()),
+                                      trailing: Text(
+                                        "Status\nPending",
+                                        style: TextStyle(
+                                            fontSize: 11.sp,
+                                            color: Colors.green,
+                                            fontStyle: FontStyle.italic),
+                                      ),
+                                    );
+                                  } else {
+                                    return Center(
+                                      child: Text("No Sent Request"),
+                                    );
+                                  }
+                                } else {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              }));
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: Text("No Sent Requests"),
+                      );
+                    }
+                  } else {
+                    return Center(
+                      child: Text("No Sent Requests"),
+                    );
+                  }
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator.adaptive(),
                   );
-                },
-              ),
-            ),
+                }
+              },
+            )),
         ],
       ),
     );

@@ -63,6 +63,8 @@ dependencies:
   easy_localization: ^3.0.1
   flutter_platform_widgets: ^3.2.0
   camera: ^0.10.3+2
+  pull_to_refresh: ^2.0.0
+  tflite_flutter: ^0.9.4
   # fluttertoast: ^8.2.1
 
 dev_dependencies:

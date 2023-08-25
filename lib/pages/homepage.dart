@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           CupertinoButton(
               child: Image.asset(
-                "assets/iconImages/newMessage.png",
+                "assets/iconImages/group.png",
                 scale: 1,
               ),
               onPressed: () {
@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         leading: drawerIcon(context),
         automaticallyImplyLeading: true,
-        backgroundColor: AppColors.backgroudColor,
+        // backgroundColor: AppColors.backgroudColor,
         centerTitle: true,
         title: const Text(
           "Chats",
@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                   width: 15,
                 ),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -168,12 +168,10 @@ class _HomePageState extends State<HomePage> {
                   child: CupertinoButton(
                       padding: EdgeInsets.zero,
                       child: Container(
-                          width: 60.w,
-                          height: 30.h,
                           child: Image.asset(
-                            "assets/iconImages/searchText.png",
-                            fit: BoxFit.fill,
-                          )),
+                        "assets/iconImages/searchIcon.png",
+                        fit: BoxFit.fill,
+                      )),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             duration: Duration(milliseconds: 700),
