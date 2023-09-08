@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
-import 'package:simplechat/pages/screens/forgetPassword.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
-import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
-
-import 'checking camera/send_photo_check.dart';
 
 final drawerController = ZoomDrawerController();
 
@@ -97,7 +94,7 @@ class MyHomePage extends StatelessWidget {
                       title: "Chats",
                       // image: "assets/iconImages/home.png",
                       icon: Icon(
-                        color: Colors.white,
+                        color: Colors.black,
                         Icons.home,
                         size: 15,
                       ),
@@ -112,7 +109,7 @@ class MyHomePage extends StatelessWidget {
                       title: "Profile",
                       // image: "assets/iconImages/profile.png",
                       icon: Icon(
-                        color: Colors.white,
+                        color: Colors.black,
                         Icons.person_2_outlined,
                         size: 15,
                       ),
@@ -125,7 +122,7 @@ class MyHomePage extends StatelessWidget {
                       title: "Requests",
                       // image: "assets/iconImages/request.png",
                       icon: Icon(
-                        color: Colors.white,
+                        color: Colors.black,
                         Icons.person_add,
                         size: 15,
                       ),
@@ -146,7 +143,7 @@ class MyHomePage extends StatelessWidget {
                       title: "My Friends",
                       // image: "assets/iconImages/friends.png",
                       icon: Icon(
-                        color: Colors.white,
+                        color: Colors.black,
                         Icons.groups_2_outlined,
                         size: 15,
                       ),
@@ -156,6 +153,19 @@ class MyHomePage extends StatelessWidget {
                         drawerController.toggle!();
                       }),
 
+                  draweroption(
+                      context: context,
+                      title: "Check Modes",
+                      // image: "assets/iconImages/profile.png",
+                      icon: Icon(
+                        color: Colors.black,
+                        Icons.emoji_emotions_outlined,
+                        size: 15,
+                      ),
+                      onTap: () {
+                        provider.changeScreenIndex(4);
+                        drawerController.toggle!();
+                      }),
                   // draweroption(
                   //     context: context,
                   //     title: "take captures demo",
@@ -187,13 +197,13 @@ class MyHomePage extends StatelessWidget {
                         activeColor: Colors.green,
                       ),
                     ),
-                    title: Text(
-                      "Send Emotions",
-                      style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blue),
-                    ),
+                    title: Text("Send Emotions",
+                        style: GoogleFonts.blackOpsOne(
+                            textStyle: Theme.of(context).textTheme.bodyMedium,
+                            // fontWeight: FontWeight.w600,
+                            decorationColor: Colors.black,
+                            color: Colors.black.withOpacity(0.7),
+                            fontSize: 13.sp)),
                     onTap: () {},
                   ),
 
@@ -209,7 +219,7 @@ class MyHomePage extends StatelessWidget {
                       // image: "assets/iconImages/logout.png",
                       icon: Icon(
                         Icons.login_rounded,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 15,
                       ),
                       onTap: () {
@@ -231,15 +241,17 @@ class MyHomePage extends StatelessWidget {
       contentPadding:
           EdgeInsets.only(left: 10.w, right: 10.w, top: 0.h, bottom: 0.h),
       leading: CircleAvatar(
-        backgroundColor: Colors.blue,
-        radius: 12, child: icon,
+        backgroundColor: Colors.blue.withOpacity(0.2),
+        radius: 15.r, child: icon,
         // Image.asset(image),
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-            fontSize: 13.sp, fontWeight: FontWeight.w600, color: Colors.blue),
-      ),
+      title: Text(title,
+          style: GoogleFonts.blackOpsOne(
+              textStyle: Theme.of(context).textTheme.bodyMedium,
+              // fontWeight: FontWeight.w600,
+              decorationColor: Colors.black,
+              color: Colors.black.withOpacity(0.7),
+              fontSize: 13.sp)),
       onTap: onTap,
     );
   }
