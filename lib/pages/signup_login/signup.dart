@@ -1,22 +1,37 @@
+import 'package:email_otp/email_otp.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
+import 'package:simplechat/pages/screens/varifyEmail.dart';
 import 'package:simplechat/pages/signup_login/login.dart';
 import 'package:simplechat/widgets/showLoading.dart';
+import 'package:simplechat/widgets/utils.dart';
 
 import '../../colors/colors.dart';
 import '../../provider/loading_provider.dart';
 
 // ignore: must_be_immutable
 class Signup extends StatefulWidget {
-  Signup({super.key});
+  final bool focusEmail;
+  final bool isVarify;
+  final String emailText;
+  Signup({
+    super.key,
+    required this.emailText,
+    required this.focusEmail,
+    required this.isVarify,
+  });
 
   @override
   State<Signup> createState() => _SignupState();
 }
+
+EmailOTP myauth = EmailOTP();
 
 class _SignupState extends State<Signup> {
   var spinkit = const SpinKitSpinningLines(
@@ -24,98 +39,21 @@ class _SignupState extends State<Signup> {
     size: 20.0,
   );
 
+  bool showNewEmail = false;
   bool show = true;
-
+  FocusNode _focusNode = FocusNode();
   TextEditingController emailController = TextEditingController();
 
   TextEditingController passwordController = TextEditingController();
 
   TextEditingController confirmPasswordController = TextEditingController();
-  TextEditingController _otpController = TextEditingController();
 
-  // late EmailAuth emailAuth;
+  @override
+  void initState() {
+    emailController.text = widget.emailText;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   emailAuth = new EmailAuth(
-  //     sessionName: "Sample session",
-  //   );
-
-  //   /// Configuring the remote server
-  //   emailAuth.config(remoteServerConfiguration);
-  // }
-
-  // void verifyOTP() {
-  //   EmailAuth emailAuth = new EmailAuth(sessionName: "OTP FOR SIGNUP");
-  //   var res = emailAuth.validateOtp(
-  //       recipientMail: emailController.value.text,
-  //       userOtp: _otpController.value.text);
-  //   if (res) {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //       duration: Duration(seconds: 2),
-  //       content: Text(
-  //         "OTP has been sent to ${emailController.text}",
-  //         style: TextStyle(fontSize: 14.sp, color: Colors.black),
-  //       ),
-  //       backgroundColor: Colors.green.shade300,
-  //     ));
-  //   } else {
-  //     print("Invalid Verification Code");
-  //   }
-  // }
-
-// ! SEND OTP
-  // void sendOTP() async {
-  //   EmailAuth emailAuth = new EmailAuth(sessionName: "Test Session");
-  //   var res = await emailAuth.sendOtp(
-  //       recipientMail: emailController.value.text, otpLength: 6);
-  //   if (res) {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //       duration: Duration(seconds: 2),
-  //       content: Text(
-  //         "OTP has been sent to ${emailController.text}",
-  //         style: TextStyle(fontSize: 14.sp, color: Colors.black),
-  //       ),
-  //       backgroundColor: Colors.green.shade300,
-  //     ));
-  //   } else {
-  //     print("Failed to send the verification code");
-  //   }
-  // }
-  // void sendOtp() async {
-  //   // EmailAuth(sessionName: "OTP For Signup Profile of EMoChat");
-
-  //   bool result =
-  //       await EmailAuth(sessionName: "OTP For Signup Profile of EmoChat")
-  //           .sendOtp(recipientMail: emailController.text, otpLength: 5);
-  //   if (result) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         duration: Duration(seconds: 2),
-  //         content: Text(
-  //           "OTP has been sent to ${emailController.text}",
-  //           style: TextStyle(fontSize: 14.sp, color: Colors.black),
-  //         ),
-  //         backgroundColor: Colors.green.shade300,
-  //       ),
-  //     );
-  //   } else {
-  //     print("Issue while sending OTP");
-  //   }
-  // }
-
-  // ! Validate OTP
-  // bool validateOTP() {
-  //   var result = EmailAuth(sessionName: "OTP For Signup Profile of EmoChat")
-  //       .validateOtp(
-  //           recipientMail: emailController.text, userOtp: _otpController.text);
-  //   if (result) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
+    super.initState();
+  }
 
   void signup({required BuildContext context}) {
     FirebaseController authController = FirebaseController();
@@ -175,12 +113,15 @@ class _SignupState extends State<Signup> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 20.h,
+                    height: 50.h,
                   ),
-                  SizedBox(
-                      // height: 130.h,
-                      width: MediaQuery.of(context).size.width,
-                      child: Image.asset("assets/logo.png")),
+                  Text("EmoChat",
+                      style: GoogleFonts.blackOpsOne(
+                          textStyle: Theme.of(context).textTheme.bodyMedium,
+                          decorationColor: Colors.black,
+                          backgroundColor: Colors.grey.shade100,
+                          color: Colors.blue,
+                          fontSize: 55.sp)),
                   Text(
                     "Welcome Back!",
                     style: TextStyle(
@@ -214,45 +155,58 @@ class _SignupState extends State<Signup> {
                             borderRadius: BorderRadius.circular(25),
                           ),
                           child: Padding(
-                            padding: EdgeInsets.only(left: 100),
-                            child: TextFormField(
-                              controller: emailController,
-                              cursorColor: Colors.black,
-                              cursorHeight: 17.sp,
-                              // controller: ,
-                              style: kTextFieldInputStyle,
-                              validator: (value) {
-                                if (!RegExp(
-                                        r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
-                                    .hasMatch(value!)) {
-                                  return "Enter Correct Email";
-                                } else {
-                                  return null;
-                                }
-                              },
-                              onChanged: (v) {
-                                if (emailController.text.isEmpty) {
-                                  provider.changShowOtpButton(value: false);
-                                } else {
-                                  provider.changShowOtpButton(value: true);
-                                }
-                              },
+                            padding: EdgeInsets.only(left: 80.w, right: 20.w),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    readOnly: widget.focusEmail,
+                                    focusNode: _focusNode,
+                                    controller: emailController,
+                                    cursorColor: Colors.black,
+                                    cursorHeight: 17.sp,
+                                    // controller: ,
+                                    style: kTextFieldInputStyle,
+                                    validator: (value) {
+                                      if (!RegExp(
+                                              r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
+                                          .hasMatch(value!)) {
+                                        return "Enter Correct Email";
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onChanged: (v) {},
 
-                              decoration: InputDecoration(
-                                hintText: 'someOne@something.com',
+                                    decoration: InputDecoration(
+                                      hintText: 'someOne@something.com',
 
-                                hintStyle: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontStyle: FontStyle.italic),
-                                // label: Text(
-                                //   'Email',
-                                //   style: TextStyle(
-                                //       color: Colors.black, fontSize: 13.sp),
-                                // ),
-                                border: InputBorder.none,
-                                // enabledBorder: kTextFieldBorder,
-                                // focusedBorder: kTextFieldBorder
-                              ),
+                                      hintStyle: TextStyle(
+                                          fontSize: 12.sp,
+                                          fontStyle: FontStyle.italic),
+                                      // label: Text(
+                                      //   'Email',
+                                      //   style: TextStyle(
+                                      //       color: Colors.black, fontSize: 13.sp),
+                                      // ),
+                                      border: InputBorder.none,
+                                      // enabledBorder: kTextFieldBorder,
+                                      // focusedBorder: kTextFieldBorder
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                    visible: provider.emailVarified,
+                                    child: CircleAvatar(
+                                      radius: 10.r,
+                                      backgroundColor: Colors.green,
+                                      child: Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                        size: 15.sp,
+                                      ),
+                                    ))
+                              ],
                             ),
                           ),
                         ),
@@ -281,134 +235,168 @@ class _SignupState extends State<Signup> {
                       ],
                     ),
                   ),
-
-                  Container(
-                    height: 90.h,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 300.w,
-                          height: 50.h,
-                          decoration: BoxDecoration(
-                            boxShadow: [shadow],
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
+                  Visibility(
+                    visible: provider.otpVisibility,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                          child: Text(
+                            "Signup with new Email",
+                            style:
+                                TextStyle(fontSize: 12.sp, color: Colors.blue),
                           ),
-                          child: Padding(
-                              padding: EdgeInsets.only(left: 100),
-                              child: TextField(
-                                cursorColor: Colors.black,
-                                cursorHeight: 20.sp,
-                                controller: passwordController,
-                                style: kTextFieldInputStyle,
-                                obscureText: provider.show,
-                                decoration: InputDecoration(
-                                  suffixIcon: InkWell(
-                                    onTap: () {
-                                      provider.changeShow(
-                                          value: !provider.show);
-                                      print(provider.show);
-                                    },
-                                    child: Icon(
-                                      Icons.remove_red_eye_outlined,
-                                      color: Colors.blue,
-                                      size: 20.sp,
+                          onPressed: () {
+                            provider.changeEmailVarfied(value: false);
+                            provider.changeOtpVisibility(value: false);
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    duration: const Duration(milliseconds: 700),
+                                    type: PageTransitionType.fade,
+                                    child: Signup(
+                                      emailText: "",
+                                      isVarify: false,
+                                      focusEmail: false,
                                     ),
-                                  ),
-                                  hintText: 'Enter a secure password',
-                                  hintStyle: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontStyle: FontStyle.italic),
-                                  border: InputBorder.none,
-                                  // enabledBorder: kTextFieldBorder,
-                                  // focusedBorder: kTextFieldBorder,
-                                ),
-                              )),
-                        ),
-                        Positioned(
-                          left: 0.w,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [avatarShadow],
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 35.r,
-                              child: Center(
-                                  child: Icon(
-                                Icons.lock_open,
-                                color: Colors.blue,
-                              )),
-                            ),
-                          ),
-                        )
-                      ],
+                                    isIos: true));
+                          }),
                     ),
                   ),
-                  Container(
-                    height: 90.h,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 300.w,
-                          height: 50.h,
-                          decoration: BoxDecoration(
-                            boxShadow: [shadow],
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Padding(
-                              padding: EdgeInsets.only(left: 100),
-                              child: TextField(
-                                cursorColor: Colors.black,
-                                cursorHeight: 20.sp,
-                                controller: confirmPasswordController,
-                                style: kTextFieldInputStyle,
-                                obscureText: provider.show,
-                                decoration: InputDecoration(
-                                  suffixIcon: InkWell(
-                                    onTap: () {
-                                      provider.changeShow(
-                                          value: !provider.show);
-                                    },
-                                    child: Icon(
-                                      Icons.remove_red_eye_outlined,
-                                      color: Colors.blue,
-                                      size: 20.sp,
-                                    ),
-                                  ),
-                                  hintText: 'Confirm password',
-                                  hintStyle: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontStyle: FontStyle.italic),
-                                  border: InputBorder.none,
-                                  // enabledBorder: kTextFieldBorder,
-                                  // focusedBorder: kTextFieldBorder,
-                                ),
-                              )),
-                        ),
-                        Positioned(
-                          left: 0.w,
-                          child: Container(
+                  Visibility(
+                    visible: provider.emailVarified,
+                    child: Container(
+                      height: 90.h,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 300.w,
+                            height: 50.h,
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [avatarShadow],
+                              boxShadow: [shadow],
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25),
                             ),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 35.r,
-                              child: Center(
-                                  child: Icon(
-                                Icons.lock_open,
-                                color: Colors.blue,
-                              )),
-                            ),
+                            child: Padding(
+                                padding: EdgeInsets.only(left: 100),
+                                child: TextField(
+                                  autofocus:
+                                      widget.emailText != "" ? true : false,
+                                  cursorColor: Colors.black,
+                                  cursorHeight: 20.sp,
+                                  controller: passwordController,
+                                  style: kTextFieldInputStyle,
+                                  obscureText: provider.show,
+                                  decoration: InputDecoration(
+                                    suffixIcon: InkWell(
+                                      onTap: () {
+                                        provider.changeShow(
+                                            value: !provider.show);
+                                        print(provider.show);
+                                      },
+                                      child: Icon(
+                                        Icons.remove_red_eye_outlined,
+                                        color: Colors.blue,
+                                        size: 20.sp,
+                                      ),
+                                    ),
+                                    hintText: 'Enter a secure password',
+                                    hintStyle: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontStyle: FontStyle.italic),
+                                    border: InputBorder.none,
+                                    // enabledBorder: kTextFieldBorder,
+                                    // focusedBorder: kTextFieldBorder,
+                                  ),
+                                )),
                           ),
-                        )
-                      ],
+                          Positioned(
+                            left: 0.w,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [avatarShadow],
+                              ),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 35.r,
+                                child: Center(
+                                    child: Icon(
+                                  Icons.lock_open,
+                                  color: Colors.blue,
+                                )),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: provider.emailVarified,
+                    child: Container(
+                      height: 90.h,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 300.w,
+                            height: 50.h,
+                            decoration: BoxDecoration(
+                              boxShadow: [shadow],
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Padding(
+                                padding: EdgeInsets.only(left: 100),
+                                child: TextField(
+                                  cursorColor: Colors.black,
+                                  cursorHeight: 20.sp,
+                                  controller: confirmPasswordController,
+                                  style: kTextFieldInputStyle,
+                                  obscureText: provider.show,
+                                  decoration: InputDecoration(
+                                    suffixIcon: InkWell(
+                                      onTap: () {
+                                        provider.changeShow(
+                                            value: !provider.show);
+                                      },
+                                      child: Icon(
+                                        Icons.remove_red_eye_outlined,
+                                        color: Colors.blue,
+                                        size: 20.sp,
+                                      ),
+                                    ),
+                                    hintText: 'Confirm password',
+                                    hintStyle: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontStyle: FontStyle.italic),
+                                    border: InputBorder.none,
+                                    // enabledBorder: kTextFieldBorder,
+                                    // focusedBorder: kTextFieldBorder,
+                                  ),
+                                )),
+                          ),
+                          Positioned(
+                            left: 0.w,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [avatarShadow],
+                              ),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 35.r,
+                                child: Center(
+                                    child: Icon(
+                                  Icons.lock_open,
+                                  color: Colors.blue,
+                                )),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                   // Container(
@@ -527,53 +515,95 @@ class _SignupState extends State<Signup> {
                           color: Colors.blue,
                           size: 20.0,
                         )
-                      : Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: [shadow],
-                          ),
-                          child: ElevatedButton(
-                            style: ButtonStyle(
-                              padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(horizontal: 35.w)),
-                              foregroundColor:
-                                  MaterialStateProperty.all(Colors.white),
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.blue),
-                            ),
-                            child: Text(
-                              "Sign up",
-                              style: TextStyle(fontSize: 15.sp),
-                            ),
-                            onPressed: () {
-                              // signup(context: context);
-                              // provider.changeSigupLoading(value: true);
-                              if (!_formkey.currentState!.validate()) {
-                              } else {
-                                // return "Enter";
+                      : widget.isVarify
+                          ? Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [shadow],
+                              ),
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      EdgeInsets.symmetric(horizontal: 35.w)),
+                                  foregroundColor:
+                                      MaterialStateProperty.all(Colors.white),
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.blue),
+                                ),
+                                child: Text(
+                                  "Sign up",
+                                  style: TextStyle(fontSize: 15.sp),
+                                ),
+                                onPressed: () {
+                                  // signup(context: context);
+                                  // provider.changeSigupLoading(value: true);
+                                  if (!_formkey.currentState!.validate()) {
+                                  } else {
+                                    // return "Enter";
 
-                                if (passwordController.text.toString() ==
-                                    confirmPasswordController.text.toString()) {
-                                  FirebaseController().signup(
-                                      context: context,
-                                      email: emailController.text.toLowerCase(),
-                                      password: passwordController.text
-                                          .toLowerCase());
+                                    if (passwordController.text.toString() ==
+                                        confirmPasswordController.text
+                                            .toString()) {
+                                      FirebaseController().signup(
+                                          context: context,
+                                          email: emailController.text
+                                              .toLowerCase(),
+                                          password: passwordController.text
+                                              .toLowerCase());
+                                    } else {
+                                      Loading.showAlertDialog(
+                                          context,
+                                          "Password miss matched",
+                                          "Both the passwords do not match");
+                                    }
+                                  }
+
+                                  // Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //         builder: (builder) => const CompleteProfile()));
+                                },
+                              ),
+                            )
+                          : ElevatedButton(
+                              style: ButtonStyle(
+                                padding: MaterialStateProperty.all(
+                                    EdgeInsets.symmetric(horizontal: 35.w)),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.blue),
+                              ),
+                              onPressed: () {
+                                if (!_formkey.currentState!.validate()) {
                                 } else {
-                                  Loading.showAlertDialog(
+                                  try {
+                                    myauth.setConfig(
+                                        appEmail: "varify@emochat.com",
+                                        appName: "Email OTP",
+                                        userEmail: emailController.text,
+                                        otpLength: 4,
+                                        otpType: OTPType.digitsOnly);
+                                    myauth.sendOTP();
+                                    utils.showSnackbar(
+                                        color: Colors.green,
+                                        seconds: 2,
+                                        context: context,
+                                        content:
+                                            "OTP has been Sent to ${emailController.text}");
+                                  } catch (e) {}
+                                  Navigator.push(
                                       context,
-                                      "Password miss matched",
-                                      "Both the passwords do not match");
+                                      PageTransition(
+                                          duration:
+                                              const Duration(milliseconds: 700),
+                                          type: PageTransitionType.fade,
+                                          child: VarifyEmailPage(
+                                              email: emailController.text),
+                                          isIos: true));
                                 }
-                              }
-
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (builder) => const CompleteProfile()));
-                            },
-                          ),
-                        ),
+                              },
+                              child: Text("Varify Email")),
                   SizedBox(
                     height: 30.h,
                   )

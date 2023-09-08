@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/pages/screens/screens.dart';
@@ -126,12 +127,11 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
               centerTitle: true,
               title: Text(
                 "Requests",
-                style: TextStyle(
-                    letterSpacing: -2,
-                    // fontFamily: "Zombie",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.sp,
-                    color: Colors.black.withOpacity(0.7)),
+                style: GoogleFonts.blackOpsOne(
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
+                    decorationColor: Colors.black,
+                    color: Colors.black.withOpacity(0.7),
+                    fontSize: 25.sp),
               ),
             ),
           )),
@@ -162,12 +162,13 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                         height: 35.h,
                         child: Text(
                           "Pending Requests",
-                          style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
+                          style: GoogleFonts.blackOpsOne(
+                              textStyle: Theme.of(context).textTheme.bodyMedium,
+                              decorationColor: Colors.black,
                               color: provider.pending == true
                                   ? Colors.blue.shade900
-                                  : Colors.blue.shade100),
+                                  : Colors.blue.shade100,
+                              fontSize: 12.sp),
                         ),
                       ),
                     ),
@@ -186,12 +187,13 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                         height: 35.h,
                         child: Text(
                           "Sent Requests",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15.sp,
-                              color: provider.pending == true
-                                  ? Colors.blue.shade100
-                                  : Colors.blue.shade900),
+                          style: GoogleFonts.blackOpsOne(
+                              textStyle: Theme.of(context).textTheme.bodyMedium,
+                              decorationColor: Colors.black,
+                              color: provider.pending != true
+                                  ? Colors.blue.shade900
+                                  : Colors.blue.shade100,
+                              fontSize: 12.sp),
                         ),
                       ),
                     )

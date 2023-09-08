@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:simplechat/widgets/glass_morphism.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:simplechat/widgets/utils.dart';
 
 class ForgetPassword extends StatefulWidget {
@@ -63,19 +63,26 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Image.asset("assets/logo.png"),
+                  Text("EmoChat",
+                      style: GoogleFonts.blackOpsOne(
+                          textStyle: Theme.of(context).textTheme.bodyMedium,
+                          decorationColor: Colors.black,
+                          backgroundColor: Colors.grey.shade100,
+                          color: Colors.blue,
+                          fontSize: 55.sp)),
                   SizedBox(
                     height: _size.height * 0.0216541,
                   ),
                   SizedBox(
-                    height: _size.height * 0.02816541,
+                    height: _size.height * 0.02016541,
                   ),
                   Text(
                     'Forgot your password?',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Poppins-Medium',
-                      fontSize: 15.sp,
+                    style: GoogleFonts.shrikhand(
+                      color: Colors.blue,
+                      backgroundColor: Colors.grey.shade100,
+                      textStyle: Theme.of(context).textTheme.bodyMedium,
+                      fontSize: 17.sp,
                     ),
                   ),
                   SizedBox(
@@ -83,9 +90,10 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   ),
                   Text(
                     'Enter Your registerd email below to receive \n password reset instruction',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Poppins-Medium',
+                    style: GoogleFonts.shrikhand(
+                      color: Colors.blue,
+                      backgroundColor: Colors.grey.shade100,
+                      textStyle: Theme.of(context).textTheme.bodySmall,
                       fontSize: 13.sp,
                     ),
                     textAlign: TextAlign.center,
@@ -117,29 +125,24 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                    child: InkWell(
-                      onTap: () {
-                        if (!_formkey.currentState!.validate()) {
-                        } else {
-                          resetPassword();
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20)),
-                        height: 40.h,
-                        child: Center(
-                          child: Text(
-                            "Send Email",
-                            style:
-                                TextStyle(fontSize: 14.sp, color: Colors.black),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(
+                                EdgeInsets.symmetric(horizontal: 35.w)),
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.white),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.blue),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
+                          onPressed: () {
+                            if (!_formkey.currentState!.validate()) {
+                            } else {
+                              resetPassword();
+                            }
+                          },
+                          child: Text("Send Email"))),
                 ]),
           ),
         ));

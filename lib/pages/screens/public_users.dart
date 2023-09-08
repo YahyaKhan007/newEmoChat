@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -97,11 +98,11 @@ class _PublicUsersState extends State<PublicUsers> {
                 centerTitle: true,
                 title: Text(
                   "Public User",
-                  style: TextStyle(
-                      fontSize: 22.sp,
-                      letterSpacing: -1.3,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black.withOpacity(0.7)),
+                  style: GoogleFonts.blackOpsOne(
+                      textStyle: Theme.of(context).textTheme.bodyMedium,
+                      decorationColor: Colors.black,
+                      color: Colors.black.withOpacity(0.7),
+                      fontSize: 25.sp),
                 ),
                 elevation: 0,
                 leading: CupertinoButton(
@@ -148,34 +149,32 @@ class _PublicUsersState extends State<PublicUsers> {
                                   // showWaiting(context: context, title: "creating");
 
                                   log("object");
-                                  if (userModelProvider.userModel.isVarified!) {
-                                    Loading.showLoadingDialog(
-                                        context, "Creating");
-                                    ChatRoomModel? chatRoom =
-                                        await getChatroomModel(endUser);
-                                    Navigator.pushReplacement(
-                                        context,
-                                        PageTransition(
-                                            duration: const Duration(
-                                                milliseconds: 700),
-                                            type: PageTransitionType.fade,
-                                            child: ChatRoom(
-                                              chatRoomModel: chatRoom!,
-                                              enduser: endUser,
-                                              firebaseUser:
-                                                  widget.firebaseUser!,
-                                              currentUserModel:
-                                                  widget.userModel!,
-                                            ),
-                                            isIos: true));
-                                  } else {
-                                    utils.showSnackbar(
-                                        context: context,
-                                        color: Colors.redAccent.shade400,
-                                        content:
-                                            "to Perform the Action, You must varify your acoount",
-                                        seconds: 2);
-                                  }
+                                  // if (userModelProvider.userModel.isVarified!) {
+                                  Loading.showLoadingDialog(
+                                      context, "Creating");
+                                  ChatRoomModel? chatRoom =
+                                      await getChatroomModel(endUser);
+                                  Navigator.pushReplacement(
+                                      context,
+                                      PageTransition(
+                                          duration:
+                                              const Duration(milliseconds: 700),
+                                          type: PageTransitionType.fade,
+                                          child: ChatRoom(
+                                            chatRoomModel: chatRoom!,
+                                            enduser: endUser,
+                                            firebaseUser: widget.firebaseUser!,
+                                            currentUserModel: widget.userModel!,
+                                          ),
+                                          isIos: true));
+                                  // } else {
+                                  //   utils.showSnackbar(
+                                  //       context: context,
+                                  //       color: Colors.redAccent.shade400,
+                                  //       content:
+                                  //           "to Perform the Action, You must varify your acoount",
+                                  //       seconds: 2);
+                                  // }
                                 },
                                 leading: Stack(
                                   children: [
@@ -238,8 +237,11 @@ class _PublicUsersState extends State<PublicUsers> {
                   return Center(
                       child: Text(
                     "There are no other Users in the Database",
-                    style:
-                        TextStyle(fontStyle: FontStyle.italic, fontSize: 12.sp),
+                    style: GoogleFonts.blackOpsOne(
+                        textStyle: Theme.of(context).textTheme.bodyMedium,
+                        decorationColor: Colors.black,
+                        color: Colors.black.withOpacity(0.7),
+                        fontSize: 13.sp),
                   ));
                 }
                 // !   ***********

@@ -68,6 +68,8 @@ dependencies:
   awesome_notifications: ^0.6.21
   http: ^0.13.4
   zego_uikit_prebuilt_call: ^3.3.0
+  email_otp: ^2.0.1
+  google_fonts: ^4.0.4
   # email_auth: ^1.0.0
 
 dev_dependencies:

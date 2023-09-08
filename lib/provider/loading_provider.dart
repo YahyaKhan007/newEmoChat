@@ -24,10 +24,10 @@ class LoadingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _showOtpButton = false;
-  bool get showOtpButton => _showOtpButton;
-  void changShowOtpButton({required bool value}) {
-    _showOtpButton = value;
+  bool _emailVarified = false;
+  bool get emailVarified => _emailVarified;
+  void changeEmailVarfied({required bool value}) {
+    _emailVarified = value;
     notifyListeners();
   }
   // !   Signup Loading

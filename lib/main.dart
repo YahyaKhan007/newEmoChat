@@ -12,7 +12,9 @@ import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/onboarding/onBoarding.dart';
+import 'package:simplechat/pages/screens/varifyEmail.dart';
 import 'package:simplechat/pages/splash/splash_screen.dart';
+import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/tokenProvider.dart';
@@ -124,6 +126,7 @@ class MyApp extends StatelessWidget {
         ListenableProvider(create: (_) => UserModelProvider()),
         ListenableProvider(create: (_) => RandomName()),
         ListenableProvider(create: (_) => TokenProvider()),
+        ListenableProvider(create: (_) => NotifyProvider()),
         BlocProvider(create: (_) => InternetCubit())
       ],
       child: MaterialApp(
@@ -135,6 +138,9 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home:
+            // VarifyEmailPage(
+            //   email: "yahya.ali.barki@gmail.com",
+            // )
             // ForgetPassword()
             //  CompleteProfile(
             //     userModel: thisUserModel, firebaseUser: currentUser),

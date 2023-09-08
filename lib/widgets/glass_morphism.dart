@@ -34,6 +34,30 @@ Widget GlassDrop(
   );
 }
 
+Widget GlassDropCircle(
+    {required double width,
+    required double height,
+    required blur,
+    required opacity,
+    required child}) {
+  return ClipRRect(
+    clipBehavior: Clip.antiAlias,
+    borderRadius: BorderRadius.circular(20),
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+      child: Container(
+        height: height,
+        // width: width,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color.fromARGB(255, 213, 204, 204).withOpacity(opacity),
+        ),
+        child: child,
+      ),
+    ),
+  );
+}
+
 Widget GlassMorphism(
     {required double width,
     required double height,

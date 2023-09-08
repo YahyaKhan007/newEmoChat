@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
@@ -59,7 +60,11 @@ class _LoginState extends State<Login> {
                   PageTransition(
                       duration: const Duration(milliseconds: 700),
                       type: PageTransitionType.fade,
-                      child: Signup(),
+                      child: Signup(
+                        emailText: "",
+                        isVarify: false,
+                        focusEmail: false,
+                      ),
                       isIos: true));
             },
             child: const Text(
@@ -83,10 +88,18 @@ class _LoginState extends State<Login> {
                       SizedBox(
                         height: 60.h,
                       ),
-                      SizedBox(
-                          // height: 130.h,
-                          width: MediaQuery.of(context).size.width,
-                          child: Image.asset("assets/logo.png")),
+                      // SizedBox(
+                      //     // height: 130.h,
+                      //     width: MediaQuery.of(context).size.width,
+                      //     child: Image.asset("assets/logo.png")),
+
+                      Text("EmoChat",
+                          style: GoogleFonts.blackOpsOne(
+                              textStyle: Theme.of(context).textTheme.bodyMedium,
+                              decorationColor: Colors.black,
+                              backgroundColor: Colors.grey.shade100,
+                              color: Colors.blue,
+                              fontSize: 55.sp)),
                       Text(
                         "Welcome Back!",
                         style: TextStyle(

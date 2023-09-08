@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/pages/screens/forgetPassword.dart';
 import 'package:simplechat/pages/screens/screens.dart';
+import 'package:simplechat/provider/notifyProvider.dart';
+import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 
 import 'checking camera/send_photo_check.dart';
@@ -16,6 +18,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<UserModelProvider>(context);
+    final notifyProvider = Provider.of<NotifyProvider>(context);
     List screens = [
       HomePage(
           userModel: provider.userModel, firebaseUser: provider.firebaseUser!),
@@ -100,6 +103,7 @@ class MyHomePage extends StatelessWidget {
                       ),
                       onTap: () {
                         provider.changeScreenIndex(0);
+                        notifyProvider.changeCloseOption(value: true);
 
                         drawerController.toggle!();
                       }),

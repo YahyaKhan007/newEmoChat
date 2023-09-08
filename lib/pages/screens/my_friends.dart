@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
@@ -33,7 +34,6 @@ class _MyFirendsState extends State<MyFirends> {
   @override
   void initState() {
     userProvider = Provider.of<UserModelProvider>(context, listen: false);
-
     super.initState();
   }
 
@@ -107,20 +107,29 @@ class _MyFirendsState extends State<MyFirends> {
     final LoadingProvider provider = Provider.of<LoadingProvider>(context);
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.blue.shade100,
-          elevation: 0.3,
-          leading: drawerIcon(context),
-          title: Text(
-            "My Friends",
-            style: TextStyle(
-                letterSpacing: -2,
-                // fontFamily: "Zombie",
-                fontWeight: FontWeight.bold,
-                color: Colors.blue.shade900),
-          ),
-        ),
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(120.h),
+            child: GlassDrop(
+              width: MediaQuery.of(context).size.width,
+              height: 120.h,
+              blur: 20.0,
+              opacity: 0.1,
+              child: AppBar(
+                leadingWidth: 70.w,
+                backgroundColor: Colors.blue.shade100,
+                elevation: 0.3,
+                leading: drawerIcon(context),
+                centerTitle: true,
+                title: Text(
+                  "My Friends",
+                  style: GoogleFonts.blackOpsOne(
+                      textStyle: Theme.of(context).textTheme.bodyMedium,
+                      decorationColor: Colors.black,
+                      color: Colors.black.withOpacity(0.7),
+                      fontSize: 25.sp),
+                ),
+              ),
+            )),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection("users")
@@ -131,6 +140,8 @@ class _MyFirendsState extends State<MyFirends> {
               if (snapshot.hasData) {
                 QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
                 if (dataSnapshot.docs.isNotEmpty) {
+                  print("ini-------- stata");
+
                   Map<String, dynamic> userData =
                       dataSnapshot.docs[0].data() as Map<String, dynamic>;
 
@@ -147,86 +158,98 @@ class _MyFirendsState extends State<MyFirends> {
                             if (snapshot.connectionState ==
                                 ConnectionState.done) {
                               if (snapshot.hasData) {
-                                log("has data");
-                                return GlassMorphism(
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 70.h,
-                                    blur: 20,
-                                    borderRadius: 20,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        ListTile(
-                                            leading: Stack(
-                                              children: [
-                                                CircleAvatar(
-                                                    radius: 25.r,
-                                                    backgroundImage:
-                                                        NetworkImage(snapshot
-                                                            .data!
-                                                            .profilePicture!)),
-                                                Visibility(
-                                                  visible: snapshot
-                                                      .data!.isVarified!,
-                                                  child: Positioned(
-                                                      bottom: 0,
-                                                      right: 0,
-                                                      child: CircleAvatar(
-                                                          radius: 10.r,
-                                                          child: Image.asset(
-                                                            "assets/iconImages/blueTick.png",
-                                                            color: Colors.blue,
-                                                          ))),
-                                                )
-                                              ],
-                                            ),
-                                            title: Text(
-                                              snapshot.data!.fullName
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  fontSize: 14.sp,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            subtitle: Text(
-                                              snapshot.data!.bio.toString(),
-                                              style: TextStyle(
-                                                fontSize: 11.sp,
-                                                color: Colors.blue.shade300,
-                                              ),
-                                            ),
-                                            trailing: Container(
-                                              decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  boxShadow: [shadow]),
-                                              child: CircleAvatar(
-                                                  backgroundColor: Colors.white,
-                                                  radius: 14.r,
-                                                  child: Icon(
-                                                    Icons.messenger,
-                                                    // Icons.child_care_outlined,
+                                log("${dataSnapshot.docs.length}");
 
-                                                    color: Colors.blue,
-                                                    size: 12.r,
+                                if (dataSnapshot.docs.isEmpty) {
+                                  return Text("No Firend");
+                                } else {
+                                  return GlassMorphism(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 70.h,
+                                      blur: 20,
+                                      borderRadius: 20,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ListTile(
+                                              leading: Stack(
+                                                children: [
+                                                  CircleAvatar(
+                                                      radius: 25.r,
+                                                      backgroundImage:
+                                                          NetworkImage(snapshot
+                                                              .data!
+                                                              .profilePicture!)),
+                                                  Visibility(
+                                                    visible: snapshot
+                                                        .data!.isVarified!,
+                                                    child: Positioned(
+                                                        bottom: 0,
+                                                        right: 0,
+                                                        child: CircleAvatar(
+                                                            radius: 10.r,
+                                                            child: Image.asset(
+                                                              "assets/iconImages/blueTick.png",
+                                                              color:
+                                                                  Colors.blue,
+                                                            ))),
                                                   )
-                                                  // Image.asset(
-                                                  //   "assets/iconImages/sendMessage.png",
-                                                  // ),
-                                                  ),
-                                            )),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              left: 60.w, right: 30.w),
-                                          height: 0.6,
-                                          color: Colors.blue.shade200,
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                        )
-                                      ],
-                                    ));
+                                                ],
+                                              ),
+                                              title: Text(
+                                                snapshot.data!.fullName
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    fontSize: 14.sp,
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              subtitle: Text(
+                                                snapshot.data!.bio.toString(),
+                                                style: TextStyle(
+                                                  fontSize: 11.sp,
+                                                  color: Colors.blue.shade300,
+                                                ),
+                                              ),
+                                              trailing: Container(
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    boxShadow: [shadow]),
+                                                child: CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    radius: 14.r,
+                                                    child: Icon(
+                                                      Icons.messenger,
+                                                      // Icons.child_care_outlined,
+
+                                                      color: Colors.blue,
+                                                      size: 12.r,
+                                                    )
+                                                    // Image.asset(
+                                                    //   "assets/iconImages/sendMessage.png",
+                                                    // ),
+                                                    ),
+                                              )),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 60.w, right: 30.w),
+                                            height: 0.6,
+                                            color: Colors.blue.shade200,
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                          )
+                                        ],
+                                      ));
+                                }
                               } else {
                                 return Center(
-                                  child: Text("No Sent Request"),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 300),
+                                    child: Text("No Sent Request"),
+                                  ),
                                 );
                               }
                             } else {
@@ -238,34 +261,21 @@ class _MyFirendsState extends State<MyFirends> {
                               );
                             }
                           }));
-                      // ListTile(
-                      //   onTap: () {
-                      //     ScaffoldMessenger.of(context).showSnackBar(
-                      //         SnackBar(content: Text("Waiting")));
-                      //   },
-                      //   leading: CircleAvatar(
-                      //       backgroundImage:
-                      //           NetworkImage(endUser.profilePicture!)),
-                      //   title: Text(endUser.fullName!),
-                      //   subtitle: Text(senderNames[index]['bio']),
-                      //   trailing: Text(
-                      //     "Status\nPending",
-                      //     style: TextStyle(
-                      //         fontSize: 11.sp,
-                      //         color: Colors.green,
-                      //         fontStyle: FontStyle.italic),
-                      //   ),
-                      // );
                     },
                   );
                 } else {
-                  return Center(
-                    child: Text("No Sent Requests"),
+                  return Text(
+                    "You have no Friends",
+                    style: GoogleFonts.blackOpsOne(
+                        textStyle: Theme.of(context).textTheme.bodyMedium,
+                        decorationColor: Colors.black,
+                        color: Colors.black.withOpacity(0.7),
+                        fontSize: 14.sp),
                   );
                 }
               } else {
                 return Center(
-                  child: Text("No Sent Requests"),
+                  child: Text("No Firend"),
                 );
               }
             } else {

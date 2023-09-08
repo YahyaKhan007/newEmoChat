@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ import '../../colors/colors.dart';
 import '../../widgets/drawer_icon.dart';
 import '../../widgets/glass_morphism.dart';
 import 'screens.dart';
+import 'package:email_otp/email_otp.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -30,8 +32,16 @@ class _ProfileState extends State<Profile> {
   static FirebaseMessaging messaging = FirebaseMessaging.instance;
   UserModel? userModel;
   late UserModelProvider userModelProvider;
+
   @override
   void initState() {
+    // myauth.setSMTP(
+    //     host: "smtp.rohitchouhan.com",
+    //     auth: true,
+    //     username: "email-varify@emochat.com",
+    //     password: "*************",
+    //     secure: "TLS",
+    //     port: 576);
     userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
     getoken();
     super.initState();
@@ -96,11 +106,11 @@ class _ProfileState extends State<Profile> {
                 centerTitle: true,
                 title: Text(
                   "Profile",
-                  style: TextStyle(
-                      fontSize: 22.sp,
-                      letterSpacing: -1.3,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black.withOpacity(0.7)),
+                  style: GoogleFonts.blackOpsOne(
+                      textStyle: Theme.of(context).textTheme.bodyMedium,
+                      decorationColor: Colors.black,
+                      color: Colors.black.withOpacity(0.7),
+                      fontSize: 25.sp),
                 ),
                 actions: [
                   CupertinoButton(
@@ -146,56 +156,58 @@ class _ProfileState extends State<Profile> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Visibility(
-                            visible: !userModel!.isVarified!,
-                            child: GlassMorphism(
-                                width: MediaQuery.of(context).size.width,
-                                height: 60.0,
-                                blur: 20.0,
-                                borderRadius: 20.0,
-                                child: Center(
-                                  child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 12.w),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Flexible(
-                                            child: Text(
-                                          "Your Account is Not varified",
-                                          style: TextStyle(
-                                              color: Colors.grey.shade600,
-                                              fontSize: 12.sp),
-                                        )),
-                                        InkWell(
-                                            onTap: () {
-                                              sendVarificationEmail()
-                                                  .then((value) =>
-                                                      utils.showSnackbar(
-                                                          context: context,
-                                                          color: Colors.green,
-                                                          content:
-                                                              "An Email has been sent to your Email, Click to Varify your account",
-                                                          seconds: 2))
-                                                  .then((value) =>
-                                                      Future.delayed(
-                                                        Duration(seconds: 15),
-                                                        () =>
-                                                            checkEmailVerificationStatus(),
-                                                      ));
-                                            },
-                                            child: Text(
-                                              "Click to Varify",
-                                              style: TextStyle(
-                                                  color: Colors.green,
-                                                  fontSize: 13.sp),
-                                            ))
-                                      ],
-                                    ),
-                                  ),
-                                )),
-                          ),
+                          // Visibility(
+                          //   visible: !userModel!.isVarified!,
+                          //   child: GlassMorphism(
+                          //       width: MediaQuery.of(context).size.width,
+                          //       height: 60.0,
+                          //       blur: 20.0,
+                          //       borderRadius: 20.0,
+                          //       child: Center(
+                          //         child: Padding(
+                          //           padding:
+                          //               EdgeInsets.symmetric(horizontal: 12.w),
+                          //           child: Row(
+                          //             mainAxisAlignment:
+                          //                 MainAxisAlignment.spaceAround,
+                          //             children: [
+                          //               Flexible(
+                          //                   child: Text(
+                          //                 "Your Account is Not varified",
+                          //                 style: TextStyle(
+                          //                     color: Colors.grey.shade600,
+                          //                     fontSize: 12.sp),
+                          //               )),
+                          //               InkWell(
+                          //                   onTap: () {
+                          //                     // sendVarificationEmail()
+                          //                     myauth
+                          //                         .sendOTP()
+                          //                         .then((value) =>
+                          //                             utils.showSnackbar(
+                          //                                 context: context,
+                          //                                 color: Colors.green,
+                          //                                 content:
+                          //                                     "An Email has been sent to your Email, Click to Varify your account",
+                          //                                 seconds: 2))
+                          //                         .then((value) =>
+                          //                             Future.delayed(
+                          //                               Duration(seconds: 15),
+                          //                               () =>
+                          //                                   checkEmailVerificationStatus(),
+                          //                             ));
+                          //                   },
+                          //                   child: Text(
+                          //                     "Click to Varify",
+                          //                     style: TextStyle(
+                          //                         color: Colors.green,
+                          //                         fontSize: 13.sp),
+                          //                   ))
+                          //             ],
+                          //           ),
+                          //         ),
+                          //       )),
+                          // ),
                           Padding(
                             padding: EdgeInsets.only(
                                 left: 25.w,

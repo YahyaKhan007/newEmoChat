@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +18,10 @@ import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/bloc/internetBloc.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/notification/local_notification.dart';
+import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
+import 'package:simplechat/widgets/notify_for_varification.dart';
 import 'package:simplechat/widgets/show_connection.dart';
 import 'package:simplechat/widgets/utils.dart';
 
@@ -74,6 +77,7 @@ class _HomePageState extends State<HomePage> {
     size: 25.0,
   );
   late UserModelProvider userModelProvider;
+  late NotifyProvider notifyProvider;
   late TokenProvider tokenProvider;
   void uploaddata(
       {required User user,
@@ -100,8 +104,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
     tokenProvider = Provider.of<TokenProvider>(context, listen: false);
+    notifyProvider = Provider.of<NotifyProvider>(context, listen: false);
 
-    checkEmailVerificationStatus();
+    // checkEmailVerificationStatus();
 
     log(userModelProvider.userModel.fullName.toString());
     log(userModelProvider.firebaseUser.toString());
@@ -152,6 +157,7 @@ class _HomePageState extends State<HomePage> {
                       // FirebaseController().signout(context: context);
                     })
               ],
+
               leadingWidth: 70.w,
               elevation: 0,
               leading: drawerIcon(context),
@@ -160,12 +166,11 @@ class _HomePageState extends State<HomePage> {
               centerTitle: true,
               title: Text(
                 "Chats",
-                style: TextStyle(
-                    letterSpacing: -2,
-                    // fontFamily: "Zombie",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25.sp,
-                    color: Colors.black.withOpacity(0.7)),
+                style: GoogleFonts.blackOpsOne(
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
+                    decorationColor: Colors.black,
+                    color: Colors.black.withOpacity(0.7),
+                    fontSize: 30.sp),
               ),
             )),
       ),
@@ -177,8 +182,7 @@ class _HomePageState extends State<HomePage> {
                   content: Text("No Internet Connection"),
                   backgroundColor: Colors.red),
             );
-          } else if (state == InternetState.wifi ||
-              state == InternetState.mobile) {
+          } else {
             tokenProvider.changeToken(value: widget.userModel.pushToken!);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -188,431 +192,428 @@ class _HomePageState extends State<HomePage> {
           }
         },
         builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          return Stack(
+            alignment: Alignment.center,
             children: [
-              SizedBox(
-                height: 15.h,
-              ),
-              SizedBox(
-                height: 35.h,
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15)),
-                        child: TextField(
-                          controller: searchUserController,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              labelText: "Search User",
-                              labelStyle: TextStyle(fontSize: 13.sp)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  SizedBox(
+                    height: 35.h,
+                    child: Row(
+                      children: [
+                        const SizedBox(
+                          width: 15,
                         ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 0,
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: CupertinoButton(
-                          padding: EdgeInsets.zero,
+                        Expanded(
+                          flex: 5,
                           child: Container(
-                              child: Icon(
-                            Icons.search,
-                            color: Colors.black.withOpacity(0.7),
-                          )
-                              // Image.asset(
-                              //   "assets/iconImages/searchIcon.png",
-                              //   fit: BoxFit.fill,
-                              // ),
-                              ),
-                          onPressed: () {
-                            searchUserController.clear();
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                duration: Duration(milliseconds: 700),
-                                content: Text(
-                                    "To be implemented in the coming updates")));
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15)),
+                            child: TextField(
+                              controller: searchUserController,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15)),
+                                  labelText: "Search User",
+                                  labelStyle: TextStyle(fontSize: 13.sp)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 0,
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: Container(
+                                  child: Icon(
+                                Icons.search,
+                                color: Colors.black.withOpacity(0.7),
+                              )
+                                  // Image.asset(
+                                  //   "assets/iconImages/searchIcon.png",
+                                  //   fit: BoxFit.fill,
+                                  // ),
+                                  ),
+                              onPressed: () {
+                                searchUserController.clear();
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    duration: Duration(milliseconds: 700),
+                                    content: Text(
+                                        "To be implemented in the coming updates")));
 
-                            // setState(() {
-                            //   Navigator.push(
-                            //       context,
-                            //       MaterialPageRoute(
-                            //           builder: (builder) => MyFirends(
-                            //                 firebaseUser: widget.firebaseUser,
-                            //                 currentUserModel: widget.userModel,
-                            //               )));
-                            //   // search(
-                            //   //     context: context,
-                            //   //     userEmail: searchUserController.text
-                            //   //         .toLowerCase()
-                            //   //         .toString(),
-                            //   //     currentUserModel: widget.userModel);
-                            // });
-                          }),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 5.h,
-              ),
-              Expanded(
-                child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection("chatrooms")
-                      .where("users", arrayContains: widget.userModel.uid)
-                      .orderBy("updatedOn", descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.active) {
-                      if (snapshot.hasData) {
-                        // !   *************************
-                        CollectionReference ref =
-                            FirebaseFirestore.instance.collection('chatrooms');
+                                // setState(() {
+                                //   Navigator.push(
+                                //       context,
+                                //       MaterialPageRoute(
+                                //           builder: (builder) => MyFirends(
+                                //                 firebaseUser: widget.firebaseUser,
+                                //                 currentUserModel: widget.userModel,
+                                //               )));
+                                //   // search(
+                                //   //     context: context,
+                                //   //     userEmail: searchUserController.text
+                                //   //         .toLowerCase()
+                                //   //         .toString(),
+                                //   //     currentUserModel: widget.userModel);
+                                // });
+                              }),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  Expanded(
+                    child: StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection("chatrooms")
+                          .where("users", arrayContains: widget.userModel.uid)
+                          .orderBy("updatedOn", descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.active) {
+                          if (snapshot.hasData) {
+                            // !   *************************
+                            CollectionReference ref = FirebaseFirestore.instance
+                                .collection('chatrooms');
 
-                        // !   *************************
+                            // !   *************************
 
-                        QuerySnapshot chatRoomSnapshot =
-                            snapshot.data as QuerySnapshot;
+                            QuerySnapshot chatRoomSnapshot =
+                                snapshot.data as QuerySnapshot;
 
-                        return chatRoomSnapshot.docs.isNotEmpty
-                            ? ListView.builder(
-                                itemCount: chatRoomSnapshot.docs.length,
-                                itemBuilder: ((context, index) {
-                                  // ! we need a chatroom model in Order to show it on the HomePage
+                            return chatRoomSnapshot.docs.isNotEmpty
+                                ? ListView.builder(
+                                    itemCount: chatRoomSnapshot.docs.length,
+                                    itemBuilder: ((context, index) {
+                                      // ! we need a chatroom model in Order to show it on the HomePage
 
-                                  ChatRoomModel chatRoomModel =
-                                      ChatRoomModel.fromMap(
-                                          chatRoomSnapshot.docs[index].data()
-                                              as Map<String, dynamic>);
+                                      ChatRoomModel chatRoomModel =
+                                          ChatRoomModel.fromMap(chatRoomSnapshot
+                                              .docs[index]
+                                              .data() as Map<String, dynamic>);
 
-                                  // ! we also need a target user model in Order to show the detail of the target user on the HomePage
+                                      // ! we also need a target user model in Order to show the detail of the target user on the HomePage
 
-                                  Map<String, dynamic> chatrooms =
-                                      chatRoomModel.participants!;
+                                      Map<String, dynamic> chatrooms =
+                                          chatRoomModel.participants!;
 
-                                  List<String> participantKey =
-                                      chatrooms.keys.toList();
+                                      List<String> participantKey =
+                                          chatrooms.keys.toList();
 
-                                  participantKey.remove(widget.userModel.uid);
-                                  // !                here we finally get the target user UID
-                                  // !                No we can fetch target user Model
+                                      participantKey
+                                          .remove(widget.userModel.uid);
+                                      // !                here we finally get the target user UID
+                                      // !                No we can fetch target user Model
 
-                                  return FutureBuilder(
-                                      future: FirebaseHelper.getUserModelById(
-                                          participantKey[0]),
-                                      builder: (context, userData) {
-                                        if (userData.connectionState ==
-                                            ConnectionState.done) {
-                                          UserModel userModel =
-                                              userData.data as UserModel;
+                                      return FutureBuilder(
+                                          future:
+                                              FirebaseHelper.getUserModelById(
+                                                  participantKey[0]),
+                                          builder: (context, userData) {
+                                            if (userData.connectionState ==
+                                                ConnectionState.done) {
+                                              UserModel userModel =
+                                                  userData.data as UserModel;
 
-                                          // !   This Container will be shown on the Homepage as a chatroom
+                                              // !   This Container will be shown on the Homepage as a chatroom
 
-                                          return GestureDetector(
-                                            onLongPress: () {
-                                              dialogBox(
-                                                  chatRoomModel: chatRoomModel,
-                                                  ref: ref,
-                                                  context: context,
-                                                  onPressed: () {
-                                                    ref
-                                                        .doc(chatRoomModel
-                                                            .chatroomid)
-                                                        .delete();
-                                                    Navigator.of(context,
-                                                            rootNavigator: true)
-                                                        .pop();
-                                                    log("deleted");
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(SnackBar(
-                                                            content: Text(
-                                                                "Deleted Succussfully")));
-                                                  });
-                                              // ! **********************
-                                              // !    Delete
-                                              // !  *********************
-                                            },
-                                            onTap: () {
-                                              if (widget
-                                                  .userModel.isVarified!) {
-                                                chatRoomModel.fromUser
-                                                            .toString() !=
-                                                        FirebaseAuth.instance
-                                                            .currentUser!.uid
-                                                    ? chatRoomModel
-                                                            .readMessage =
-                                                        Timestamp.now()
-                                                    : chatRoomModel
-                                                        .readMessage = null;
+                                              return GestureDetector(
+                                                onLongPress: () {
+                                                  dialogBox(
+                                                      chatRoomModel:
+                                                          chatRoomModel,
+                                                      ref: ref,
+                                                      context: context,
+                                                      onPressed: () {
+                                                        ref
+                                                            .doc(chatRoomModel
+                                                                .chatroomid)
+                                                            .delete();
+                                                        Navigator.of(context,
+                                                                rootNavigator:
+                                                                    true)
+                                                            .pop();
+                                                        log("deleted");
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(SnackBar(
+                                                                content: Text(
+                                                                    "Deleted Succussfully")));
+                                                      });
+                                                  // ! **********************
+                                                  // !    Delete
+                                                  // !  *********************
+                                                },
+                                                onTap: () {
+                                                  // if (widget
+                                                  //     .userModel.isVarified!) {
+                                                  chatRoomModel.fromUser
+                                                              .toString() !=
+                                                          FirebaseAuth.instance
+                                                              .currentUser!.uid
+                                                      ? chatRoomModel
+                                                              .readMessage =
+                                                          Timestamp.now()
+                                                      : chatRoomModel
+                                                          .readMessage = null;
 
-                                                FirebaseFirestore.instance
-                                                    .collection("chatrooms")
-                                                    .doc(chatRoomModel
-                                                        .chatroomid)
-                                                    .set(chatRoomModel.toMap());
+                                                  FirebaseFirestore.instance
+                                                      .collection("chatrooms")
+                                                      .doc(chatRoomModel
+                                                          .chatroomid)
+                                                      .set(chatRoomModel
+                                                          .toMap());
 
-                                                log("chatRoom updated");
+                                                  log("chatRoom updated");
 
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (builder) =>
-                                                            ChatRoom(
-                                                              chatRoomModel:
-                                                                  chatRoomModel,
-                                                              enduser:
-                                                                  userModel,
-                                                              firebaseUser: widget
-                                                                  .firebaseUser,
-                                                              currentUserModel:
-                                                                  widget
-                                                                      .userModel,
-                                                            )));
-                                              } else {
-                                                utils.showSnackbar(
-                                                    context: context,
-                                                    color: Colors.redAccent,
-                                                    content:
-                                                        "to Perform the Action, You must varify your acoount",
-                                                    seconds: 2);
-                                              }
-                                            },
-                                            child: GlassMorphism(
-                                              height: 70.h,
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              blur: 80,
-                                              borderRadius: 20,
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 5.h,
-                                                              horizontal: 10.w),
-                                                      height: 60.h,
-                                                      width:
-                                                          MediaQuery.of(context)
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (builder) =>
+                                                              ChatRoom(
+                                                                chatRoomModel:
+                                                                    chatRoomModel,
+                                                                enduser:
+                                                                    userModel,
+                                                                firebaseUser: widget
+                                                                    .firebaseUser,
+                                                                currentUserModel:
+                                                                    widget
+                                                                        .userModel,
+                                                              )));
+                                                  // } else {
+                                                  //   utils.showSnackbar(
+                                                  //       context: context,
+                                                  //       color: Colors.redAccent,
+                                                  //       content:
+                                                  //           "to Perform the Action, You must varify your acoount",
+                                                  //       seconds: 2);
+                                                  // }
+                                                },
+                                                child: GlassMorphism(
+                                                  height: 70.h,
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  blur: 80,
+                                                  borderRadius: 20,
+                                                  child: Column(
+                                                    children: [
+                                                      Container(
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 5.h,
+                                                                  horizontal:
+                                                                      10.w),
+                                                          height: 60.h,
+                                                          width: MediaQuery.of(
+                                                                  context)
                                                               .size
                                                               .width,
-                                                      // decoration: BoxDecoration(
-                                                      //   boxShadow: [
-                                                      //     AppColors.containerShadow
-                                                      //   ],
-                                                      //   color: Colors.white,
-                                                      //   borderRadius:
-                                                      //       BorderRadius.circular(
-                                                      //           10.r),
-                                                      // ),
-                                                      child: Center(
-                                                          child: ListTile(
-                                                              minVerticalPadding:
-                                                                  -30,
-                                                              // dense: true,
-                                                              contentPadding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      bottom: 0,
-                                                                      right: 10,
-                                                                      left: 0),
-                                                              leading: Stack(
-                                                                children: [
-                                                                  CircleAvatar(
-                                                                    radius:
-                                                                        30.r,
-                                                                    backgroundColor:
-                                                                        Colors
+                                                          // decoration: BoxDecoration(
+                                                          //   boxShadow: [
+                                                          //     AppColors.containerShadow
+                                                          //   ],
+                                                          //   color: Colors.white,
+                                                          //   borderRadius:
+                                                          //       BorderRadius.circular(
+                                                          //           10.r),
+                                                          // ),
+                                                          child: Center(
+                                                              child: ListTile(
+                                                                  minVerticalPadding:
+                                                                      -30,
+                                                                  // dense: true,
+                                                                  contentPadding:
+                                                                      const EdgeInsets
+                                                                              .only(
+                                                                          bottom:
+                                                                              0,
+                                                                          right:
+                                                                              10,
+                                                                          left:
+                                                                              0),
+                                                                  leading:
+                                                                      Stack(
+                                                                    children: [
+                                                                      CircleAvatar(
+                                                                        radius:
+                                                                            30.r,
+                                                                        backgroundColor: Colors
                                                                             .grey
                                                                             .shade500,
-                                                                    backgroundImage:
-                                                                        NetworkImage(
-                                                                            userModel.profilePicture!),
+                                                                        backgroundImage:
+                                                                            NetworkImage(userModel.profilePicture!),
+                                                                      ),
+                                                                      Visibility(
+                                                                        visible:
+                                                                            userModel.isVarified!,
+                                                                        child: Positioned(
+                                                                            bottom: 0,
+                                                                            right: 0,
+                                                                            child: CircleAvatar(
+                                                                                radius: 10.r,
+                                                                                child: Image.asset(
+                                                                                  "assets/iconImages/blueTick.png",
+                                                                                  color: Colors.blue,
+                                                                                ))),
+                                                                      )
+                                                                    ],
                                                                   ),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        userModel
-                                                                            .isVarified!,
-                                                                    child: Positioned(
-                                                                        bottom: 0,
-                                                                        right: 0,
-                                                                        child: CircleAvatar(
-                                                                            radius: 10.r,
-                                                                            child: Image.asset(
-                                                                              "assets/iconImages/blueTick.png",
-                                                                              color: Colors.blue,
-                                                                            ))),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                              title: Text(
-                                                                userModel
-                                                                    .fullName!,
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        "Aclonica",
-                                                                    color: chatRoomModel.readMessage !=
-                                                                            null
-                                                                        ? Colors
-                                                                            .grey
-                                                                            .shade600
-                                                                        : Colors
-                                                                            .black,
-                                                                    fontWeight: chatRoomModel.readMessage !=
-                                                                            null
-                                                                        ? FontWeight
-                                                                            .normal
-                                                                        : FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        13.sp),
-                                                              ),
-                                                              subtitle:
-                                                                  chatRoomModel
-                                                                              .lastMessage !=
-                                                                          ""
-                                                                      ? Text(
-                                                                          chatRoomModel
-                                                                              .lastMessage!,
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontWeight: chatRoomModel.readMessage != null
-                                                                                ? FontWeight.normal
-                                                                                : FontWeight.bold,
-                                                                            fontStyle:
-                                                                                FontStyle.italic,
-                                                                            color: chatRoomModel.readMessage != null
-                                                                                ? Colors.grey
-                                                                                : Colors.black,
-                                                                            fontSize:
-                                                                                11.sp,
-                                                                          ),
-                                                                        )
-                                                                      : Text(
-                                                                          "Say Hi to Start a Conversation!",
-                                                                          style: TextStyle(
-                                                                              color: Colors.blue,
-                                                                              fontSize: 11.sp,
-                                                                              fontStyle: FontStyle.italic),
-                                                                        ),
+                                                                  title: Text(
+                                                                    userModel
+                                                                        .fullName!,
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            "Aclonica",
+                                                                        color: chatRoomModel.readMessage !=
+                                                                                null
+                                                                            ? Colors
+                                                                                .grey.shade600
+                                                                            : Colors
+                                                                                .black,
+                                                                        fontWeight: chatRoomModel.readMessage !=
+                                                                                null
+                                                                            ? FontWeight
+                                                                                .normal
+                                                                            : FontWeight
+                                                                                .bold,
+                                                                        fontSize:
+                                                                            13.sp),
+                                                                  ),
+                                                                  subtitle:
+                                                                      chatRoomModel.lastMessage !=
+                                                                              ""
+                                                                          ? Text(
+                                                                              chatRoomModel.lastMessage!,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              style: TextStyle(
+                                                                                fontWeight: chatRoomModel.readMessage != null ? FontWeight.normal : FontWeight.bold,
+                                                                                fontStyle: FontStyle.italic,
+                                                                                color: chatRoomModel.readMessage != null ? Colors.grey : Colors.black,
+                                                                                fontSize: 11.sp,
+                                                                              ),
+                                                                            )
+                                                                          : Text(
+                                                                              "Say Hi to Start a Conversation!",
+                                                                              style: TextStyle(color: Colors.blue, fontSize: 11.sp, fontStyle: FontStyle.italic),
+                                                                            ),
 
-                                                              // ! Option for Delete
-                                                              trailing: chatRoomModel
-                                                                          .readMessage !=
-                                                                      null
-                                                                  ? Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .min,
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        Text(
-                                                                          DateFormat(" dd MMM yyy").format(DateTime.fromMillisecondsSinceEpoch(chatRoomModel
-                                                                              .updatedOn!
-                                                                              .millisecondsSinceEpoch)),
-                                                                          style: TextStyle(
-                                                                              fontSize: 8.sp,
-                                                                              fontStyle: FontStyle.italic,
-                                                                              color: Colors.grey),
-                                                                        ),
-                                                                        Text(
-                                                                          DateFormat(" hh:mm").format(DateTime.fromMillisecondsSinceEpoch(chatRoomModel
-                                                                              .updatedOn!
-                                                                              .millisecondsSinceEpoch)),
-                                                                          style: TextStyle(
-                                                                              fontSize: 8.sp,
-                                                                              fontStyle: FontStyle.italic,
-                                                                              color: Colors.grey),
-                                                                        ),
-                                                                      ],
-                                                                    )
-                                                                  : CircleAvatar(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .blue,
-                                                                      radius: 7,
-                                                                    )))),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          return Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 5.h),
-                                            child: Shimmer.fromColors(
-                                              baseColor: Colors.grey.shade100,
-                                              highlightColor:
-                                                  Colors.grey.shade500,
-                                              child: ListTile(
-                                                leading: CircleAvatar(
-                                                  radius: 27.r,
-                                                  backgroundColor: Colors.white,
+                                                                  // ! Option for Delete
+                                                                  trailing: chatRoomModel
+                                                                              .readMessage !=
+                                                                          null
+                                                                      ? Column(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.center,
+                                                                          children: [
+                                                                            Text(
+                                                                              DateFormat(" dd MMM yyy").format(DateTime.fromMillisecondsSinceEpoch(chatRoomModel.updatedOn!.millisecondsSinceEpoch)),
+                                                                              style: TextStyle(fontSize: 8.sp, fontStyle: FontStyle.italic, color: Colors.grey),
+                                                                            ),
+                                                                            Text(
+                                                                              DateFormat(" hh:mm").format(DateTime.fromMillisecondsSinceEpoch(chatRoomModel.updatedOn!.millisecondsSinceEpoch)),
+                                                                              style: TextStyle(fontSize: 8.sp, fontStyle: FontStyle.italic, color: Colors.grey),
+                                                                            ),
+                                                                          ],
+                                                                        )
+                                                                      : CircleAvatar(
+                                                                          backgroundColor:
+                                                                              Colors.blue,
+                                                                          radius:
+                                                                              7,
+                                                                        )))),
+                                                    ],
+                                                  ),
                                                 ),
-                                                title: Container(
-                                                    height: 5,
-                                                    color: Colors.white,
-                                                    width:
-                                                        MediaQuery.of(context)
+                                              );
+                                            } else {
+                                              return Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 5.h),
+                                                child: Shimmer.fromColors(
+                                                  baseColor:
+                                                      Colors.grey.shade100,
+                                                  highlightColor:
+                                                      Colors.grey.shade500,
+                                                  child: ListTile(
+                                                    leading: CircleAvatar(
+                                                      radius: 27.r,
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                    ),
+                                                    title: Container(
+                                                        height: 5,
+                                                        color: Colors.white,
+                                                        width: MediaQuery.of(
+                                                                    context)
                                                                 .size
                                                                 .width *
                                                             0.4),
-                                                subtitle: Container(
-                                                    height: 3,
-                                                    color: Colors.white,
-                                                    width: 50),
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      });
-                                }))
-                            : Center(
-                                child: Image.asset(
-                                    "assets/noMessageTransparent.png"));
-                      } else if (snapshot.hasError) {
-                        return Center(
-                          child: Text(
-                            snapshot.error.toString(),
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 14.sp),
-                          ),
-                        );
-                      } else {
-                        return Center(
-                          child: Text(
-                            "No Chats Yet",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 14.sp),
-                          ),
-                        );
-                      }
-                    } else {
-                      return Center(
-                        child: SizedBox(
-                          height: 30,
-                          width: 30,
-                          child: spinkit,
-                        ),
-                      );
-                    }
-                  },
-                ),
+                                                    subtitle: Container(
+                                                        height: 3,
+                                                        color: Colors.white,
+                                                        width: 50),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          });
+                                    }))
+                                : Center(
+                                    child: Image.asset(
+                                        "assets/noMessageTransparent.png"));
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                snapshot.error.toString(),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14.sp),
+                              ),
+                            );
+                          } else {
+                            return Center(
+                              child: Text(
+                                "No Chats Yet",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14.sp),
+                              ),
+                            );
+                          }
+                        } else {
+                          return Center(
+                            child: SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: spinkit,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
+              // Positioned(
+              //     // left: 40.w,
+              //     // top: 190.h,
+              //     child: Visibility(
+              //         visible: widget.userModel.isVarified!
+              //             ? false
+              //             : notifyProvider.isClose,
+              //         child: NotifyForVarification(context: context)))
             ],
           );
         },

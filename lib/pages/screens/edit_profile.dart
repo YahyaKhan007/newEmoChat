@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -205,11 +206,11 @@ class _EditProfileState extends State<EditProfile> {
                 centerTitle: true,
                 title: Text(
                   "Edit Profile",
-                  style: TextStyle(
-                      fontSize: 22.sp,
-                      letterSpacing: -1.3,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black.withOpacity(0.7)),
+                  style: GoogleFonts.blackOpsOne(
+                      textStyle: Theme.of(context).textTheme.bodyMedium,
+                      decorationColor: Colors.black,
+                      color: Colors.black.withOpacity(0.7),
+                      fontSize: 25.sp),
                 ),
                 elevation: 0,
                 leading: CupertinoButton(
@@ -331,6 +332,8 @@ class _EditProfileState extends State<EditProfile> {
                                           scrollPadding: EdgeInsets.zero,
                                           controller: nameController,
                                           decoration: InputDecoration(
+                                            errorBorder: OutlineInputBorder(
+                                                gapPadding: 6.0),
                                             contentPadding: EdgeInsets.zero,
                                             hintStyle: TextStyle(
                                                 color: Colors.black87,

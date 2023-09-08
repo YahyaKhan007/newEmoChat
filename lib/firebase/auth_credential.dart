@@ -13,6 +13,7 @@ import 'package:simplechat/widgets/showLoading.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/zoom_drawer.dart';
 import '../pages/screens/screens.dart';
+import '../widgets/utils.dart';
 
 enum Status {
   done,
@@ -38,6 +39,12 @@ class FirebaseController extends ChangeNotifier {
       log("just came here 2 ======================================>  $credential");
     } on FirebaseAuthException catch (e) {
       provider.changeSigupLoading(value: false);
+      provider.changeOtpVisibility(value: true);
+      utils.showSnackbar(
+          color: Colors.red,
+          content: "Provided Email is already is use",
+          context: context,
+          seconds: 2);
 
       log(
         "the error is  ============================================?  $e",
@@ -57,7 +64,7 @@ class FirebaseController extends ChangeNotifier {
           bio: "",
           pushToken: "",
           memberSince: Timestamp.now(),
-          isVarified: false);
+          isVarified: true);
 
       await FirebaseFirestore.instance
           .collection("users")
@@ -108,6 +115,7 @@ class FirebaseController extends ChangeNotifier {
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           duration: Duration(milliseconds: 700),
+          backgroundColor: Colors.green,
           content: Text("User Logged in")));
       provider.changeLoginLoading(value: false);
 
@@ -118,18 +126,28 @@ class FirebaseController extends ChangeNotifier {
         userModelProvider.changeScreenIndex(0);
       }
       Navigator.popUntil(context, (route) => route.isFirst);
+
       Navigator.pushReplacement(
           context,
           PageTransition(
               duration: const Duration(milliseconds: 700),
               type: PageTransitionType.fade,
-              child: MyHomePage(),
+              child: userModelProvider.userModel.fullName == ""
+                  ? CompleteProfile(
+                      userModel: userModel,
+                      firebaseUser: userModelProvider.firebaseUser!)
+                  : MyHomePage(),
               isIos: true));
 
       return true;
     } catch (e) {
       provider.changeLoginLoading(value: false);
-      Loading.showAlertDialog(context, "Signup Error", e.toString());
+      utils.showSnackbar(
+          context: context,
+          color: Colors.redAccent,
+          content: "InValid Email Password",
+          seconds: 3);
+      // Loading.showAlertDialog(context, "Signup Error", e.toString());
       log("$e");
       return false;
     }

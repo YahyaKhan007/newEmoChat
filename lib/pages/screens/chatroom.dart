@@ -25,7 +25,6 @@ import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
-import 'package:simplechat/widgets/show_connection.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 import '../../colors/colors.dart';
@@ -599,11 +598,27 @@ class _ChatRoomState extends State<ChatRoom> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                      radius: 23.r,
-                      backgroundImage: NetworkImage(
-                        widget.enduser.profilePicture!,
-                      )),
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                          radius: 23.r,
+                          backgroundImage: NetworkImage(
+                            widget.enduser.profilePicture!,
+                          )),
+                      Visibility(
+                        visible: widget.enduser.isVarified!,
+                        child: Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                                radius: 8.r,
+                                child: Image.asset(
+                                  "assets/iconImages/blueTick.png",
+                                  color: Colors.blue,
+                                ))),
+                      ),
+                    ],
+                  ),
                   SizedBox(
                     width: 15.sp,
                   ),
