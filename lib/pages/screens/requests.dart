@@ -17,6 +17,7 @@ import 'package:simplechat/widgets/utils.dart';
 import '../../colors/colors.dart';
 import '../../models/models.dart';
 import '../../provider/loading_provider.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ReceiverListWidget extends StatefulWidget {
   final String uid;
@@ -154,46 +155,71 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                         provider.changePending(value: true);
                         log(provider.pending.toString());
                       },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10.w, vertical: 4.h),
-                        decoration:
-                            BoxDecoration(color: AppColors.backgroudColor),
-                        height: 35.h,
-                        child: Text(
-                          "Pending Requests",
-                          style: GoogleFonts.blackOpsOne(
-                              textStyle: Theme.of(context).textTheme.bodyMedium,
-                              decorationColor: Colors.black,
-                              color: provider.pending == true
-                                  ? Colors.blue.shade900
-                                  : Colors.blue.shade100,
-                              fontSize: 12.sp),
+                      child: badges.Badge(
+                        position:
+                            badges.BadgePosition.custom(top: -15, end: 10),
+                        showBadge: receiverNames.isNotEmpty,
+                        badgeAnimation: badges.BadgeAnimation.fade(),
+                        // badgeStyle: badges.BadgeStyle(
+                        //   badgeColor: Colors.green,
+                        // ),
+                        badgeContent: Text("${receiverNames.length}",
+                            style: TextStyle(color: Colors.white)),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.w, vertical: 4.h),
+                          decoration:
+                              BoxDecoration(color: AppColors.backgroudColor),
+                          height: 35.h,
+                          child: Text(
+                            "Pending Requests",
+                            style: GoogleFonts.blackOpsOne(
+                                textStyle:
+                                    Theme.of(context).textTheme.bodyMedium,
+                                decorationColor: Colors.black,
+                                color: provider.pending == true
+                                    ? Colors.blue.shade900
+                                    : Colors.blue.shade100,
+                                fontSize: 12.sp),
+                          ),
                         ),
                       ),
                     ),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        setState(() {});
-                        provider.changePending(value: false);
-                        log(provider.pending.toString());
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10.w, vertical: 4.h),
-                        decoration:
-                            BoxDecoration(color: AppColors.backgroudColor),
-                        height: 35.h,
-                        child: Text(
-                          "Sent Requests",
-                          style: GoogleFonts.blackOpsOne(
-                              textStyle: Theme.of(context).textTheme.bodyMedium,
-                              decorationColor: Colors.black,
-                              color: provider.pending != true
-                                  ? Colors.blue.shade900
-                                  : Colors.blue.shade100,
-                              fontSize: 12.sp),
+                    badges.Badge(
+                      position: badges.BadgePosition.custom(top: -15, end: 10),
+                      badgeAnimation: badges.BadgeAnimation.fade(),
+                      badgeStyle: badges.BadgeStyle(
+                        badgeColor: Colors.green,
+                      ),
+                      showBadge: senderNames.isNotEmpty,
+                      badgeContent: Text(
+                        "${senderNames.length}",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          setState(() {});
+                          provider.changePending(value: false);
+                          log(provider.pending.toString());
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.w, vertical: 4.h),
+                          decoration:
+                              BoxDecoration(color: AppColors.backgroudColor),
+                          height: 35.h,
+                          child: Text(
+                            "Sent Requests",
+                            style: GoogleFonts.blackOpsOne(
+                                textStyle:
+                                    Theme.of(context).textTheme.bodyMedium,
+                                decorationColor: Colors.black,
+                                color: provider.pending != true
+                                    ? Colors.blue.shade900
+                                    : Colors.blue.shade100,
+                                fontSize: 12.sp),
+                          ),
                         ),
                       ),
                     )

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/config.dart';
@@ -5,9 +7,11 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
+import 'package:simplechat/pages/screens/picture%20emotion/picture_emotion.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
+import 'package:badges/badges.dart' as badges;
 
 final drawerController = ZoomDrawerController();
 
@@ -27,6 +31,8 @@ class MyHomePage extends StatelessWidget {
       MyFirends(
           currentUserModel: provider.userModel,
           firebaseUser: provider.firebaseUser!),
+
+      PictureEmotion()
 
       // ChatPage()
       // EmotionDetector()
@@ -90,6 +96,7 @@ class MyHomePage extends StatelessWidget {
                     height: 10.h,
                   ),
                   draweroption(
+                      // provider: provider,
                       context: context,
                       title: "Chats",
                       // image: "assets/iconImages/home.png",
@@ -105,6 +112,7 @@ class MyHomePage extends StatelessWidget {
                         drawerController.toggle!();
                       }),
                   draweroption(
+                      // provider: provider,
                       context: context,
                       title: "Profile",
                       // image: "assets/iconImages/profile.png",
@@ -117,20 +125,33 @@ class MyHomePage extends StatelessWidget {
                         provider.changeScreenIndex(1);
                         drawerController.toggle!();
                       }),
-                  draweroption(
-                      context: context,
-                      title: "Requests",
-                      // image: "assets/iconImages/request.png",
-                      icon: Icon(
-                        color: Colors.black,
-                        Icons.person_add,
-                        size: 15,
-                      ),
-                      onTap: () {
-                        provider.changeScreenIndex(2);
+                  badges.Badge(
+                    showBadge: (provider.userModel.reciever!.isNotEmpty ||
+                        provider.userModel.sender!.isNotEmpty),
+                    position: badges.BadgePosition.custom(top: 10.h, end: 0.w),
+                    badgeStyle: badges.BadgeStyle(badgeColor: Colors.green),
+                    badgeContent: Text(
+                      "${provider.userModel.sender!.length + provider.userModel.reciever!.length}",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: draweroption(
+                        // provider: provider,
+                        context: context,
+                        title: "Requests",
 
-                        drawerController.toggle!();
-                      }),
+                        // image: "assets/iconImages/request.png",
+                        icon: Icon(
+                          color: Colors.black,
+                          Icons.person_add,
+                          size: 15,
+                        ),
+                        onTap: () {
+                          log("Friends are ======> ${provider.userModel.friends!.length}");
+                          provider.changeScreenIndex(2);
+
+                          drawerController.toggle!();
+                        }),
+                  ),
                   // draweroption(
                   //     context: context,
                   //     title: "Settings",
@@ -139,6 +160,7 @@ class MyHomePage extends StatelessWidget {
                   //       drawerController.toggle!();
                   //     }),
                   draweroption(
+                      // provider: provider,
                       context: context,
                       title: "My Friends",
                       // image: "assets/iconImages/friends.png",
@@ -154,6 +176,7 @@ class MyHomePage extends StatelessWidget {
                       }),
 
                   draweroption(
+                      // provider: provider,
                       context: context,
                       title: "Check Modes",
                       // image: "assets/iconImages/profile.png",
@@ -214,6 +237,7 @@ class MyHomePage extends StatelessWidget {
                     thickness: 1,
                   ),
                   draweroption(
+                      // provider: provider,
                       context: context,
                       title: "Logout",
                       // image: "assets/iconImages/logout.png",
@@ -235,6 +259,7 @@ class MyHomePage extends StatelessWidget {
   Widget draweroption(
       {required BuildContext context,
       required String title,
+      // required UserModelProvider provider,
       required Icon icon,
       required VoidCallback onTap}) {
     return ListTile(

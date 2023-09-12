@@ -7,7 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:simplechat/pages/screens/screens.dart';
+import 'package:simplechat/pages/signup_login/login.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
 
@@ -168,81 +168,69 @@ class _MyFirendsState extends State<MyFirends> {
                                       height: 70.h,
                                       blur: 20,
                                       borderRadius: 20,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          ListTile(
-                                              leading: Stack(
-                                                children: [
-                                                  CircleAvatar(
-                                                      radius: 25.r,
-                                                      backgroundImage:
-                                                          NetworkImage(snapshot
-                                                              .data!
-                                                              .profilePicture!)),
-                                                  Visibility(
-                                                    visible: snapshot
-                                                        .data!.isVarified!,
-                                                    child: Positioned(
-                                                        bottom: 0,
-                                                        right: 0,
-                                                        child: CircleAvatar(
-                                                            radius: 10.r,
-                                                            child: Image.asset(
-                                                              "assets/iconImages/blueTick.png",
-                                                              color:
-                                                                  Colors.blue,
-                                                            ))),
-                                                  )
-                                                ],
-                                              ),
-                                              title: Text(
-                                                snapshot.data!.fullName
-                                                    .toString(),
-                                                style: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    color: Colors.black,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              subtitle: Text(
-                                                snapshot.data!.bio.toString(),
-                                                style: TextStyle(
-                                                  fontSize: 11.sp,
-                                                  color: Colors.blue.shade300,
-                                                ),
-                                              ),
-                                              trailing: Container(
+                                      child: ListTile(
+                                          leading: Stack(
+                                            children: [
+                                              Container(
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
-                                                    boxShadow: [shadow]),
+                                                    boxShadow: [greyShadow]),
                                                 child: CircleAvatar(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    radius: 14.r,
-                                                    child: Icon(
-                                                      Icons.messenger,
-                                                      // Icons.child_care_outlined,
-
-                                                      color: Colors.blue,
-                                                      size: 12.r,
-                                                    )
-                                                    // Image.asset(
-                                                    //   "assets/iconImages/sendMessage.png",
-                                                    // ),
-                                                    ),
-                                              )),
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                                left: 60.w, right: 30.w),
-                                            height: 0.6,
-                                            color: Colors.blue.shade200,
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                          )
-                                        ],
-                                      ));
+                                                    radius: 25.r,
+                                                    backgroundImage:
+                                                        NetworkImage(snapshot
+                                                            .data!
+                                                            .profilePicture!)),
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    snapshot.data!.isVarified!,
+                                                child: Positioned(
+                                                    bottom: 0,
+                                                    right: 0,
+                                                    child: CircleAvatar(
+                                                        radius: 10.r,
+                                                        child: Image.asset(
+                                                          "assets/iconImages/blueTick.png",
+                                                          color: Colors.blue,
+                                                        ))),
+                                              )
+                                            ],
+                                          ),
+                                          title: Text(
+                                            snapshot.data!.fullName.toString(),
+                                            style: TextStyle(
+                                                fontSize: 14.sp,
+                                                color: Colors.black
+                                                    .withOpacity(0.6),
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          subtitle: Text(
+                                            snapshot.data!.bio.toString(),
+                                            style: TextStyle(
+                                              fontSize: 11.sp,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                          trailing: Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              // boxShadow: [shadow]
+                                            ),
+                                            child: CircleAvatar(
+                                                backgroundColor: Colors.white
+                                                    .withOpacity(0.3),
+                                                radius: 14.r,
+                                                child: Image.asset(
+                                                  "assets/iconImages/sms.png",
+                                                  height: 30.h,
+                                                  color: Colors.grey,
+                                                )
+                                                // Image.asset(
+                                                //   "assets/iconImages/sendMessage.png",
+                                                // ),
+                                                ),
+                                          )));
                                 }
                               } else {
                                 return Center(

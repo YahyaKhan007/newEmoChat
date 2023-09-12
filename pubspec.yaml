@@ -70,6 +70,9 @@ dependencies:
   zego_uikit_prebuilt_call: ^3.3.0
   email_otp: ^2.0.1
   google_fonts: ^4.0.4
+  dia: ^0.1.5
+  dio: ^5.3.2
+  badges: ^3.1.2
   # email_auth: ^1.0.0
 
 dev_dependencies:
@@ -125,6 +128,8 @@ flutter:
     - assets/
     - assets/images/
     - assets/iconImages/
+    - assets/modelPix/
+    - assets/modelPix/3.jpeg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

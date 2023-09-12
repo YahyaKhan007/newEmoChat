@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
-import 'package:simplechat/pages/screens/forgetPassword.dart';
 import '../../colors/colors.dart';
 import '../../provider/loading_provider.dart';
 import '../screens/screens.dart';
@@ -472,6 +471,13 @@ BoxShadow avatarShadow = BoxShadow(
 
 BoxShadow shadow = BoxShadow(
   color: Colors.blue.shade300,
+  blurRadius: 5,
+  offset: Offset(1, 4),
+  spreadRadius: 0.00,
+);
+
+BoxShadow greyShadow = BoxShadow(
+  color: Colors.grey.shade300,
   blurRadius: 5,
   offset: Offset(1, 4),
   spreadRadius: 0.00,

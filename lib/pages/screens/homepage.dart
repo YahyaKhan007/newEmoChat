@@ -21,9 +21,7 @@ import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
-import 'package:simplechat/widgets/notify_for_varification.dart';
 import 'package:simplechat/widgets/show_connection.dart';
-import 'package:simplechat/widgets/utils.dart';
 
 import '../../models/chatroom_model.dart';
 import '../../models/user_model.dart';

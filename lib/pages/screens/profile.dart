@@ -13,13 +13,11 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
-import 'package:simplechat/widgets/utils.dart';
 
 import '../../colors/colors.dart';
 import '../../widgets/drawer_icon.dart';
 import '../../widgets/glass_morphism.dart';
 import 'screens.dart';
-import 'package:email_otp/email_otp.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});

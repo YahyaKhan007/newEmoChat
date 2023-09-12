@@ -8,15 +8,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/widgets/showLoading.dart';
-import 'package:simplechat/widgets/utils.dart';
 import '../../colors/colors.dart';
 import '../../main.dart';
-import '../../provider/user_model_provider.dart';
-import '../../widgets/drawer_icon.dart';
 import '../../widgets/glass_morphism.dart';
 import 'screens.dart';
 
@@ -81,8 +77,6 @@ class _PublicUsersState extends State<PublicUsers> {
 
   @override
   Widget build(BuildContext context) {
-    final userModelProvider = Provider.of<UserModelProvider>(context);
-
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: PreferredSize(

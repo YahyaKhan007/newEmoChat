@@ -16,12 +16,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/models/user_model.dart';
-import 'package:simplechat/pages/signup_login/login.dart';
 import 'package:simplechat/provider/loading_provider.dart';
-import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
-
+import '../screens/screens.dart';
 import '../../colors/colors.dart';
 import '../../zoom_drawer.dart';
 
