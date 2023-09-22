@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
@@ -254,13 +255,15 @@ class _CompleteProfileState extends State<CompleteProfile> {
             leadingWidth: 90,
             centerTitle: true,
             backgroundColor: AppColors.backgroudColor,
-            leading: SizedBox(
-              height: 200,
-              child: Image.asset("assets/logo.png"),
-            ),
-            title: const Text(
+            title: Text(
               "Complete Profile",
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              style: GoogleFonts.blackOpsOne(
+                fontSize: 30.sp,
+                textStyle: Theme.of(context).textTheme.bodyMedium,
+                decorationColor: Colors.black,
+                backgroundColor: Colors.grey.shade100,
+                color: Colors.blue,
+              ),
             )),
       ),
       body: SingleChildScrollView(

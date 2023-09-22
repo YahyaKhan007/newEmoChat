@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,9 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/notification/local_notification.dart';
-import 'package:simplechat/pages/onboarding/onBoarding.dart';
-import 'package:simplechat/pages/screens/varifyEmail.dart';
-import 'package:simplechat/pages/splash/splash_screen.dart';
+import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
@@ -24,6 +20,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'bloc/internetBloc.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+
+import 'pages/screens/screens.dart';
 
 var uuid = const Uuid();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -61,8 +59,9 @@ List<CameraDescription>? cameras;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  cameras = await availableCameras();
 
+  cameras = await availableCameras();
+  final firstCamera = cameras!.first;
   await Firebase.initializeApp();
   User? currentUser = FirebaseAuth.instance.currentUser;
   UserModel? thisUserModel;
@@ -102,10 +101,12 @@ void main() async {
 
         return firstTime == null
             ? OnBoardingScreen(
+                firstCamera: firstCamera,
                 currentUser: currentUser,
                 thisUserModel: thisUserModel,
               )
             : MyApp(
+                firstCamera: firstCamera,
                 currentUser: currentUser,
                 thisUserModel: thisUserModel,
               );
@@ -115,39 +116,79 @@ void main() async {
 class MyApp extends StatelessWidget {
   final currentUser;
   final thisUserModel;
-  const MyApp(
-      {super.key, required this.currentUser, required this.thisUserModel});
+  final CameraDescription firstCamera;
+  const MyApp({
+    super.key,
+    required this.currentUser,
+    required this.thisUserModel,
+    required this.firstCamera,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ListenableProvider(create: (_) => LoadingProvider()),
-        ListenableProvider(create: (_) => UserModelProvider()),
-        ListenableProvider(create: (_) => RandomName()),
-        ListenableProvider(create: (_) => TokenProvider()),
-        ListenableProvider(create: (_) => NotifyProvider()),
-        BlocProvider(create: (_) => InternetCubit())
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Emochat',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          primaryColor: Color.fromARGB(255, 134, 77, 232),
-          useMaterial3: true,
-        ),
-        home:
-            // VarifyEmailPage(
-            //   email: "yahya.ali.barki@gmail.com",
-            // )
-            // ForgetPassword()
-            //  CompleteProfile(
-            //     userModel: thisUserModel, firebaseUser: currentUser),
-            // NewScreen()
-            SplashScreen(
-          firebaseUser: currentUser,
-          userModel: thisUserModel,
+        providers: [
+          ListenableProvider(create: (_) => LoadingProvider()),
+          ListenableProvider(create: (_) => UserModelProvider()),
+          ListenableProvider(create: (_) => ModeProvider()),
+          ListenableProvider(create: (_) => RandomName()),
+          ListenableProvider(create: (_) => TokenProvider()),
+          ListenableProvider(create: (_) => NotifyProvider()),
+          BlocProvider(create: (_) => InternetCubit())
+        ],
+        child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Emochat',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              primaryColor: Color.fromARGB(255, 134, 77, 232),
+              useMaterial3: true,
+            ),
+            home:
+                // VarifyEmailPage(
+                //   email: "yahya.ali.barki@gmail.com",
+                // )
+                // ForgetPassword()
+                //  CompleteProfile(
+                //     userModel: thisUserModel, firebaseUser: currentUser),
+                NewScreen()
+            //     SplashScreen(
+            //   firebaseUser: currentUser,
+            //   userModel: thisUserModel,
+            // ),
+            // EmotionRecognitionPage()
+            // CameraScreen(
+            //     // camera: firstCamera,
+            //     )),
+            ));
+  }
+}
+
+class NewScreen extends StatelessWidget {
+  const NewScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text("widget.title"),
+      ),
+      body: const Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 500,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                    hintText: "Enter here", border: OutlineInputBorder()),
+              )
+            ],
+          ),
         ),
       ),
     );

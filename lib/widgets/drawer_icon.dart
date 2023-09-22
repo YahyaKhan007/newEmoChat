@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 
@@ -43,7 +42,7 @@ Widget drawerIcon(BuildContext context) {
       onPressed: () {
         log("message");
         log(provider.firebaseUser!.uid);
-        FirebaseHelper().updateUserModelWithFirebaseUser(provider);
+        // FirebaseHelper().updateUserModelWithFirebaseUser(provider);
 
         drawerController.toggle!();
       });

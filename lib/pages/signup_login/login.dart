@@ -41,8 +41,6 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     final provider = Provider.of<LoadingProvider>(context, listen: true);
 
-    bool show = true;
-
     return Scaffold(
       backgroundColor: AppColors.backgroudColor,
       bottomNavigationBar: Row(
@@ -399,7 +397,7 @@ class _LoginState extends State<Login> {
                         onPressed: () async {
                           if (!_formkey.currentState!.validate()) {
                           } else {
-                            Future<bool> res = FirebaseController().login(
+                            FirebaseController().login(
                                 context: context,
                                 email: emailController.text.toLowerCase(),
                                 password:

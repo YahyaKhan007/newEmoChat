@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
         .collection("users")
         .doc(widget.userModel.uid!)
         .set(widget.userModel.toMap())
-        .then((value) => userModelProvider.updateUser(widget.userModel!));
+        .then((value) => userModelProvider.updateUser(widget.userModel));
   }
 
   Future<void> checkEmailVerificationStatus() async {

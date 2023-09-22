@@ -7,7 +7,6 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
-import 'package:simplechat/pages/screens/picture%20emotion/picture_emotion.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
@@ -32,7 +31,8 @@ class MyHomePage extends StatelessWidget {
           currentUserModel: provider.userModel,
           firebaseUser: provider.firebaseUser!),
 
-      PictureEmotion()
+      // PictureEmotion(),
+      DummyPage3()
 
       // ChatPage()
       // EmotionDetector()

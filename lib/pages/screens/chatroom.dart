@@ -1,9 +1,15 @@
+// ignore_for_file: unused_local_variable
+
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
-import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,7 +17,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +27,7 @@ import 'package:simplechat/main.dart';
 import 'package:simplechat/notification/local_notification.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
@@ -55,6 +61,74 @@ class _ChatRoomState extends State<ChatRoom> {
   File? imageFile;
   final TextEditingController messageController = TextEditingController();
   final TextEditingController messageNextController = TextEditingController();
+  late final ModeProvider modeProvider;
+  late final UserModelProvider userModelProvider;
+
+  // * INIT STATE
+  @override
+  void initState() {
+    super.initState();
+    userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
+    modeProvider = Provider.of<ModeProvider>(context, listen: false);
+    print(userModelProvider);
+
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _startCapturing();
+      } else {
+        _stopCapturing();
+      }
+    });
+    _initializeCamera();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      String? title = message.notification!.title;
+      String? body = message.notification!.body;
+      AwesomeNotifications().createNotification(
+          content: NotificationContent(
+              id: 123,
+              channelKey: 'call_channel',
+              title: title,
+              body: body,
+              category: NotificationCategory.Call,
+              wakeUpScreen: true,
+              fullScreenIntent: true,
+              autoDismissible: true,
+              backgroundColor: Colors.orange),
+          actionButtons: [
+            NotificationActionButton(
+              key: 'ACCEPT',
+              color: Colors.green,
+              label: 'Accept Call',
+              autoDismissible: true,
+            ),
+            NotificationActionButton(
+              key: 'REJECT',
+              label: 'Reject Call',
+              color: Colors.red,
+              autoDismissible: true,
+            ),
+          ]);
+
+      AwesomeNotifications().actionStream.listen((event) {
+        if (event.buttonKeyPressed == "REJECT") {
+          /// 1.2.2. de-initialization ZegoUIKitPrebuiltCallInvitationService
+          /// when app's user is logged out
+          ZegoUIKitPrebuiltCallInvitationService().uninitCallkitService();
+          print("Call Rejected");
+        } else if (event.buttonKeyPressed == 'ACCEPT') {
+          print("Call Accepted");
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (builder) => CallPage(
+                      currentUserModel: widget.currentUserModel,
+                      endUserModel: widget.enduser,
+                      callId: widget.enduser.pushToken!)));
+        }
+      });
+    });
+  }
 
 // ! Selecting the Image
   void selectImage(ImageSource source) async {
@@ -90,28 +164,28 @@ class _ChatRoomState extends State<ChatRoom> {
   // ! Send Push Notification
   static Future<void> sendPushNotificatio(
       UserModel chatUser, String msg) async {
-    try {
-      final body = {
-        "to": chatUser.pushToken,
-        "notification": {
-          "title": chatUser.fullName,
-          "body": msg,
-          "android_channel_id": "chats"
-        },
-      };
+    // try {
+    //   // final body = {
+    //   //   "to": chatUser.pushToken,
+    //   //   "notification": {
+    //   //     "title": chatUser.fullName,
+    //   //     "body": msg,
+    //   //     "android_channel_id": "chats"
+    //   //   },
+    //   };
 
-      var res = await post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
-          headers: {
-            HttpHeaders.contentTypeHeader: 'application/json',
-            HttpHeaders.authorizationHeader:
-                'key=AAAAXk1Z2Yw:APA91bEJJT8NzzNAbx-pNe3_h6uB5x84hga6FtIatZmRSXk40p6FzF9H7iVoQ9jmVa_rDM79hfuQxSjssxJQMuXMCCfn_X3q_4dvZXl7z-MxPCxMG5-hyfPYlxI5A0DQlIxq5ib0SqCV',
-          },
-          body: jsonEncode(body));
-      // log("Response status : ${res.statusCode}");
-      // log("Response body : ${res.body}");
-    } catch (e) {
-      // log("Send Notification  E --->      $e");
-    }
+    // var res = await post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
+    // headers: {
+    //   HttpHeaders.contentTypeHeader: 'application/json',
+    //   HttpHeaders.authorizationHeader:
+    //       'key=AAAAXk1Z2Yw:APA91bEJJT8NzzNAbx-pNe3_h6uB5x84hga6FtIatZmRSXk40p6FzF9H7iVoQ9jmVa_rDM79hfuQxSjssxJQMuXMCCfn_X3q_4dvZXl7z-MxPCxMG5-hyfPYlxI5A0DQlIxq5ib0SqCV',
+    // },
+    // body: jsonEncode(body));
+    // log("Response status : ${res.statusCode}");
+    // log("Response body : ${res.body}");
+    // } catch (e) {
+    //   // log("Send Notification  E --->      $e");
+    // }
   }
 
   // ! sending photo
@@ -220,6 +294,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                       provider.sendPhotoCmplete(value: false);
                                     }
                                     sendMessage(
+                                        emotion: modeProvider.mode,
                                         msg: messageNextController.text.trim());
                                     Navigator.pop(context);
                                   })
@@ -289,7 +364,7 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
 // !  **********************************************
-  void sendMessage({required String? msg}) async {
+  void sendMessage({required String? msg, required String? emotion}) async {
     MessageModel? messageModel;
     // String? msg = messageController.text.trim();
     messageController.clear();
@@ -297,6 +372,7 @@ class _ChatRoomState extends State<ChatRoom> {
 // ! for simple message
     if (msg != "" && imageFile == null) {
       messageModel = MessageModel(
+          emotion: emotion,
           createdOn: Timestamp.now(),
           image: "",
           messageId: uuid.v1(),
@@ -424,10 +500,6 @@ class _ChatRoomState extends State<ChatRoom> {
       final provider = Provider.of<LoadingProvider>(context, listen: false);
       provider.sendPhotoCmplete(value: true);
     }
-
-    setState(() {
-      imageFile = null;
-    });
   }
 
   var spinkit = const SpinKitCircle(
@@ -441,460 +513,519 @@ class _ChatRoomState extends State<ChatRoom> {
 // ? *****************************************************
 // ? *****************************************************
 // ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
-// ? *****************************************************
+
+  // ! *************************
+  // ! *************************
+  // ! *************************
+
+  // * Capturing Picture
+
+  String? mostFrequent = null;
+  String? secondFrequent = null;
+  final dio = Dio();
+  List<String> emotions = [];
+  late CameraController _controller;
+  Timer? _timer;
+  File? capturedImage;
+
+  final FocusNode _focusNode = FocusNode();
+
+  Future<void> _initializeCamera() async {
+    final cameras = await availableCameras();
+    final frontCamera = cameras.firstWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.front);
+    _controller = CameraController(
+      frontCamera,
+      ResolutionPreset.medium,
+      imageFormatGroup: ImageFormatGroup.jpeg,
+    );
+    await _controller.initialize();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      String? title = message.notification!.title;
-      String? body = message.notification!.body;
-      AwesomeNotifications().createNotification(
-          content: NotificationContent(
-              id: 123,
-              channelKey: 'call_channel',
-              title: title,
-              body: body,
-              category: NotificationCategory.Call,
-              wakeUpScreen: true,
-              fullScreenIntent: true,
-              autoDismissible: true,
-              backgroundColor: Colors.orange),
-          actionButtons: [
-            NotificationActionButton(
-              key: 'ACCEPT',
-              color: Colors.green,
-              label: 'Accept Call',
-              autoDismissible: true,
-            ),
-            NotificationActionButton(
-              key: 'REJECT',
-              label: 'Reject Call',
-              color: Colors.red,
-              autoDismissible: true,
-            ),
-          ]);
-
-      AwesomeNotifications().actionStream.listen((event) {
-        if (event.buttonKeyPressed == "REJECT") {
-          /// 1.2.2. de-initialization ZegoUIKitPrebuiltCallInvitationService
-          /// when app's user is logged out
-          ZegoUIKitPrebuiltCallInvitationService().uninitCallkitService();
-          print("Call Rejected");
-        } else if (event.buttonKeyPressed == 'ACCEPT') {
-          print("Call Accepted");
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (builder) => CallPage(
-                      currentUserModel: widget.currentUserModel,
-                      endUserModel: widget.enduser,
-                      callId: widget.enduser.pushToken!)));
-        }
-      });
+  void _startCapturing() {
+    if (!_controller.value.isInitialized) {
+      _initializeCamera();
+    }
+    _timer = Timer.periodic(Duration(seconds: 7), (timer) {
+      if (_controller.value.isInitialized) {
+        _captureImage();
+      }
     });
   }
+
+  void _stopCapturing() {
+    _timer?.cancel();
+    // print("{$emotions}");
+    _focusNode.unfocus();
+    setState(() {
+      capturedImage = null;
+    });
+    // _controller.dispose();
+  }
+
+  Future<void> _captureImage() async {
+    try {
+      final XFile file = await _controller.takePicture();
+
+      Uint8List? imageBytes = await File(file.path).readAsBytes();
+      String capturedImageBase64 = base64.encode(imageBytes);
+      fetchData(base64String: capturedImageBase64);
+      log("Picture hase been taken");
+      log(capturedImageBase64);
+    } catch (e) {
+      print('Error capturing image: $e');
+    }
+  }
+
+  // !     REQUEST THE SERVER
+
+  void fetchData({required String base64String}) async {
+    try {
+      print("it came here");
+      final response = await dio.get("http://146.190.212.199:5005/detect",
+          data: {'image': '${base64String}'});
+
+      if (response.statusCode == 200) {
+        print("aslo came ....................");
+        Map<String, dynamic>? responseData = null;
+        responseData = response.data;
+        if (responseData != null) {
+          modeProvider.updateEmotionList(responseData['emotion']);
+        }
+
+        // HTTP status code 200 indicates success
+        log("API Success");
+        print("Request successful");
+        print("Response data: ${responseData}");
+      } else {
+        log("API Not Hit");
+
+        // Handle different HTTP status codes here
+        print("Request failed with status code ${response.statusCode}");
+        print("Response data: ${response.data}");
+      }
+    } catch (e) {
+      // Handle exceptions, such as network errors or timeouts
+      print("Problem occurred: $e");
+    }
+  }
+
+// * Finding modes
+  String? findMode({required List<String> modes}) {
+    log("List of Modes --> $modes");
+    Map<String, int> frequencyMap = {};
+
+    for (String str in modes) {
+      if (frequencyMap.containsKey(str)) {
+        frequencyMap[str] =
+            frequencyMap[str]! + 1; // Ensure the entry exists and increment it.
+      } else {
+        frequencyMap[str] = 1;
+      }
+    }
+
+    var sortedEntries = frequencyMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    mostFrequent = sortedEntries.isNotEmpty ? sortedEntries.first.key : "";
+    secondFrequent = sortedEntries.length > 1 ? sortedEntries[1].key : "";
+
+    print("mostFrequent -------> $mostFrequent");
+    print("secondFrequent ------> $secondFrequent");
+    if (mostFrequent == "neutral" && secondFrequent != "") {
+      return mostFrequent;
+    } else if (mostFrequent == "neutral" &&
+        secondFrequent != "" &&
+        secondFrequent != "neutral") {
+      return secondFrequent;
+    } else {
+      return "neutral";
+    }
+  }
+// * End Capturing
+  // ! ************************************************
+  // ! ************************************************
+  // ! ************************************************
+  // ! ************************************************
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<RandomName>(context);
-    final secondProvider = Provider.of<LoadingProvider>(context);
-    final userModelProvider = Provider.of<UserModelProvider>(context);
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
-        child: GlassDrop(
-          width: MediaQuery.of(context).size.width,
-          height: 110.h,
-          blur: 0.0,
-          opacity: 0.4,
-          child: AppBar(
-            // actions: [
-            //   // Padding(
-            //   //   padding: const EdgeInsets.only(right: 15.0),
-            //   //   child: showConnection(context: context),
-            //   // )
-            //   IconButton(
-            //     onPressed: () {
-            //       sendPushNotification();
-            //       Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //               builder: (builder) => CallPage(
-            //                     currentUserModel: widget.currentUserModel,
-            //                     endUserModel: widget.enduser,
-            //                     callId: widget.currentUserModel.pushToken!,
-            //                   )));
-            //     },
-            //     icon: Icon(
-            //       Icons.call,
-            //     ),
-            //   ),
-            //   IconButton(
-            //     onPressed: () async {
-            //       String? _token = await FirebaseMessaging.instance.getToken();
-            //       print(_token);
-            //       print(
-            //           "userModel.pushToken --------------->   ${widget.currentUserModel.pushToken}");
-            //       print(
-            //           "TOkenProvider  --------------->   ${widget.currentUserModel.pushToken}");
-            //     },
-            //     icon: Icon(
-            //       Icons.video_call,
-            //     ),
-            //   ),
-            // ],
-            backgroundColor: Colors.blue.shade100,
-            // backgroundColor: Colors.transparent,
-            leadingWidth: 50,
-            elevation: 0.3,
-            leading: InkWell(
-              onTap: () {
-                Navigator.of(context, rootNavigator: true).pop();
-              },
-              child: Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black.withOpacity(0.7),
-              ),
-            ),
-            //  Image.asset("assets/iconImages/back.png"),
 
-            title: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    PageTransition(
-                        duration: const Duration(milliseconds: 700),
-                        type: PageTransitionType.fade,
-                        child: EndUserProfile(endUser: widget.enduser)));
-              },
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                          radius: 23.r,
-                          backgroundImage: NetworkImage(
-                            widget.enduser.profilePicture!,
-                          )),
-                      Visibility(
-                        visible: widget.enduser.isVarified!,
-                        child: Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: CircleAvatar(
-                                radius: 8.r,
-                                child: Image.asset(
-                                  "assets/iconImages/blueTick.png",
-                                  color: Colors.blue,
-                                ))),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    width: 15.sp,
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.enduser.fullName!,
-                        style: TextStyle(
-                            color: Colors.black.withOpacity(0.7),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15.sp,
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                      Text(
-                        widget.enduser.email!,
-                        style: TextStyle(
-                            color: Colors.black.withOpacity(0.7),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10.sp,
-                            fontStyle: FontStyle.italic),
-                      ),
-                    ],
-                  ),
-                ],
+    final secondProvider = Provider.of<LoadingProvider>(context);
+    return GestureDetector(
+      onTap: () {
+        _focusNode.unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(120),
+          child: GlassDrop(
+            width: MediaQuery.of(context).size.width,
+            height: 110.h,
+            blur: 0.0,
+            opacity: 0.4,
+            child: AppBar(
+              backgroundColor: Colors.blue.shade100,
+              // backgroundColor: Colors.transparent,
+              leadingWidth: 50,
+              elevation: 0.3,
+              leading: InkWell(
+                onTap: () {
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.black.withOpacity(0.7),
+                ),
+              ),
+              //  Image.asset("assets/iconImages/back.png"),
+
+              title: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          duration: const Duration(milliseconds: 700),
+                          type: PageTransitionType.fade,
+                          child: EndUserProfile(endUser: widget.enduser)));
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                            radius: 23.r,
+                            backgroundImage: NetworkImage(
+                              widget.enduser.profilePicture!,
+                            )),
+                        Visibility(
+                          visible: widget.enduser.isVarified!,
+                          child: Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: CircleAvatar(
+                                  radius: 8.r,
+                                  child: Image.asset(
+                                    "assets/iconImages/blueTick.png",
+                                    color: Colors.blue,
+                                  ))),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      width: 15.sp,
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.enduser.fullName!,
+                          style: TextStyle(
+                              color: Colors.black.withOpacity(0.7),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15.sp,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                        Text(
+                          widget.enduser.email!,
+                          style: TextStyle(
+                              color: Colors.black.withOpacity(0.7),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10.sp,
+                              fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-      body: Column(children: [
-        Expanded(
-            child: Container(
-          padding: EdgeInsets.only(bottom: 10.h),
-          child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("chatrooms")
-                  .doc(widget.chatRoomModel.chatroomid)
-                  .collection("messages")
-                  .orderBy("createdOn", descending: true)
-                  .snapshots(),
-              builder: ((context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.active) {
-                  if (snapshot.hasData) {
-                    QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
-                    // log(dataSnapshot.docs.length.toString());
+        body: Column(children: [
+          Expanded(
+              child: Container(
+            padding: EdgeInsets.only(bottom: 10.h),
+            child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("chatrooms")
+                    .doc(widget.chatRoomModel.chatroomid)
+                    .collection("messages")
+                    .orderBy("createdOn", descending: true)
+                    .snapshots(),
+                builder: ((context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.active) {
+                    if (snapshot.hasData) {
+                      QuerySnapshot dataSnapshot =
+                          snapshot.data as QuerySnapshot;
 
-                    return dataSnapshot.docs.length != 0
-                        ? ListView.builder(
-                            reverse: true,
-                            itemCount: dataSnapshot.docs.length,
-                            itemBuilder: (context, index) {
-                              // ! converting to message model
-                              MessageModel currentMessage =
-                                  MessageModel.fromMap(dataSnapshot.docs[index]
-                                      .data() as Map<String, dynamic>);
+                      return dataSnapshot.docs.length != 0
+                          ? ListView.builder(
+                              reverse: true,
+                              itemCount: dataSnapshot.docs.length,
+                              itemBuilder: (context, index) {
+                                // ! converting to message model
+                                MessageModel currentMessage =
+                                    MessageModel.fromMap(
+                                        dataSnapshot.docs[index].data()
+                                            as Map<String, dynamic>);
+                                int emotion;
+                                if (currentMessage.emotion != null) {
+                                  emotion = Emotions.findStringIndex(
+                                      currentMessage.emotion!);
+                                  print(emotion);
+                                }
 
-                              String messgaeDate =
-                                  DateFormat("EEE,dd MMM   hh:mm a").format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          currentMessage.createdOn!
-                                              .millisecondsSinceEpoch));
+                                String messgaeDate =
+                                    DateFormat("EEE,dd MMM   hh:mm a").format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            currentMessage.createdOn!
+                                                .millisecondsSinceEpoch));
 
-                              var rand = Random();
-
-                              return currentMessage.sender ==
-                                          widget.currentUserModel.uid
-                                              .toString() &&
-                                      provider.disbale
-                                  ? spinkit
-                                  : Column(
-                                      crossAxisAlignment:
-                                          currentMessage.sender ==
-                                                  widget.currentUserModel.uid
-                                                      .toString()
-                                              ? CrossAxisAlignment.end
-                                              : CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          currentMessage.sender ==
-                                                  widget.currentUserModel.uid
-                                                      .toString()
-                                              ? MainAxisAlignment.end
-                                              : MainAxisAlignment.start,
-                                      children: [
-                                        InkWell(
-                                          onTap: () {},
-                                          child: messageContainer(
-                                              emotion: rand.nextInt(4),
-                                              context: context,
-                                              image: currentMessage.image != ""
-                                                  ? currentMessage.image
-                                                  : null,
-                                              messageText:
-                                                  currentMessage.text == ""
-                                                      ? null
-                                                      : currentMessage.text
-                                                          .toString(),
-                                              sender: currentMessage.sender ==
-                                                  widget.currentUserModel.uid
-                                                      .toString(),
-                                              time: messgaeDate),
-                                        ),
-                                        Visibility(
-                                          visible: index == 0 &&
-                                              secondProvider.send == false,
-                                          // visible: provider.send && canShowNow,
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.4,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: Colors.grey.shade300
-                                                //     image: DecorationImage(
-                                                //   image: FileImage(imageFile!),
-                                                // )
-                                                ),
-                                            child: Center(child: spinkit),
+                                return currentMessage.sender ==
+                                            widget.currentUserModel.uid
+                                                .toString() &&
+                                        provider.disbale
+                                    ? spinkit
+                                    : Column(
+                                        crossAxisAlignment:
+                                            currentMessage.sender ==
+                                                    widget.currentUserModel.uid
+                                                        .toString()
+                                                ? CrossAxisAlignment.end
+                                                : CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            currentMessage.sender ==
+                                                    widget.currentUserModel.uid
+                                                        .toString()
+                                                ? MainAxisAlignment.end
+                                                : MainAxisAlignment.start,
+                                        children: [
+                                          InkWell(
+                                            onTap: () {},
+                                            child: messageContainer(
+                                                emotion: currentMessage.emotion,
+                                                context: context,
+                                                image: currentMessage.image !=
+                                                        ""
+                                                    ? currentMessage.image
+                                                    : null,
+                                                messageText:
+                                                    currentMessage.text == ""
+                                                        ? null
+                                                        : currentMessage.text
+                                                            .toString(),
+                                                sender: currentMessage.sender ==
+                                                    widget.currentUserModel.uid
+                                                        .toString(),
+                                                time: messgaeDate),
                                           ),
-                                        )
-                                      ],
-                                    );
-                            })
-                        : Center(child: Image.asset("assets/noMessage.png"));
-                  } else if (snapshot.hasError) {
-                    return const Center(
-                      child: Text("Internet Issue"),
-                    );
+                                          Visibility(
+                                            visible: index == 0 &&
+                                                secondProvider.send == false,
+                                            // visible: provider.send && canShowNow,
+                                            child: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.4,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  color: Colors.grey.shade300
+                                                  //     image: DecorationImage(
+                                                  //   image: FileImage(imageFile!),
+                                                  // )
+                                                  ),
+                                              child: Center(child: spinkit),
+                                            ),
+                                          )
+                                        ],
+                                      );
+                              })
+                          : Center(child: Image.asset("assets/noMessage.png"));
+                    } else if (snapshot.hasError) {
+                      return const Center(
+                        child: Text("Internet Issue"),
+                      );
+                    } else {
+                      return const Center(
+                        child: Text("Say hi! to start a conversation"),
+                      );
+                    }
                   } else {
-                    return const Center(
-                      child: Text("Say hi! to start a conversation"),
+                    return Center(
+                      child: spinkit,
                     );
                   }
-                } else {
-                  return Center(
-                    child: spinkit,
-                  );
-                }
-              })),
-        )),
-        Container(
-          color: AppColors.backgroudColor,
-          child: Row(
-            children: [
-              CupertinoButton(
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                  child: CircleAvatar(
-                      backgroundColor: AppColors.foregroundColor,
-                      radius: 15.r,
-                      child: Icon(Icons.camera_alt)),
-                  onPressed: () {
-                    // sendMessage();
+                })),
+          )),
+          Container(
+            color: AppColors.backgroudColor,
+            child: Row(
+              children: [
+                CupertinoButton(
+                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                    child: CircleAvatar(
+                        backgroundColor: AppColors.foregroundColor,
+                        radius: 15.r,
+                        child: Icon(Icons.camera_alt)),
+                    onPressed: () {
+                      // sendMessage();
 
-                    provider.randomNameChanger(value: provider.randomName + 1);
-                    randomName = provider.randomName;
-                    setState(() {});
-                    showPhotoOption();
-                  }),
-              Flexible(
-                  child: TextFormField(
-                // textAlignVertical: TextAlignVertical.top,
-                // textAlign: TextAlign.center,
-                controller: messageController,
-                style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                cursorColor: Colors.black87,
-                maxLines: null,
-                // enabled: imageFile != null ? false : true,
-                decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.only(
-                      left: 15,
-                    ),
-                    hintText: "Type a messgae ...",
-                    hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black87,
-                      fontSize: 14,
-                    ),
-                    border: InputBorder.none),
-              )),
-              CupertinoButton(
-                  child: CircleAvatar(
-                      backgroundColor: AppColors.foregroundColor,
-                      radius: 20.r,
-                      child: Image.asset("assets/iconImages/send.png")),
-                  onPressed: () {
-                    sendMessage(msg: messageController.text.trim());
-                    setState(() {
-                      imageFile = null;
-                    });
-                  })
-            ],
-          ),
-        )
-      ]),
-      // bottomSheet: Container(
-      //   color: Colors.blue.shade100,
-      //   child: Row(
-      //     children: [
-      //       CupertinoButton(
-      //           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      //           child: CircleAvatar(
-      //               backgroundColor: Colors.white,
-      //               radius: 15.r,
-      //               child: Icon(
-      //                 Icons.camera_enhance_rounded,
-      //                 size: 20.sp,
-      //                 color: Colors.blue,
-      //               )
-      //               // Image.asset(
-      //               //   "assets/iconImages/camera.png",
-      //               //   scale: 3,
-      //               // ),
-      //               ),
-      //           onPressed: () {
-      //             // sendMessage();
+                      provider.randomNameChanger(
+                          value: provider.randomName + 1);
+                      randomName = provider.randomName;
+                      setState(() {});
+                      showPhotoOption();
+                    }),
+                Flexible(
+                    child: TextFormField(
+                  // textAlignVertical: TextAlignVertical.top,
+                  // textAlign: TextAlign.center,
+                  controller: messageController,
+                  focusNode: _focusNode,
+                  // enabled: false,
+                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                  cursorColor: Colors.black87,
+                  maxLines: null,
 
-      //             provider.randomNameChanger(value: provider.randomName + 1);
-      //             randomName = provider.randomName;
-      //             setState(() {});
-      //             showPhotoOption();
-      //           }),
-      //       TextFormField(
-      //         // textAlignVertical: TextAlignVertical.top,
-      //         // textAlign: TextAlign.center,
-      //         controller: messageController,
-      //         style: TextStyle(fontSize: 11.sp, color: Colors.black87),
-      //         cursorColor: Colors.black87,
-      //         maxLines: null,
-      //         // enabled: imageFile != null ? false : true,
-      //         decoration: const InputDecoration(
-      //             contentPadding: EdgeInsets.only(
-      //               left: 15,
-      //             ),
-      //             hintText: "Type a messgae ...",
-      //             hintStyle: TextStyle(
-      //               fontStyle: FontStyle.italic,
-      //               color: Colors.black87,
-      //               fontSize: 11,
-      //             ),
-      //             border: InputBorder.none),
-      //       ),
-      //       CupertinoButton(
-      //           child: CircleAvatar(
-      //               backgroundColor: Colors.white,
-      //               // backgroundColor: AppColors.foregroundColor,
-      //               radius: 16.r,
-      //               child: Icon(
-      //                 Icons.send_outlined,
-      //                 color: Colors.blue,
-      //                 size: 20,
-      //               )
-      //               //  Image.asset("assets/iconImages/send.png"),
-      //               ),
-      //           onPressed: () {
-      //             sendMessage(msg: messageController.text.trim());
-      //             setState(() {
-      //               imageFile = null;
-      //             });
-      //           })
-      //     ],
-      //   ),
-      // ),
+                  // enabled: imageFile != null ? false : true,
+                  decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.only(
+                        left: 15,
+                      ),
+                      hintText: "Type a messgae ...",
+                      hintStyle: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: Colors.black87,
+                        fontSize: 14,
+                      ),
+                      border: InputBorder.none),
+                )),
+                CupertinoButton(
+                    child: CircleAvatar(
+                        backgroundColor: AppColors.foregroundColor,
+                        radius: 20.r,
+                        child: Image.asset("assets/iconImages/send.png")),
+                    onPressed: () {
+                      // * Dummy Emotion
+                      // * as their is soe issue in model server
+                      // _stopCapturing();
+                      modeProvider.emotionList.clear();
+
+                      modeProvider.updateMode(
+                          findMode(modes: modeProvider.emotionList)!);
+
+                      // modeProvider.changeMode(currentEmotion!);
+                      print("The FInal mode is ${modeProvider.mode}");
+
+                      sendMessage(
+                          msg: messageController.text.trim(),
+                          emotion: userModelProvider.sendEmotion
+                              ? modeProvider.mode
+                              : null);
+                    })
+              ],
+            ),
+          )
+        ]),
+        // bottomSheet: Container(
+        //   color: Colors.blue.shade100,
+        //   child: Row(
+        //     children: [
+        //       CupertinoButton(
+        //           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        //           child: CircleAvatar(
+        //               backgroundColor: Colors.white,
+        //               radius: 15.r,
+        //               child: Icon(
+        //                 Icons.camera_enhance_rounded,
+        //                 size: 20.sp,
+        //                 color: Colors.blue,
+        //               )
+        //               // Image.asset(
+        //               //   "assets/iconImages/camera.png",
+        //               //   scale: 3,
+        //               // ),
+        //               ),
+        //           onPressed: () {
+        //             // sendMessage();
+
+        //             provider.randomNameChanger(value: provider.randomName + 1);
+        //             randomName = provider.randomName;
+        //             setState(() {});
+        //             showPhotoOption();
+        //           }),
+        //       TextFormField(
+        //         // textAlignVertical: TextAlignVertical.top,
+        //         // textAlign: TextAlign.center,
+        //         controller: messageController,
+        //         style: TextStyle(fontSize: 11.sp, color: Colors.black87),
+        //         cursorColor: Colors.black87,
+        //         maxLines: null,
+        //         // enabled: imageFile != null ? false : true,
+        //         decoration: const InputDecoration(
+        //             contentPadding: EdgeInsets.only(
+        //               left: 15,
+        //             ),
+        //             hintText: "Type a messgae ...",
+        //             hintStyle: TextStyle(
+        //               fontStyle: FontStyle.italic,
+        //               color: Colors.black87,
+        //               fontSize: 11,
+        //             ),
+        //             border: InputBorder.none),
+        //       ),
+        //       CupertinoButton(
+        //           child: CircleAvatar(
+        //               backgroundColor: Colors.white,
+        //               // backgroundColor: AppColors.foregroundColor,
+        //               radius: 16.r,
+        //               child: Icon(
+        //                 Icons.send_outlined,
+        //                 color: Colors.blue,
+        //                 size: 20,
+        //               )
+        //               //  Image.asset("assets/iconImages/send.png"),
+        //               ),
+        //           onPressed: () {
+        //             sendMessage(msg: messageController.text.trim());
+        //             setState(() {
+        //               imageFile = null;
+        //             });
+        //           })
+        //     ],
+        //   ),
+        // ),
+      ),
     );
   }
 // !  This is Widget in which we will show messages to the user
 
   Widget messageContainer(
-      {required int emotion,
+      {required String? emotion,
       required BuildContext context,
       required String? messageText,
       required String? image,
@@ -919,10 +1050,14 @@ class _ChatRoomState extends State<ChatRoom> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 CircleAvatar(
-                  radius: 13.sp,
-                  backgroundColor: Colors.grey.shade300,
-                  backgroundImage: AssetImage(Emotions.emotions[emotion]),
-                ),
+                    radius: 13.sp,
+                    backgroundColor: Colors.grey.shade300,
+                    backgroundImage: emotion != null
+                        ? Emotions.findStringIndex(emotion) != -1
+                            ? AssetImage(Emotions
+                                .emotions[(Emotions.findStringIndex(emotion))])
+                            : AssetImage("assets/iconImages/NoEmotion.jpg")
+                        : AssetImage("assets/iconImages/NoEmotion.jpg")),
                 SizedBox(
                   width: 7,
                 )
@@ -1035,24 +1170,28 @@ class _ChatRoomState extends State<ChatRoom> {
               ),
             ],
           ),
-          // Visibility(
-          //   visible: sender,
-          //   child: Row(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     mainAxisAlignment: MainAxisAlignment.start,
-          //     mainAxisSize: MainAxisSize.min,
-          //     children: [
-          //       SizedBox(
-          //         width: 7,
-          //       ),
-          //       CircleAvatar(
-          //         radius: 13.sp,
-          //         backgroundColor: Colors.green.shade300,
-          //         backgroundImage: AssetImage(Emotions.emotions[emotion]),
-          //       ),
-          //     ],
-          //   ),
-          // ),
+          Visibility(
+            visible: sender,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 7,
+                ),
+                CircleAvatar(
+                    radius: 13.sp,
+                    backgroundColor: Colors.green.shade300,
+                    backgroundImage: emotion != null
+                        ? Emotions.findStringIndex(emotion) != -1
+                            ? AssetImage(Emotions
+                                .emotions[(Emotions.findStringIndex(emotion))])
+                            : AssetImage("assets/iconImages/NoEmotion.jpg")
+                        : AssetImage("assets/iconImages/NoEmotion.jpg")),
+              ],
+            ),
+          ),
         ],
       ),
     );

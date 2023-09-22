@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
-import 'package:simplechat/pages/screens/varifyEmail.dart';
+import 'package:simplechat/pages/signup_login/varifyEmail.dart';
 import 'package:simplechat/pages/signup_login/login.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 import 'package:simplechat/widgets/utils.dart';

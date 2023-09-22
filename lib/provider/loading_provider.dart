@@ -8,7 +8,6 @@ class LoadingProvider extends ChangeNotifier {
   bool _loading = false;
   bool _loginLoading = false;
   bool _show = true;
-  bool _Show = true;
 
   bool _otpVisibility = false;
   bool get otpVisibility => _otpVisibility;
@@ -46,7 +45,6 @@ class LoadingProvider extends ChangeNotifier {
 
   bool get Show => _show;
   void ChangeShow({required bool value}) {
-    _Show = value;
     notifyListeners();
   }
 

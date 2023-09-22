@@ -8,7 +8,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/pages/signup_login/login.dart';
-import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
 
 import '../../colors/colors.dart';
@@ -104,7 +103,6 @@ class _MyFirendsState extends State<MyFirends> {
 
   @override
   Widget build(BuildContext context) {
-    final LoadingProvider provider = Provider.of<LoadingProvider>(context);
     return Scaffold(
         backgroundColor: AppColors.backgroudColor,
         appBar: PreferredSize(

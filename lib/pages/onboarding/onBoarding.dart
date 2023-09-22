@@ -12,8 +12,12 @@ import '../../provider/randomNameGenerator.dart';
 class OnBoardingScreen extends StatelessWidget {
   final currentUser;
   final thisUserModel;
+  final firstCamera;
   const OnBoardingScreen(
-      {super.key, required this.currentUser, required this.thisUserModel});
+      {super.key,
+      required this.currentUser,
+      required this.thisUserModel,
+      required this.firstCamera});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,11 @@ class OnBoardingScreen extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: OnBoarding(),
+        home: OnBoarding(
+          currentUser: currentUser,
+          thisUserModel: thisUserModel,
+          firstCamera: firstCamera,
+        ),
       ),
     );
   }
@@ -33,7 +41,9 @@ class OnBoardingScreen extends StatelessWidget {
 class OnBoarding extends StatefulWidget {
   final currentUser;
   final thisUserModel;
-  const OnBoarding({super.key, this.currentUser, this.thisUserModel});
+  final firstCamera;
+  const OnBoarding(
+      {super.key, this.currentUser, this.thisUserModel, this.firstCamera});
 
   @override
   _OnBoardingState createState() => _OnBoardingState();
@@ -309,6 +319,7 @@ class _OnBoardingState extends State<OnBoarding> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => MyApp(
+                                  firstCamera: widget.firstCamera,
                                   currentUser: widget.currentUser,
                                   thisUserModel: widget.thisUserModel,
                                 )));

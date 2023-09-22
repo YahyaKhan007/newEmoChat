@@ -142,9 +142,10 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
             height: 10.h,
           ),
           Container(
-            decoration: BoxDecoration(),
+            // height: ,
+            width: MediaQuery.of(context).size.width,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50.w),
+              padding: EdgeInsets.symmetric(horizontal: 30.w),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -463,7 +464,7 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                       UserModel endUser = UserModel.fromMap(userData);
                       return ListView.builder(
                         shrinkWrap: true,
-                        itemCount: endUser.sender!.length,
+                        itemCount: endUser.sender?.length,
                         itemBuilder: (context, index) {
                           log(dataSnapshot.docs.length.toString());
                           return FutureBuilder(

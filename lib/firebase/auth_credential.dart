@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:simplechat/models/models.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
-import 'package:simplechat/widgets/showLoading.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:simplechat/zoom_drawer.dart';
 import '../pages/screens/screens.dart';

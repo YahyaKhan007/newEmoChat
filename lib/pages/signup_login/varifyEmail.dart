@@ -65,14 +65,16 @@ class _VarifyEmailPageState extends State<VarifyEmailPage> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Center(
-              child: SizedBox(
-                height: 60,
-                child: Image.asset(
-                  "assets/logo.png",
-                  // color: Colors.grey.shade600,
-                ),
+                child: Text(
+              "Emochat",
+              style: GoogleFonts.blackOpsOne(
+                fontSize: 50.sp,
+                textStyle: Theme.of(context).textTheme.bodyMedium,
+                decorationColor: Colors.black,
+                backgroundColor: Colors.grey.shade100,
+                color: Colors.blue,
               ),
-            ),
+            )),
             // Center(
             //   child: SizedBox(
             //     height: 60,
