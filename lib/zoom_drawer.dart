@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/pages/screens/screens.dart';
+import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:badges/badges.dart' as badges;
@@ -32,7 +33,9 @@ class MyHomePage extends StatelessWidget {
           firebaseUser: provider.firebaseUser!),
 
       // PictureEmotion(),
-      DummyPage3()
+      DummyPage3(
+        modeProvider: Provider.of<ModeProvider>(context, listen: true),
+      )
 
       // ChatPage()
       // EmotionDetector()

@@ -137,30 +137,30 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => InternetCubit())
         ],
         child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Emochat',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              primaryColor: Color.fromARGB(255, 134, 77, 232),
-              useMaterial3: true,
-            ),
-            home:
-                // VarifyEmailPage(
-                //   email: "yahya.ali.barki@gmail.com",
-                // )
-                // ForgetPassword()
-                //  CompleteProfile(
-                //     userModel: thisUserModel, firebaseUser: currentUser),
-                NewScreen()
-            //     SplashScreen(
-            //   firebaseUser: currentUser,
-            //   userModel: thisUserModel,
-            // ),
-            // EmotionRecognitionPage()
-            // CameraScreen(
-            //     // camera: firstCamera,
-            //     )),
-            ));
+          debugShowCheckedModeBanner: false,
+          title: 'Emochat',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            primaryColor: Color.fromARGB(255, 134, 77, 232),
+            useMaterial3: true,
+          ),
+          home:
+              // VarifyEmailPage(
+              //   email: "yahya.ali.barki@gmail.com",
+              // )
+              // ForgetPassword()
+              //  CompleteProfile(
+              //     userModel: thisUserModel, firebaseUser: currentUser),
+              // NewScreen()
+              SplashScreen(
+            firebaseUser: currentUser,
+            userModel: thisUserModel,
+          ),
+          // EmotionRecognitionPage()
+          // CameraScreen(
+          //     // camera: firstCamera,
+          //     )),
+        ));
   }
 }
 

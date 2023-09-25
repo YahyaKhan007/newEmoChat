@@ -19,6 +19,14 @@ class ModeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _showloading = false;
+  bool get showloading => _showloading;
+  void updateLoading(bool x) {
+    _showloading = x;
+
+    notifyListeners();
+  }
+
   Uint8List? _bytes = null;
   Uint8List? get bytes => _bytes;
   void updateUni8List(val) async {
@@ -31,7 +39,7 @@ class ModeProvider extends ChangeNotifier {
 
   File? get imageFile => _imageFile;
 
-  void updateImage(File img) {
+  void updateImage(File? img) {
     _imageFile = img;
     log("Updated --> " + imageFile.toString());
     notifyListeners();

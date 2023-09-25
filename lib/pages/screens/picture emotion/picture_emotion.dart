@@ -315,20 +315,15 @@ class _PictureEmotionState extends State<PictureEmotion> {
 }
 
 class DummyPage3 extends StatefulWidget {
-  const DummyPage3({super.key});
+  const DummyPage3({super.key, required this.modeProvider});
+
+  final ModeProvider modeProvider;
 
   @override
   State<DummyPage3> createState() => _DummyPage3State();
 }
 
 class _DummyPage3State extends State<DummyPage3> {
-  late ModeProvider modeProvider;
-  @override
-  void initState() {
-    modeProvider = Provider.of<ModeProvider>(context, listen: false);
-    super.initState();
-  }
-
   final dio = Dio();
 
   bool show = false;
@@ -336,47 +331,44 @@ class _DummyPage3State extends State<DummyPage3> {
   // get dio => null;
 
 // ! Selecting the Image
-  void selectImage(ImageSource source) async {
-    XFile? pickedFile = await ImagePicker().pickImage(source: source);
+  Future<void> selectImage(ImageSource source) async {
+    try {
+      final pickedFile = await ImagePicker().pickImage(source: source);
 
-    if (pickedFile != null) {
+      if (pickedFile == null) {
+        // User canceled image selection
+        return;
+      }
+
+      final file = File(pickedFile.path);
+
+      widget.modeProvider.updateImage(file);
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Done taking picture"),
         duration: Duration(seconds: 3),
       ));
 
-      log("DOne with taking pix");
-      // ! we are cropping the image now
-      // cropImage(pickedFile);
-      modeProvider.updateImage(File(pickedFile.path));
+      log("Done with taking picture");
+
+      await convertToBase64(file);
+    } catch (e) {
+      print('Error selecting or processing image: $e');
+      // Handle the error gracefully, e.g., show an error message to the user.
     }
   }
 
-  void convertToBase64() async {
-    Uint8List? _bytes = await modeProvider.imageFile!.readAsBytes();
+  Future<void> convertToBase64(File imageFile) async {
+    try {
+      final bytes = await imageFile.readAsBytes();
+      final base64Image = base64Encode(bytes);
 
-    modeProvider.updateBase64Image(base64.encode(_bytes));
-
-    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //   content: Text("Updated"),
-    //   duration: Duration(seconds: 3),
-    // ));
+      widget.modeProvider.updateBase64Image(base64Image);
+    } catch (e) {
+      print('Error converting image to base64: $e');
+      // Handle the error gracefully, e.g., show an error message to the user.
+    }
   }
-
-// ! Cropping the Image
-  // void cropImage(XFile file) async {
-  //   CroppedFile? croppedImage = await ImageCropper().cropImage(
-  //       sourcePath: file.path,
-  //       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-  //       compressQuality: 20);
-  //   if (croppedImage != null) {
-  //     // ! we need "a value of File Type" so here we are converting the from CropperdFile to File
-  //     final File croppedFile = File(
-  //       croppedImage.path,
-  //     );
-
-  //   }
-  // }
 
   // ! Options for picking a photo
   void showPhotoOption() {
@@ -440,29 +432,34 @@ class _DummyPage3State extends State<DummyPage3> {
 
   void fetchData() async {
     try {
-      log(modeProvider.base64Image.toString());
+      widget.modeProvider.updateLoading(true);
+      log(widget.modeProvider.base64Image.toString());
 
       final response = await dio.get("http://146.190.212.199:5005/detect",
-          data: {'image': '${modeProvider.base64Image}'});
+          data: {'image': '${widget.modeProvider.base64Image}'});
 
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = response.data;
 
         // ^ Update Mode/Emotion
-        modeProvider.updateMode(responseData["emotion"]);
+        widget.modeProvider.updateMode(responseData["emotion"]);
 
         // HTTP status code 200 indicates success
         log("API Success");
         print("Request successful");
         print("Response data: ${responseData}");
+        widget.modeProvider.updateLoading(false);
       } else {
         log("API Not Hit");
+        widget.modeProvider.updateLoading(false);
 
         // Handle different HTTP status codes here
         print("Request failed with status code ${response.statusCode}");
         print("Response data: ${response.data}");
       }
     } catch (e) {
+      widget.modeProvider.updateLoading(false);
+
       // Handle exceptions, such as network errors or timeouts
       print("Problem occurred: $e");
     }
@@ -500,7 +497,7 @@ class _DummyPage3State extends State<DummyPage3> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Emotion is --> ${modeProvider.mode}",
+              "Emotion is --> ${widget.modeProvider.mode}",
               style: GoogleFonts.blackOpsOne(
                   textStyle: Theme.of(context).textTheme.bodyMedium,
                   decorationColor: Colors.black,
@@ -510,12 +507,12 @@ class _DummyPage3State extends State<DummyPage3> {
             Row(
               children: [
                 Visibility(
-                  visible: show,
+                  visible: true,
                   child: Container(
-                    width: 200.w,
-                    height: 100.h,
+                    width: 250.w,
+                    height: 60.h,
                     child: Text(
-                      "base64 --> ${modeProvider.base64Image == '' ? "nothing yet" : modeProvider.base64Image}",
+                      "base64 --> ${widget.modeProvider.base64Image == '' ? "nothing yet" : widget.modeProvider.base64Image}",
                       style: TextStyle(fontSize: 11.sp),
                     ),
                   ),
@@ -527,9 +524,10 @@ class _DummyPage3State extends State<DummyPage3> {
                       });
                     },
                     child: Text(
-                      show ? "Hide base64 address" : "Show base64 address",
+                      "",
+                      // show ? "Hide base64 address" : "Show base64 address",
                       style: TextStyle(fontSize: 11),
-                    ))
+                    )),
               ],
             ),
             SizedBox(
@@ -545,14 +543,14 @@ class _DummyPage3State extends State<DummyPage3> {
                 child:
                     //  Image.asset("assets/modelPix/3.jpeg")
 
-                    (modeProvider.imageFile == null)
+                    (widget.modeProvider.imageFile == null)
                         ? Icon(
                             Icons.person,
                             color: Colors.blue,
                             size: 65.r,
                           )
                         : Image.file(
-                            modeProvider.imageFile!,
+                            widget.modeProvider.imageFile!,
                             fit: BoxFit.cover,
                           ),
               ),
@@ -571,8 +569,9 @@ class _DummyPage3State extends State<DummyPage3> {
                       backgroundColor: MaterialStateProperty.all(Colors.blue),
                     ),
                     onPressed: () {
-                      modeProvider.updateBase64Image("");
-                      modeProvider.updateMode("");
+                      widget.modeProvider.updateBase64Image("");
+                      widget.modeProvider.updateMode("");
+                      widget.modeProvider.updateImage(null);
 
                       showPhotoOption();
                     },
@@ -592,14 +591,26 @@ class _DummyPage3State extends State<DummyPage3> {
                       //   // _emotion = emotion.toString();
                       // });
 
-                      print(modeProvider.base64Image);
+                      print(widget.modeProvider.base64Image);
                     },
-                    child: Text("Detect Emotion"))
+                    child: widget.modeProvider.showloading
+                        ? CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : Text("Detect Emotion")),
               ],
             ),
+            TextButton.icon(
+                label: Text("Clear vars"),
+                onPressed: () {
+                  widget.modeProvider.updateLoading(false);
+                  print(widget.modeProvider.showloading);
+                },
+                icon: Icon(Icons.clean_hands)),
             ElevatedButton(
                 onPressed: () {
-                  convertToBase64();
+                  if (widget.modeProvider.imageFile != null)
+                    convertToBase64(widget.modeProvider.imageFile!);
                   // Navigator.push(
                   //     context,
                   //     MaterialPageRoute(
