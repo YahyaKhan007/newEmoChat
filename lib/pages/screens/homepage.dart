@@ -18,7 +18,9 @@ import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/bloc/internetBloc.dart';
 import 'package:simplechat/firebase/firebase_helper.dart';
 import 'package:simplechat/notification/local_notification.dart';
+import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
+import 'package:simplechat/provider/spaceControllerProvider.dart';
 import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
 import 'package:simplechat/widgets/show_connection.dart';
@@ -31,7 +33,12 @@ import 'screens.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage(
-      {super.key, required this.userModel, required this.firebaseUser});
+      {super.key,
+      required this.userModel,
+      required this.firebaseUser,
+      required this.spaceControlProvider});
+
+  final SpaceControlProvider spaceControlProvider;
   final UserModel userModel;
   final User firebaseUser;
 
@@ -119,6 +126,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final ModeProvider modeProvider =
+        Provider.of<ModeProvider>(context, listen: true);
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       // backgroundColor: Colors.black,
       appBar: PreferredSize(
@@ -379,6 +389,12 @@ class _HomePageState extends State<HomePage> {
                                                       MaterialPageRoute(
                                                           builder: (builder) =>
                                                               ChatRoom(
+                                                                modeProvider:
+                                                                    modeProvider,
+                                                                size: size,
+                                                                spaceControlProvider:
+                                                                    widget
+                                                                        .spaceControlProvider,
                                                                 chatRoomModel:
                                                                     chatRoomModel,
                                                                 enduser:
@@ -411,8 +427,8 @@ class _HomePageState extends State<HomePage> {
                                                           margin: EdgeInsets
                                                               .symmetric(
                                                                   vertical: 5.h,
-                                                                  horizontal:
-                                                                      10.w),
+                                                                  horizontal: 10
+                                                                      .w),
                                                           height: 60.h,
                                                           width: MediaQuery.of(
                                                                   context)
@@ -434,7 +450,7 @@ class _HomePageState extends State<HomePage> {
                                                                   // dense: true,
                                                                   contentPadding:
                                                                       const EdgeInsets
-                                                                              .only(
+                                                                          .only(
                                                                           bottom:
                                                                               0,
                                                                           right:

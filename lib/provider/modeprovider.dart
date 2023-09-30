@@ -27,6 +27,14 @@ class ModeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _showImgloading = false;
+  bool get showImgloading => _showImgloading;
+  void updateImgLoading(bool x) {
+    _showImgloading = x;
+
+    notifyListeners();
+  }
+
   Uint8List? _bytes = null;
   Uint8List? get bytes => _bytes;
   void updateUni8List(val) async {

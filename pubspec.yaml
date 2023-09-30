@@ -69,6 +69,7 @@ dependencies:
   dia: ^0.1.5
   dio: ^5.3.2
   badges: ^3.1.2
+  flutter_image_compress: ^2.0.4
   # email_auth: ^1.0.0
 
 dev_dependencies:

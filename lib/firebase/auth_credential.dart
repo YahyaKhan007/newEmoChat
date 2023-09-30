@@ -52,6 +52,7 @@ class FirebaseController extends ChangeNotifier {
     if (credential != null) {
       String uid = credential.user!.uid;
       UserModel newUser = UserModel(
+          sendEmotion: true,
           friends: [],
           sender: [],
           reciever: [],

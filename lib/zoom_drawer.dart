@@ -10,8 +10,10 @@ import 'package:simplechat/firebase/auth_credential.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
+import 'package:simplechat/provider/spaceControllerProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:badges/badges.dart' as badges;
+import 'main.dart';
 
 final drawerController = ZoomDrawerController();
 
@@ -22,7 +24,11 @@ class MyHomePage extends StatelessWidget {
     final notifyProvider = Provider.of<NotifyProvider>(context);
     List screens = [
       HomePage(
-          userModel: provider.userModel, firebaseUser: provider.firebaseUser!),
+        userModel: provider.userModel,
+        firebaseUser: provider.firebaseUser!,
+        spaceControlProvider:
+            Provider.of<SpaceControlProvider>(context, listen: true),
+      ),
       Profile(),
       // Requests(currentUserModel: provider.userModel),
       ReceiverListWidget(

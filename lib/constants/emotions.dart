@@ -3,7 +3,6 @@ class Emotions {
     "assets/normalMode.png",
     "assets/funny.gif",
     "assets/sad.gif",
-    // "assets/neutral.gfif",
     "assets/sad.gif",
     "assets/angry.gif",
     "assets/sleepy.gif",
@@ -12,8 +11,8 @@ class Emotions {
   static int findStringIndex(String searchString) {
     List<String> modesIndex = [
       'neutral',
-      "Happy",
-      'Sad',
+      "happy",
+      'sad',
     ];
 
     for (int i = 0; i < modesIndex.length; i++) {

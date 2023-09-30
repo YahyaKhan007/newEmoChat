@@ -13,6 +13,7 @@ import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/spaceControllerProvider.dart';
 import 'package:simplechat/provider/tokenProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -134,6 +135,7 @@ class MyApp extends StatelessWidget {
           ListenableProvider(create: (_) => RandomName()),
           ListenableProvider(create: (_) => TokenProvider()),
           ListenableProvider(create: (_) => NotifyProvider()),
+          ListenableProvider(create: (_) => SpaceControlProvider()),
           BlocProvider(create: (_) => InternetCubit())
         ],
         child: MaterialApp(
@@ -151,7 +153,7 @@ class MyApp extends StatelessWidget {
               // ForgetPassword()
               //  CompleteProfile(
               //     userModel: thisUserModel, firebaseUser: currentUser),
-              // NewScreen()
+              // MyApps()
               SplashScreen(
             firebaseUser: currentUser,
             userModel: thisUserModel,
@@ -164,31 +166,71 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class NewScreen extends StatelessWidget {
-  const NewScreen({super.key});
+class MyApps extends StatelessWidget {
+  const MyApps({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    SpaceControlProvider spaceControlProvider =
+        Provider.of<SpaceControlProvider>(context, listen: true);
+    return NewScreen(spaceControlProvider: spaceControlProvider);
+  }
+}
+
+class NewScreen extends StatefulWidget {
+  final SpaceControlProvider spaceControlProvider;
+  NewScreen({super.key, required this.spaceControlProvider});
+
+  @override
+  State<NewScreen> createState() => _NewScreenState();
+}
+
+class _NewScreenState extends State<NewScreen> {
+  FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        widget.spaceControlProvider.changeHeight(hyte: 250);
+      } else {
+        widget.spaceControlProvider.changeHeight(hyte: 0);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("widget.title"),
-      ),
-      body: const Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                height: 500,
+    return GestureDetector(
+      onTap: () {
+        focusNode.unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text("${widget.spaceControlProvider.height.toString()}"),
+        ),
+        body: Column(
+          // mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              child: SizedBox(
+                child: Center(child: Text("This is the chat screen")),
               ),
-              TextField(
-                decoration: InputDecoration(
-                    hintText: "Enter here", border: OutlineInputBorder()),
-              )
-            ],
-          ),
+            ),
+            TextField(
+              focusNode: focusNode,
+              minLines: 1,
+              maxLines: 3,
+              decoration: InputDecoration(
+                  hintText: "Enter here", border: OutlineInputBorder()),
+            ),
+            SizedBox(
+              height: widget.spaceControlProvider.height,
+            )
+          ],
         ),
       ),
     );

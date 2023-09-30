@@ -8,11 +8,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:simplechat/models/models.dart';
+import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 import '../../colors/colors.dart';
 import '../../main.dart';
+import '../../provider/spaceControllerProvider.dart';
 import '../../widgets/glass_morphism.dart';
 import 'screens.dart';
 
@@ -155,6 +158,15 @@ class _PublicUsersState extends State<PublicUsers> {
                                               const Duration(milliseconds: 700),
                                           type: PageTransitionType.fade,
                                           child: ChatRoom(
+                                            modeProvider:
+                                                Provider.of<ModeProvider>(
+                                                    context,
+                                                    listen: true),
+                                            size: MediaQuery.of(context).size,
+                                            spaceControlProvider: Provider.of<
+                                                    SpaceControlProvider>(
+                                                context,
+                                                listen: true),
                                             chatRoomModel: chatRoom!,
                                             enduser: endUser,
                                             firebaseUser: widget.firebaseUser!,

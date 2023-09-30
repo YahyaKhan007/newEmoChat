@@ -13,9 +13,11 @@ class UserModel {
   String? bio;
   Timestamp? memberSince;
   bool? isVarified;
+  bool? sendEmotion;
 // ! simple Constructor
   UserModel(
       {required this.uid,
+      required this.sendEmotion,
       required this.fullName,
       required this.email,
       required this.bio,
@@ -42,6 +44,7 @@ class UserModel {
     isVarified = map['isVarified'];
     profilePicture = map["profilePicture"];
     bio = map["bio"];
+    sendEmotion = map["sendEmotion"];
   }
 
 //  !  will be Used to change your UserModel object into Map/Json
@@ -58,7 +61,8 @@ class UserModel {
       "profilePicture": profilePicture,
       "pushToken": pushToken,
       'isVarified': isVarified,
-      "bio": bio
+      "bio": bio,
+      "sendEmotion": sendEmotion
     };
   }
 }

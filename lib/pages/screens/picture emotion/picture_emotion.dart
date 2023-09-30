@@ -333,9 +333,13 @@ class _DummyPage3State extends State<DummyPage3> {
 // ! Selecting the Image
   Future<void> selectImage(ImageSource source) async {
     try {
+      widget.modeProvider.updateImgLoading(true);
+
       final pickedFile = await ImagePicker().pickImage(source: source);
 
       if (pickedFile == null) {
+        widget.modeProvider.updateImgLoading(false);
+
         // User canceled image selection
         return;
       }
@@ -346,14 +350,17 @@ class _DummyPage3State extends State<DummyPage3> {
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Done taking picture"),
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 1),
       ));
 
       log("Done with taking picture");
 
       await convertToBase64(file);
+      widget.modeProvider.updateImgLoading(false);
     } catch (e) {
       print('Error selecting or processing image: $e');
+      widget.modeProvider.updateImgLoading(false);
+
       // Handle the error gracefully, e.g., show an error message to the user.
     }
   }
@@ -433,7 +440,6 @@ class _DummyPage3State extends State<DummyPage3> {
   void fetchData() async {
     try {
       widget.modeProvider.updateLoading(true);
-      log(widget.modeProvider.base64Image.toString());
 
       final response = await dio.get("http://146.190.212.199:5005/detect",
           data: {'image': '${widget.modeProvider.base64Image}'});
@@ -549,10 +555,12 @@ class _DummyPage3State extends State<DummyPage3> {
                             color: Colors.blue,
                             size: 65.r,
                           )
-                        : Image.file(
-                            widget.modeProvider.imageFile!,
-                            fit: BoxFit.cover,
-                          ),
+                        : widget.modeProvider.showImgloading
+                            ? Center(child: CircularProgressIndicator())
+                            : Image.file(
+                                widget.modeProvider.imageFile!,
+                                fit: BoxFit.cover,
+                              ),
               ),
             ),
             SizedBox(
@@ -573,7 +581,8 @@ class _DummyPage3State extends State<DummyPage3> {
                       widget.modeProvider.updateMode("");
                       widget.modeProvider.updateImage(null);
 
-                      showPhotoOption();
+                      // showPhotoOption();
+                      selectImage(ImageSource.gallery);
                     },
                     child: Text("select picture")),
                 ElevatedButton(
@@ -585,39 +594,34 @@ class _DummyPage3State extends State<DummyPage3> {
                     ),
                     onPressed: () async {
                       // convertToBase64();
-                      fetchData();
+                      if (widget.modeProvider.imageFile != null) {
+                        fetchData();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("No image selected"),
+                            duration: Duration(
+                              seconds: 1,
+                            ),
+                          ),
+                        );
+                      }
 
                       // setState(() {
                       //   // _emotion = emotion.toString();
                       // });
-
-                      print(widget.modeProvider.base64Image);
                     },
                     child: widget.modeProvider.showloading
-                        ? CircularProgressIndicator(
-                            color: Colors.white,
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
                           )
                         : Text("Detect Emotion")),
               ],
             ),
-            TextButton.icon(
-                label: Text("Clear vars"),
-                onPressed: () {
-                  widget.modeProvider.updateLoading(false);
-                  print(widget.modeProvider.showloading);
-                },
-                icon: Icon(Icons.clean_hands)),
-            ElevatedButton(
-                onPressed: () {
-                  if (widget.modeProvider.imageFile != null)
-                    convertToBase64(widget.modeProvider.imageFile!);
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (builder) =>
-                  //             NewPage(text: modeProvider.base64Image)));
-                },
-                child: Text("Base 64"))
           ],
         ),
       ),

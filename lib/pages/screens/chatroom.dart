@@ -29,6 +29,7 @@ import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
 import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/randomNameGenerator.dart';
+import 'package:simplechat/provider/spaceControllerProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/glass_morphism.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
@@ -39,29 +40,39 @@ import '../../provider/tokenProvider.dart';
 import '../../widgets/static.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+
 class ChatRoom extends StatefulWidget {
   const ChatRoom(
       {super.key,
       required this.currentUserModel,
       required this.firebaseUser,
       required this.enduser,
-      required this.chatRoomModel});
+      required this.chatRoomModel,
+      required this.spaceControlProvider,
+      required this.size,
+      required this.modeProvider});
+  final SpaceControlProvider spaceControlProvider;
 
+  final Size size;
   final UserModel enduser;
   final User firebaseUser;
   final ChatRoomModel chatRoomModel;
   final UserModel currentUserModel;
+  final ModeProvider modeProvider;
 
   @override
   State<ChatRoom> createState() => _ChatRoomState();
 }
 
 class _ChatRoomState extends State<ChatRoom> {
+  final KeyboardVisibilityController keyboardController =
+      KeyboardVisibilityController();
+
   late int randomName;
   File? imageFile;
   final TextEditingController messageController = TextEditingController();
   final TextEditingController messageNextController = TextEditingController();
-  late final ModeProvider modeProvider;
   late final UserModelProvider userModelProvider;
 
   // * INIT STATE
@@ -69,13 +80,21 @@ class _ChatRoomState extends State<ChatRoom> {
   void initState() {
     super.initState();
     userModelProvider = Provider.of<UserModelProvider>(context, listen: false);
-    modeProvider = Provider.of<ModeProvider>(context, listen: false);
     print(userModelProvider);
 
+    // ! for keyboard hides
+    keyboardController.onChange.listen((bool isVisible) {
+      if (!isVisible) {
+        _focusNode.unfocus();
+      }
+    });
+// ! ------------------------------------
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
+        widget.spaceControlProvider.changeHeight(hyte: widget.size.height / 3);
         _startCapturing();
       } else {
+        widget.spaceControlProvider.changeHeight(hyte: 0.h);
         _stopCapturing();
       }
     });
@@ -129,6 +148,20 @@ class _ChatRoomState extends State<ChatRoom> {
       });
     });
   }
+
+  // *  Screen Height Keyboard
+  double estimateKeyboardHeight(BuildContext context) {
+    MediaQueryData mediaQuery = MediaQuery.of(context);
+    double screenHeight = mediaQuery.size.height;
+    double viewInsetsBottom = mediaQuery.viewInsets.bottom;
+
+    // Subtract the remaining screen height from the total height to get the keyboard height
+    double keyboardHeight = screenHeight - viewInsetsBottom;
+
+    return keyboardHeight;
+  }
+
+// ****************
 
 // ! Selecting the Image
   void selectImage(ImageSource source) async {
@@ -294,7 +327,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                       provider.sendPhotoCmplete(value: false);
                                     }
                                     sendMessage(
-                                        emotion: modeProvider.mode,
+                                        emotion: widget.modeProvider.mode,
                                         msg: messageNextController.text.trim());
                                     Navigator.pop(context);
                                   })
@@ -557,7 +590,7 @@ class _ChatRoomState extends State<ChatRoom> {
     if (!_controller.value.isInitialized) {
       _initializeCamera();
     }
-    _timer = Timer.periodic(Duration(seconds: 7), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
       if (_controller.value.isInitialized) {
         _captureImage();
       }
@@ -582,7 +615,7 @@ class _ChatRoomState extends State<ChatRoom> {
       String capturedImageBase64 = base64.encode(imageBytes);
       fetchData(base64String: capturedImageBase64);
       log("Picture hase been taken");
-      log(capturedImageBase64);
+      // log(capturedImageBase64);
     } catch (e) {
       print('Error capturing image: $e');
     }
@@ -601,7 +634,10 @@ class _ChatRoomState extends State<ChatRoom> {
         Map<String, dynamic>? responseData = null;
         responseData = response.data;
         if (responseData != null) {
-          modeProvider.updateEmotionList(responseData['emotion']);
+          log("\n\n\n\n============>\n\n\n\n  Emotion has been added  \n\n\n\n\n============>\n\n\n\n");
+          widget.modeProvider.updateEmotionList(responseData['emotion']);
+
+          log("${widget.modeProvider.emotionList}");
         }
 
         // HTTP status code 200 indicates success
@@ -622,8 +658,9 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
 // * Finding modes
-  String? findMode({required List<String> modes}) {
-    log("List of Modes --> $modes");
+  String? findMode({required modes}) {
+    log("Came to mode Finder dunction");
+    log("List of Modes --> ${widget.modeProvider.emotionList}");
     Map<String, int> frequencyMap = {};
 
     for (String str in modes) {
@@ -642,14 +679,16 @@ class _ChatRoomState extends State<ChatRoom> {
 
     print("mostFrequent -------> $mostFrequent");
     print("secondFrequent ------> $secondFrequent");
-    if (mostFrequent == "neutral" && secondFrequent != "") {
-      return mostFrequent;
-    } else if (mostFrequent == "neutral" &&
+    if (mostFrequent == "neutral" &&
         secondFrequent != "" &&
-        secondFrequent != "neutral") {
+        secondFrequent != 'neutral') {
       return secondFrequent;
+    } else if (mostFrequent == "neutral" && secondFrequent == "") {
+      return mostFrequent;
+    } else if (mostFrequent != "neutral") {
+      return mostFrequent;
     } else {
-      return "neutral";
+      return 'neutral';
     }
   }
 // * End Capturing
@@ -819,7 +858,9 @@ class _ChatRoomState extends State<ChatRoom> {
                                                 : MainAxisAlignment.start,
                                         children: [
                                           InkWell(
-                                            onTap: () {},
+                                            onTap: () {
+                                              _focusNode.unfocus();
+                                            },
                                             child: messageContainer(
                                                 emotion: currentMessage.emotion,
                                                 context: context,
@@ -882,7 +923,12 @@ class _ChatRoomState extends State<ChatRoom> {
                 })),
           )),
           Container(
-            color: AppColors.backgroudColor,
+            decoration: BoxDecoration(
+                color: Colors.blue.shade100,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20))),
+            // color: Colors.blue,
             child: Row(
               children: [
                 CupertinoButton(
@@ -933,92 +979,38 @@ class _ChatRoomState extends State<ChatRoom> {
                       // * Dummy Emotion
                       // * as their is soe issue in model server
                       // _stopCapturing();
-                      modeProvider.emotionList.clear();
-
-                      modeProvider.updateMode(
-                          findMode(modes: modeProvider.emotionList)!);
-
+                      var mode =
+                          findMode(modes: widget.modeProvider.emotionList);
+                      //*
+                      //!
+                      //~
+                      //^
+                      //?
+                      widget.modeProvider.updateMode(mode!);
+                      //*
+                      //!
+                      //~
+                      //^
+                      //?
                       // modeProvider.changeMode(currentEmotion!);
-                      print("The FInal mode is ${modeProvider.mode}");
+                      print("The FInal mode is ${widget.modeProvider.mode}");
+
+                      log('=====>  ${widget.modeProvider.emotionList}');
 
                       sendMessage(
                           msg: messageController.text.trim(),
                           emotion: userModelProvider.sendEmotion
-                              ? modeProvider.mode
+                              ? widget.modeProvider.mode
                               : null);
+                      widget.modeProvider.emotionList.clear();
                     })
               ],
             ),
+          ),
+          SizedBox(
+            height: widget.spaceControlProvider.height,
           )
         ]),
-        // bottomSheet: Container(
-        //   color: Colors.blue.shade100,
-        //   child: Row(
-        //     children: [
-        //       CupertinoButton(
-        //           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-        //           child: CircleAvatar(
-        //               backgroundColor: Colors.white,
-        //               radius: 15.r,
-        //               child: Icon(
-        //                 Icons.camera_enhance_rounded,
-        //                 size: 20.sp,
-        //                 color: Colors.blue,
-        //               )
-        //               // Image.asset(
-        //               //   "assets/iconImages/camera.png",
-        //               //   scale: 3,
-        //               // ),
-        //               ),
-        //           onPressed: () {
-        //             // sendMessage();
-
-        //             provider.randomNameChanger(value: provider.randomName + 1);
-        //             randomName = provider.randomName;
-        //             setState(() {});
-        //             showPhotoOption();
-        //           }),
-        //       TextFormField(
-        //         // textAlignVertical: TextAlignVertical.top,
-        //         // textAlign: TextAlign.center,
-        //         controller: messageController,
-        //         style: TextStyle(fontSize: 11.sp, color: Colors.black87),
-        //         cursorColor: Colors.black87,
-        //         maxLines: null,
-        //         // enabled: imageFile != null ? false : true,
-        //         decoration: const InputDecoration(
-        //             contentPadding: EdgeInsets.only(
-        //               left: 15,
-        //             ),
-        //             hintText: "Type a messgae ...",
-        //             hintStyle: TextStyle(
-        //               fontStyle: FontStyle.italic,
-        //               color: Colors.black87,
-        //               fontSize: 11,
-        //             ),
-        //             border: InputBorder.none),
-        //       ),
-        //       CupertinoButton(
-        //           child: CircleAvatar(
-        //               backgroundColor: Colors.white,
-        //               // backgroundColor: AppColors.foregroundColor,
-        //               radius: 16.r,
-        //               child: Icon(
-        //                 Icons.send_outlined,
-        //                 color: Colors.blue,
-        //                 size: 20,
-        //               )
-        //               //  Image.asset("assets/iconImages/send.png"),
-        //               ),
-        //           onPressed: () {
-        //             sendMessage(msg: messageController.text.trim());
-        //             setState(() {
-        //               imageFile = null;
-        //             });
-        //           })
-        //     ],
-        //   ),
-        // ),
       ),
     );
   }
@@ -1099,36 +1091,41 @@ class _ChatRoomState extends State<ChatRoom> {
                         image != null
                             ? GestureDetector(
                                 onTap: () {
-                                  showModalBottomSheet(
-                                      backgroundColor: Colors.transparent,
-                                      constraints: BoxConstraints.expand(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: MediaQuery.of(context)
-                                              .size
-                                              .height),
-                                      context: context,
-                                      builder: (builder) {
-                                        return Material(
-                                          type: MaterialType.transparency,
-                                          elevation: 0,
-                                          child: Container(
-                                            color: Colors.black,
+                                  if (_focusNode.hasFocus) {
+                                    _focusNode.unfocus();
+                                  } else {
+                                    showModalBottomSheet(
+                                        backgroundColor: Colors.transparent,
+                                        constraints: BoxConstraints.expand(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
                                             height: MediaQuery.of(context)
                                                 .size
-                                                .height,
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                Expanded(
-                                                  child: Image.network(image,
-                                                      fit: BoxFit.cover),
-                                                ),
-                                              ],
+                                                .height),
+                                        context: context,
+                                        builder: (builder) {
+                                          return Material(
+                                            type: MaterialType.transparency,
+                                            elevation: 0,
+                                            child: Container(
+                                              color: Colors.black,
+                                              height: MediaQuery.of(context)
+                                                  .size
+                                                  .height,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                children: [
+                                                  Expanded(
+                                                    child: Image.network(image,
+                                                        fit: BoxFit.cover),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      });
+                                          );
+                                        });
+                                  }
                                 },
                                 child: Container(
                                   // color: AppColors.backgroudColor,

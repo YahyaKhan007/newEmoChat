@@ -287,6 +287,8 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
 
                                   if (userModelProvider.userModel.isVarified!) {
                                     var updatedUser = UserModel(
+                                        sendEmotion: receiverNames[index]
+                                            ['sendEmotion'],
                                         uid: receiverNames[index]['uid'],
                                         fullName: receiverNames[index]
                                             ['fullName'],
@@ -369,6 +371,8 @@ class _ReceiverListWidgetState extends State<ReceiverListWidget> {
                                 onPressed: () async {
                                   if (userModelProvider.userModel.isVarified!) {
                                     var updatedUser = UserModel(
+                                        sendEmotion: receiverNames[index]
+                                            ['sendEmotion'],
                                         uid: receiverNames[index]['uid'],
                                         fullName: receiverNames[index]
                                             ['fullName'],

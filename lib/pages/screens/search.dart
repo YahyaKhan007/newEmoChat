@@ -14,11 +14,13 @@ import 'package:provider/provider.dart';
 import 'package:simplechat/main.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/loading_provider.dart';
+import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:simplechat/widgets/showLoading.dart';
 
 import '../../colors/colors.dart';
 import '../../models/models.dart';
+import '../../provider/spaceControllerProvider.dart';
 import '../../widgets/glass_morphism.dart';
 
 class SearchPage extends StatefulWidget {
@@ -232,6 +234,16 @@ class _SearchPageState extends State<SearchPage> {
                                                   milliseconds: 700),
                                               type: PageTransitionType.fade,
                                               child: ChatRoom(
+                                                modeProvider:
+                                                    Provider.of<ModeProvider>(
+                                                        context,
+                                                        listen: true),
+                                                size:
+                                                    MediaQuery.of(context).size,
+                                                spaceControlProvider: Provider
+                                                    .of<SpaceControlProvider>(
+                                                        context,
+                                                        listen: true),
                                                 chatRoomModel: chatRoom!,
                                                 enduser: searchedUser,
                                                 firebaseUser:
@@ -256,6 +268,16 @@ class _SearchPageState extends State<SearchPage> {
                                                   milliseconds: 700),
                                               type: PageTransitionType.fade,
                                               child: ChatRoom(
+                                                modeProvider:
+                                                    Provider.of<ModeProvider>(
+                                                        context,
+                                                        listen: true),
+                                                size:
+                                                    MediaQuery.of(context).size,
+                                                spaceControlProvider: Provider
+                                                    .of<SpaceControlProvider>(
+                                                        context,
+                                                        listen: true),
                                                 chatRoomModel: chatRoom!,
                                                 enduser: searchedUser,
                                                 firebaseUser:
