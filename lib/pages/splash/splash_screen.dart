@@ -90,7 +90,9 @@ class _SplashScreenState extends State<SplashScreen> {
                       ? CompleteProfile(
                           userModel: widget.userModel!,
                           firebaseUser: widget.firebaseUser!)
-                      : MyHomePage()
+                      : MyHomePage(
+                          userModel: widget.userModel!,
+                        )
 
                   // FlutterZoomDrawerDemo()
 
@@ -112,15 +114,55 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       // backgroundColor: Colors.blue.shade100,
       body: Center(
-        child: Text(
-          "EmoChat",
-          style: GoogleFonts.blackOpsOne(
-            fontSize: 50.sp,
-            textStyle: Theme.of(context).textTheme.bodyMedium,
-            decorationColor: Colors.black,
-            backgroundColor: Colors.grey.shade100,
-            color: Colors.blue,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: MediaQuery.of(context).size.height * 0.45),
+            Text(
+              "EmoChat",
+              style: GoogleFonts.blackOpsOne(
+                fontSize: 50.sp,
+                textStyle: Theme.of(context).textTheme.bodyMedium,
+                decorationColor: Colors.black,
+                backgroundColor: Colors.grey.shade100,
+                color: Colors.blue,
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.only(right: 60.w),
+                child: Text(
+                  "Chat with Emotions",
+                  style: GoogleFonts.blackOpsOne(
+                    fontSize: 15.sp,
+                    textStyle: Theme.of(context).textTheme.bodySmall,
+                    decorationColor: Colors.black,
+                    backgroundColor: Colors.grey.shade100,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ),
+            Spacer(),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.only(right: 20.w),
+                child: Text(
+                  "Powered by Cusit Students",
+                  style: GoogleFonts.rajdhani(
+                    fontSize: 15.sp,
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
+                    decorationColor: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    backgroundColor: Colors.grey.shade100,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

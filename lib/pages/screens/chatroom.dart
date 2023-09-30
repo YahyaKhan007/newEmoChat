@@ -999,7 +999,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
                       sendMessage(
                           msg: messageController.text.trim(),
-                          emotion: userModelProvider.sendEmotion
+                          emotion: widget.currentUserModel.sendEmotion!
                               ? widget.modeProvider.mode
                               : null);
                       widget.modeProvider.emotionList.clear();

@@ -127,7 +127,7 @@ class _SignupState extends State<Signup> {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: Colors.black,
                     ),
                   ),
                   Text(
@@ -135,7 +135,7 @@ class _SignupState extends State<Signup> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.blue,
+                      color: Colors.black,
                     ),
                   ),
                   SizedBox(

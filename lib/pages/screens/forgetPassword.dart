@@ -78,10 +78,11 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   ),
                   Text(
                     'Forgot your password?',
-                    style: GoogleFonts.shrikhand(
-                      color: Colors.blue,
+                    style: GoogleFonts.slabo13px(
+                      color: Colors.black,
                       backgroundColor: Colors.grey.shade100,
-                      textStyle: Theme.of(context).textTheme.bodyMedium,
+                      fontWeight: FontWeight.bold,
+                      textStyle: Theme.of(context).textTheme.bodySmall,
                       fontSize: 17.sp,
                     ),
                   ),
@@ -90,8 +91,8 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   ),
                   Text(
                     'Enter Your registerd email below to receive \n password reset instruction',
-                    style: GoogleFonts.shrikhand(
-                      color: Colors.blue,
+                    style: GoogleFonts.slabo13px(
+                      color: Colors.black,
                       backgroundColor: Colors.grey.shade100,
                       textStyle: Theme.of(context).textTheme.bodySmall,
                       fontSize: 13.sp,

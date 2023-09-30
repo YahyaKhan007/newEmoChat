@@ -8,4 +8,13 @@ class NotifyProvider extends ChangeNotifier {
     _isColse = value;
     notifyListeners();
   }
+
+// ^ condition for terms and conditions
+
+  bool _acceptTermsCondition = false;
+  bool get acceptTermsCondition => _acceptTermsCondition;
+  void changeAcceptTermsCondition({required bool value}) {
+    _acceptTermsCondition = value;
+    notifyListeners();
+  }
 }

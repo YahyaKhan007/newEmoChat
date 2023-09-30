@@ -224,7 +224,9 @@ class _CompleteProfileState extends State<CompleteProfile> {
             PageTransition(
                 duration: const Duration(milliseconds: 700),
                 type: PageTransitionType.fade,
-                child: MyHomePage(),
+                child: MyHomePage(
+                  userModel: widget.userModel,
+                ),
                 isIos: true)));
   }
 

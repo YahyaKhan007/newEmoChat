@@ -136,7 +136,7 @@ class FirebaseController extends ChangeNotifier {
                   ? CompleteProfile(
                       userModel: userModel,
                       firebaseUser: userModelProvider.firebaseUser!)
-                  : MyHomePage(),
+                  : MyHomePage(userModel: userModel),
               isIos: true));
 
       return true;

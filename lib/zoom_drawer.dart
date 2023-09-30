@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/config.dart';
@@ -7,20 +9,23 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:simplechat/firebase/auth_credential.dart';
+import 'package:simplechat/models/user_model.dart';
 import 'package:simplechat/pages/screens/screens.dart';
 import 'package:simplechat/provider/modeprovider.dart';
 import 'package:simplechat/provider/notifyProvider.dart';
 import 'package:simplechat/provider/spaceControllerProvider.dart';
 import 'package:simplechat/provider/user_model_provider.dart';
 import 'package:badges/badges.dart' as badges;
-import 'main.dart';
 
 final drawerController = ZoomDrawerController();
 
 class MyHomePage extends StatelessWidget {
+  final UserModel userModel;
+  const MyHomePage({super.key, required this.userModel});
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<UserModelProvider>(context);
+    final provider = Provider.of<UserModelProvider>(context, listen: true);
     final notifyProvider = Provider.of<NotifyProvider>(context);
     List screens = [
       HomePage(
@@ -220,9 +225,17 @@ class MyHomePage extends StatelessWidget {
                       scale: 0.6.sp,
                       child: Switch(
                         splashRadius: 10,
-                        value: provider.sendEmotion,
-                        onChanged: (value) {
-                          provider.changeSendEmotionOption(value);
+                        value: userModel.sendEmotion!,
+                        onChanged: (value) async {
+                          userModel.sendEmotion = value;
+                          // provider.changeSendEmotionOption(value);
+                          await FirebaseFirestore.instance
+                              .collection("users")
+                              .doc(userModel.uid!)
+                              .set(userModel.toMap())
+                              .then((value) => provider.updateUser(userModel))
+                              .then((value) => provider.updateFirebaseUser(
+                                  FirebaseAuth.instance.currentUser!));
                         },
                         // activeTrackColor: Color.fromARGB(255, 106, 111, 106),
                         // inactiveTrackColor: Colors.black,
